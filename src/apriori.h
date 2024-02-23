@@ -36,7 +36,6 @@
 #include <map>
 
 namespace rules {
-
     // An item.
     using item_t = unsigned long;
 
@@ -71,64 +70,64 @@ namespace rules {
     /// @param x The first itemset.
     /// @param y The second itemset.
     /// @return The intersection of itemsets x and y.
-    itemset_t set_intersection(const itemset_t &x, const itemset_t &y);
+    auto set_intersection(const itemset_t& x, const itemset_t& y) -> itemset_t;
 
     /// Calculates the union of two itemsets.
     /// @param x The first itemset
     /// @param y The second itemset
     /// @return The union of itemsets x and y
-    itemset_t set_union(const itemset_t &x, const itemset_t &y);
+    auto set_union(const itemset_t& x, const itemset_t& y) -> itemset_t;
 
     /// Removes an item form the given item set.
     /// @param x The item set.
     /// @param item The removed item.
     /// @return An item set which contains all item a x expect the given item.
-    itemset_t remove_from_itemset(const itemset_t &x, const item_t &item);
+    auto remove_from_itemset(const itemset_t& x, const item_t& item) -> itemset_t;
 
     /// Insert an item to the given item set.
     /// @param x
     /// @param item
-    /// @return
-    itemset_t add_to_itemset(const itemset_t &x, const item_t &item);
+    /// @return The itemset which conatins the new item.
+    auto add_to_itemset(const itemset_t& x, const item_t& item) -> itemset_t;
 
     /// Gets an value indicating whether item set x contains item set y as a subset.
     /// @param x The left hand side item set (super set).
     /// @param y The right hand side item set (sub set).
     /// @return True if item set x contains item set y as a subset; false otherwise.
-    bool is_subset(const itemset_t &x, const itemset_t &y);
+    auto is_subset(const itemset_t& x, const itemset_t& y) -> bool;
 
     /// Gets the 1-element item sets from the transactions.
     /// @param transactions The transaction data base.
     /// @return The 1-element item sets.
-    itemset_collection_t get_candidates(const transactions_t &transactions);
+    auto get_candidates(const transactions_t& transactions) -> itemset_collection_t;
 
     /// @brief Gets candidate itemsets of a specified length from a given collection.
     /// @param collection The collection from which candidate itemsets are to be retrieved.
     /// @param k Length of the candidate itemsets to be retrieved.
     /// @return itemset_collection_t Candidate itemsets of the specified length.
-    itemset_collection_t get_candidates(const itemset_collection_t &collection, size_t k);
+    auto get_candidates(const itemset_collection_t& collection, size_t k) -> itemset_collection_t;
 
     /// Gets frequent item set from the given candidate item sets.
     /// @param candidates The candidate item set collection.
     /// @param min_support The minimal support.
-    /// @param global_itemset_frequency The frequency of items set.
+    /// @param global_support_counter The support counter.
     /// @param transactions The transaction data base.
     /// @return The frequent item set.
-    itemset_collection_t prune(
-            const itemset_collection_t &candidates,
-            float min_support,
-            support_counter_t &global_support_counter,
-            const transactions_t &transactions);
+    auto prune(
+        const itemset_collection_t& candidates,
+        float min_support,
+        support_counter_t& global_support_counter,
+        const transactions_t& transactions) -> itemset_collection_t;
 
     /// @brief Gets candidate association rules for a given itemset based on support values and minimum confidence.
     /// @param itemset The itemset for which candidate association rules are to be retrieved.
     /// @param support_counter The support counter containing support values for itemsets.
     /// @param min_confidence The minimum confidence threshold for association rules.
     /// @return association_rules_t Candidate association rules satisfying the given conditions.
-    association_rules_t get_rule_candidates(
-            const itemset_t &itemset,
-            const support_counter_t &support_counter,
-            float min_confidence);
+    auto get_rule_candidates(
+        const itemset_t& itemset,
+        const support_counter_t& support_counter,
+        float min_confidence) -> association_rules_t;
 
     /// @brief Retrieves association rules based on the given rules, support counter, minimum confidence, and length.
     /// @param rules The initial set of association rules.
@@ -136,44 +135,42 @@ namespace rules {
     /// @param min_conf The minimum confidence threshold for association rules.
     /// @param k Length of the association rules.
     /// @return association_rules_t The association rules satisfying the given conditions.
-    association_rules_t get_association_rules(
-            const association_rules_t &rules,
-            const support_counter_t &support_counter,
-            float min_conf,
-            size_t k);
+    auto get_association_rules(
+        const association_rules_t& rules,
+        const support_counter_t& support_counter,
+        float min_conf,
+        size_t k) -> association_rules_t;
 
     /// @brief Gets association rules for a given itemset based on support values and minimum confidence.
     /// @param itemset The itemset for which association rules are to be retrieved.
     /// @param support_counter The support counter containing support values for itemsets.
     /// @param min_conf The minimum confidence threshold for association rules.
     /// @return association_rules_t The association rules satisfying the given conditions.
-    association_rules_t get_association_rules(
-            const itemset_t &itemset,
-            const support_counter_t &support_counter,
-            float min_conf);
+    auto get_association_rules(
+        const itemset_t& itemset,
+        const support_counter_t& support_counter,
+        float min_conf) -> association_rules_t;
 
     /// @brief Retrieves association rules based on frequent itemsets, support counter, and minimum confidence.
     /// @param frequent_itemsets The frequent itemsets from which association rules are to be generated.
     /// @param support_counter The support counter containing support values for itemsets.
     /// @param min_conf The minimum confidence threshold for association rules.
     /// @return association_rules_t The association rules satisfying the given conditions.
-    association_rules_t get_association_rules(
-            const frequent_itemsets_t &frequent_itemsets,
-            const support_counter_t &support_counter,
-            float min_conf);
+    auto get_association_rules(
+        const frequent_itemsets_t& frequent_itemsets,
+        const support_counter_t& support_counter,
+        float min_conf) -> association_rules_t;
 
     /// @brief Computes frequent itemsets and their support values from transactions based on a minimum support threshold.
     /// @param transactions The transactions from which frequent itemsets are to be extracted.
     /// @param min_support The minimum support threshold for itemsets to be considered frequent.
     /// @return std::tuple<frequent_itemsets_t, support_counter_t> A tuple containing frequent itemsets and their support counter.
-    frequent_itemsets_result_t get_frequent_itemsets(const transactions_t &transactions, float min_support);
+    auto get_frequent_itemsets(const transactions_t& transactions, float min_support) -> frequent_itemsets_result_t;
 
     /// @brief Executes the Apriori algorithm to find association rules.
     /// @param transactions The transactions database.
-    /// @param frequent_itemsets The frequent itemsets generated from the transactions.
-    /// @param support_counter The support counter for the itemsets.
     /// @param min_support The minimum support threshold for frequent itemsets.
     /// @param min_conf The minimum confidence threshold for association rules.
     /// @return apriori_result_t Result of the Apriori algorithm.
-    apriori_result_t apriori(const transactions_t &transactions, float min_support, float min_conf);
+    auto apriori(const transactions_t& transactions, float min_support, float min_conf) -> apriori_result_t;
 }
