@@ -29,23 +29,23 @@
 #include "apriori.h"
 
 namespace rules {
-    namespace ranges = std::ranges;
+    namespace rng = std::ranges;
     using namespace std::views;
 
     auto set_intersection(const itemset_t& x, const itemset_t& y) -> itemset_t {
         itemset_t items{};
-        ranges::set_intersection(x, y, std::inserter(items, items.begin()));
+        rng::set_intersection(x, y, std::inserter(items, items.begin()));
         return items;
     }
 
     auto set_union(const itemset_t& x, const itemset_t& y) -> itemset_t {
         itemset_t items{};
-        ranges::set_union(x, y, std::inserter(items, items.begin()));
+        rng::set_union(x, y, std::inserter(items, items.begin()));
         return items;
     }
 
     auto remove_from_itemset(const itemset_t& x, const item_t& item) -> itemset_t {
-        return x | filter([&](const auto& i) { return i != item; }) | ranges::to<itemset_t>();
+        return x | filter([&](const auto& i) { return i != item; }) | rng::to<itemset_t>();
     }
 
     auto add_to_itemset(const itemset_t& x, const item_t& item) -> itemset_t {
@@ -55,7 +55,7 @@ namespace rules {
     }
 
     auto is_subset(const itemset_t& x, const itemset_t& y) -> bool {
-        return ranges::includes(y, x);
+        return rng::includes(y, x);
     }
 
     auto get_candidates(const transactions_t& transactions) -> itemset_collection_t {

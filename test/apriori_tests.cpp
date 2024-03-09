@@ -1,4 +1,4 @@
-/// @file apriori_test.cpp
+/// @file apriori_tests.cpp
 /// @brief Unit test for the Apriori algorithm.
 ///
 /// @author Roland Abel
@@ -27,7 +27,6 @@
 /// THE SOFTWARE.
 
 #include <gtest/gtest.h>
-#include <cmath>
 #include "apriori.h"
 
 using namespace rules;

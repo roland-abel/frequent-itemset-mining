@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.26)
+cmake_minimum_required(VERSION 3.22.1)
 project(association-rules
         VERSION 1.0.0
         DESCRIPTION "Implementation of the Apriori Algorithm"
@@ -8,9 +8,12 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS ON)
 
-add_executable(association-rules main.cpp
+add_executable(
+        association-rules main.cpp
         src/apriori.cpp
 )
+
+add_executable(main main.cpp)
 
 include(FetchContent)
 FetchContent_Declare(

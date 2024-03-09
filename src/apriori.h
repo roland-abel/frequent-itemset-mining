@@ -87,7 +87,7 @@ namespace rules {
     /// Insert an item to the given item set.
     /// @param x
     /// @param item
-    /// @return The itemset which conatins the new item.
+    /// @return The itemset which contains the new item.
     auto add_to_itemset(const itemset_t& x, const item_t& item) -> itemset_t;
 
     /// Gets an value indicating whether item set x contains item set y as a subset.
