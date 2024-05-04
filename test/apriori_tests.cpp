@@ -58,7 +58,7 @@ protected:
     }
 };
 
-TEST_F(AprioriTests, is_subset_test) {
+TEST_F(AprioriTests, IsSubsetTest) {
     EXPECT_TRUE(is_subset({}, {}));
     EXPECT_TRUE(is_subset({}, {Bread}));
     EXPECT_TRUE(is_subset({Sugar, Milk, Bread}, {Milk, Bread, Sugar}));
@@ -68,30 +68,30 @@ TEST_F(AprioriTests, is_subset_test) {
     EXPECT_FALSE(is_subset({Milk, Coffee}, {Milk, Bread, Sugar}));
 }
 
-TEST_F(AprioriTests, set_intersection_test) {
+TEST_F(AprioriTests, SetIntersectionTest) {
     EXPECT_EQ(set_intersection({Milk, Coffee, Bread}, {}), itemset_t{});
     EXPECT_EQ(set_intersection({Milk, Coffee, Bread}, {Coffee}), itemset_t{Coffee});
     EXPECT_EQ(set_intersection({Coffee, Bread, Sugar}, {Coffee, Sugar, Milk}), itemset_t({Coffee, Sugar}));
 }
 
-TEST_F(AprioriTests, set_union_test) {
+TEST_F(AprioriTests, SetUnionTest) {
     EXPECT_EQ(set_union({Milk, Coffee, Bread}, {}), itemset_t({Milk, Coffee, Bread}));
     EXPECT_EQ(set_union({Milk, Coffee, Bread}, {Coffee}), itemset_t({Milk, Coffee, Bread}));
     EXPECT_EQ(set_union({Coffee, Bread, Sugar}, {Coffee, Sugar, Milk}), itemset_t({Coffee, Bread, Sugar, Sugar, Milk}));
 }
 
-TEST_F(AprioriTests, number_of_transactions_test) {
+TEST_F(AprioriTests, NumberOfTransactionsTest) {
     EXPECT_EQ(get_transactions().size(), 10);
 }
 
-TEST_F(AprioriTests, get_one_element_itemsets_test) {
+TEST_F(AprioriTests, GetOneElementItemsetsTest) {
     const auto &transactions = get_transactions();
     const auto itemset_collection = get_candidates(transactions);
 
     EXPECT_EQ(itemset_collection.size(), 7);
 }
 
-TEST_F(AprioriTests, get_prune_test) {
+TEST_F(AprioriTests, GetPruneTest) {
     const auto &transactions = get_transactions();
     const auto candidate_itemsets = get_candidates(transactions);
 
@@ -115,14 +115,14 @@ TEST_F(AprioriTests, get_prune_test) {
     EXPECT_EQ(support_counter[{Flour}], 6);
 }
 
-TEST_F(AprioriTests, get_candidates_test) {
+TEST_F(AprioriTests, GetCandidatesTest) {
     const auto &transactions = get_transactions();
     const auto itemsets = get_candidates(transactions);
 
     EXPECT_EQ(get_candidates(itemsets, 2).size(), 21);
 }
 
-TEST_F(AprioriTests, get_frequent_itemsets_test) {
+TEST_F(AprioriTests, GetFrequentItemsetsTest) {
     auto get_count_by_size = [](const auto &itemsets, int k) {
         return std::ranges::count_if(itemsets.begin(), itemsets.end(), [k](const auto &x) { return x.size() == k; });
     };
@@ -138,7 +138,7 @@ TEST_F(AprioriTests, get_frequent_itemsets_test) {
     EXPECT_EQ(get_count_by_size(frequent_itemsets, 4), 1);
 }
 
-TEST_F(AprioriTests, association_rules_form_itemset_test) {
+TEST_F(AprioriTests, AssociationRulesFormItemsetTest) {
     const auto &transactions = get_transactions();
 
     const auto min_support = 0.4f;
@@ -164,7 +164,7 @@ TEST_F(AprioriTests, association_rules_form_itemset_test) {
     EXPECT_TRUE(rules.contains({{Bread}, {Cheese, Flour, Sugar}}));
 }
 
-TEST_F(AprioriTests, apriori_test) {
+TEST_F(AprioriTests, AprioriTest) {
     const auto &transactions = get_transactions();
 
     const auto min_support = 0.4f;
