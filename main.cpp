@@ -26,6 +26,25 @@
 /// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 /// THE SOFTWARE.
 
-auto main() -> int {
+#include "CLI/CLI.hpp"
+#include <iostream>
+
+auto main(int argc, char **argv) -> int {
+    CLI::App app{"App description"};
+
+    float min_supp{};
+    app.add_option("-s, --min-supp", min_supp, "Minimum support threshold for the frequent itemsets.");
+
+    float min_conf{};
+    app.add_option("-c, --min-conf", min_conf, "Minimum confidence threshold.");
+
+    std::string input_file{};
+    app.add_option("-i, --input_file", input_file, "Transaction database input file");
+
+    CLI11_PARSE(app, argc, argv);
+
+    std::cout << "Minimum support   : " << min_supp << std::endl;
+    std::cout << "Minimum confidence: " << min_conf << std::endl;
+
     return 0;
 }
