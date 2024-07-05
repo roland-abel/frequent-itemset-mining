@@ -32,47 +32,47 @@ namespace rules {
     namespace rng = std::ranges;
     using namespace std::views;
 
-    auto set_intersection(const itemset_t& x, const itemset_t& y) -> itemset_t {
+    auto set_intersection(const itemset_t &x, const itemset_t &y) -> itemset_t {
         itemset_t items{};
         rng::set_intersection(x, y, std::inserter(items, items.begin()));
         return items;
     }
 
-    auto set_union(const itemset_t& x, const itemset_t& y) -> itemset_t {
+    auto set_union(const itemset_t &x, const itemset_t &y) -> itemset_t {
         itemset_t items{};
         rng::set_union(x, y, std::inserter(items, items.begin()));
         return items;
     }
 
-    auto remove_from_itemset(const itemset_t& x, const item_t& item) -> itemset_t {
-        return x | filter([&](const auto& i) { return i != item; }) | rng::to<itemset_t>();
+    auto remove_from_itemset(const itemset_t &x, const item_t &item) -> itemset_t {
+        return x | filter([&](const auto &i) { return i != item; }) | rng::to<itemset_t>();
     }
 
-    auto add_to_itemset(const itemset_t& x, const item_t& item) -> itemset_t {
+    auto add_to_itemset(const itemset_t &x, const item_t &item) -> itemset_t {
         auto y = x;
         y.insert(item);
         return y;
     }
 
-    auto is_subset(const itemset_t& x, const itemset_t& y) -> bool {
+    auto is_subset(const itemset_t &x, const itemset_t &y) -> bool {
         return rng::includes(y, x);
     }
 
-    auto get_candidates(const transactions_t& transactions) -> itemset_collection_t {
-        auto candidates = itemset_collection_t();
+    auto get_candidates(const transactions_t &transactions) -> itemset_collection_t {
+        auto candidates = itemset_collection_t{};
 
-        for (const auto& x : transactions) {
-            for (const auto item : x) {
+        for (const auto &x: transactions) {
+            for (const auto item: x) {
                 candidates.insert(itemset_t{item});
             }
         }
         return candidates;
     }
 
-    auto get_candidates(const itemset_collection_t& collection, const size_t k) -> itemset_collection_t {
+    auto get_candidates(const itemset_collection_t &collection, const size_t k) -> itemset_collection_t {
         itemset_collection_t candidates{};
 
-        auto has_subset = [k](const itemset_t& x, const itemset_t& y) -> bool {
+        auto has_subset = [k](const itemset_t &x, const itemset_t &y) -> bool {
             // check whether the itemset y is a (k-2)-element subset of the itemset x
             return std::equal(x.cbegin(), std::next(x.cbegin(), static_cast<signed>(k) - 2), y.cbegin());
         };
@@ -80,8 +80,8 @@ namespace rules {
         // self-join
         for (auto x_iter = collection.begin(); x_iter != collection.end(); ++x_iter) {
             for (auto y_iter = next(x_iter); y_iter != collection.end(); ++y_iter) {
-                const auto& x = *x_iter;
-                if (const auto& y = *y_iter; has_subset(x, y)) {
+                const auto &x = *x_iter;
+                if (const auto &y = *y_iter; has_subset(x, y)) {
                     if (const auto u = set_union(x, y); u.size() == k)
                         candidates.insert(u);
                 }
@@ -91,14 +91,14 @@ namespace rules {
     }
 
     auto prune(
-        const itemset_collection_t& candidates,
-        const float min_support,
-        support_counter_t& global_support_counter,
-        const transactions_t& transactions) -> itemset_collection_t {
+            const itemset_collection_t &candidates,
+            const float min_support,
+            support_counter_t &global_support_counter,
+            const transactions_t &transactions) -> itemset_collection_t {
         support_counter_t counter{};
 
-        for (const auto& t : transactions) {
-            for (const auto& y : candidates) {
+        for (const auto &t: transactions) {
+            for (const auto &y: candidates) {
                 if (is_subset(y, t)) {
                     global_support_counter[y] += 1;
                     counter[y] += 1;
@@ -109,7 +109,7 @@ namespace rules {
         auto itemsets = itemset_collection_t{};
         const auto total = transactions.size();
 
-        for (auto const& [x, count] : counter) {
+        for (auto const &[x, count]: counter) {
             const auto support = static_cast<float>(count) / static_cast<float>(total);
             if (support >= min_support) {
                 itemsets.insert(x);
@@ -120,14 +120,15 @@ namespace rules {
     }
 
     auto get_rule_candidates(
-        const itemset_t& itemset,
-        const support_counter_t& support_counter,
-        const float min_confidence) -> association_rules_t {
+            const itemset_t &itemset,
+            const support_counter_t &support_counter,
+            const float min_confidence) -> association_rules_t {
+
         auto candidates = association_rules_t{};
-        for (const auto& item : itemset) {
-            const auto& x = remove_from_itemset(itemset, item);
-            const auto& y = add_to_itemset(itemset_t{}, item);
-            const auto& u = set_union(x, y);
+        for (const auto &item: itemset) {
+            const auto &x = remove_from_itemset(itemset, item);
+            const auto &y = add_to_itemset(itemset_t{}, item);
+            const auto &u = set_union(x, y);
 
             const float conf = static_cast<float>(support_counter.at(u)) / static_cast<float>(support_counter.at(x));
             if (conf >= min_confidence) {
@@ -138,17 +139,17 @@ namespace rules {
     }
 
     auto get_association_rules(
-        const association_rules_t& rules,
-        const support_counter_t& support_counter,
-        const float min_conf,
-        const size_t k) -> association_rules_t {
+            const association_rules_t &rules,
+            const support_counter_t &support_counter,
+            const float min_conf,
+            const size_t k) -> association_rules_t {
         auto candidates = association_rules_t{};
 
         // self-join
         for (auto r_iter = rules.begin(); r_iter != rules.end(); ++r_iter) {
             for (auto s_iter = next(r_iter); s_iter != rules.end(); ++s_iter) {
-                const auto& [x1, y1] = *r_iter;
-                const auto& [x2, y2] = *s_iter;
+                const auto &[x1, y1] = *r_iter;
+                const auto &[x2, y2] = *s_iter;
 
                 const auto u = set_union(y1, y2);
                 const auto i = set_intersection(x1, x2);
@@ -158,12 +159,12 @@ namespace rules {
                 }
 
                 const float conf = static_cast<float>(support_counter.at(set_union(u, i))) / static_cast<float>(
-                    support_counter.at(i));
+                        support_counter.at(i));
                 if (conf >= min_conf) {
                     // Add rule: "X1 intersection X2 => Y1 union Y2"
                     candidates.insert(std::make_tuple(
-                        set_intersection(x1, x2),
-                        set_union(y1, y2)));
+                            set_intersection(x1, x2),
+                            set_union(y1, y2)));
                 }
             }
         }
@@ -171,9 +172,9 @@ namespace rules {
     }
 
     auto get_association_rules(
-        const itemset_t& itemset,
-        const support_counter_t& support_counter,
-        const float min_conf) -> association_rules_t {
+            const itemset_t &itemset,
+            const support_counter_t &support_counter,
+            const float min_conf) -> association_rules_t {
         auto all_rules = association_rules_t{};
         auto rules = get_rule_candidates(itemset, support_counter, min_conf);
 
@@ -191,12 +192,12 @@ namespace rules {
     }
 
     auto get_association_rules(
-        const frequent_itemsets_t& frequent_itemsets,
-        const support_counter_t& support_counter,
-        const float min_conf) -> association_rules_t {
+            const frequent_itemsets_t &frequent_itemsets,
+            const support_counter_t &support_counter,
+            const float min_conf) -> association_rules_t {
         auto rules = association_rules_t{};
 
-        for (const auto& itemset : frequent_itemsets | filter([](const auto& x) { return x.size() > 1; })) {
+        for (const auto &itemset: frequent_itemsets | filter([](const auto &x) { return x.size() > 1; })) {
             const auto r = get_association_rules(itemset, support_counter, min_conf);
             rules.insert(r.begin(), r.end());
         }
@@ -204,24 +205,24 @@ namespace rules {
     }
 
     auto get_frequent_itemsets(
-        const transactions_t& transactions,
-        const float min_support) -> frequent_itemsets_result_t {
+            const transactions_t &transactions,
+            const float min_support) -> frequent_itemsets_result_t {
         auto support_counter = support_counter_t{};
         auto frequent_itemsets = frequent_itemsets_t{};
 
         auto candidates = get_candidates(transactions);
         auto itemsets = prune(
-            candidates,
-            min_support,
-            support_counter,
-            transactions);
+                candidates,
+                min_support,
+                support_counter,
+                transactions);
 
         auto k = 2;
         while (!itemsets.empty()) {
             frequent_itemsets.insert(
-                frequent_itemsets.cend(),
-                itemsets.cbegin(),
-                itemsets.cend());
+                    frequent_itemsets.cend(),
+                    itemsets.cbegin(),
+                    itemsets.cend());
 
             candidates = get_candidates(itemsets, k);
             itemsets = prune(candidates, min_support, support_counter, transactions);
@@ -232,11 +233,12 @@ namespace rules {
     }
 
     auto apriori(
-        const transactions_t& transactions,
-        const float min_support,
-        const float min_conf) -> apriori_result_t {
+            const transactions_t &transactions,
+            const float min_support,
+            const float min_conf) -> apriori_result_t {
+
         // first determine all frequent item sets
-        const auto& [frequent_itemsets, support_counter] = get_frequent_itemsets(transactions, min_support);
+        const auto &[frequent_itemsets, support_counter] = get_frequent_itemsets(transactions, min_support);
 
         // determine all rules that can be derived from the frequent item sets
         const auto rules = get_association_rules(frequent_itemsets, support_counter, min_conf);
