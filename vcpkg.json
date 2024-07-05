@@ -1,0 +1,10 @@
+{
+  "name" : "association-rules",
+  "version" : "1.0.0",
+  "dependencies" : [ {
+    "name" : "cli11",
+    "version>=" : "2.4.2"
+  }, {
+    "name" : "gtest"
+  } ]
+}
