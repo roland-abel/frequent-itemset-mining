@@ -35,24 +35,26 @@
 #include <vector>
 #include <map>
 
+#include "config.h"
+
 namespace rules {
 
     // An item.
     using item_t = unsigned long;
 
-    // An item set.
+    // An itemset.
     using itemset_t = std::set<item_t>;
 
-    // Collection of item sets.
+    // Collection of itemsets.
     using itemset_collection_t = std::set<itemset_t>;
 
     // Transaction database type.
     using transactions_t = std::multiset<itemset_t>;
 
-    // Frequency of the item sets.
+    // Frequency of the itemsets.
     using support_counter_t = std::map<itemset_t, size_t>;
 
-    // Frequent item sets. The vector contains at index (k-1) the k-element frequent item sets.
+    // Frequent itemsets. The vector contains at index (k-1) the k-element frequent itemsets.
     using frequent_itemsets_t = std::vector<itemset_t>;
 
     // An associate rule containing the premise and the conclusion.
@@ -71,36 +73,36 @@ namespace rules {
     /// Calculates the intersection of two itemsets.
     /// @param x The first x.
     /// @param y The second x.
-    /// @return The intersection of the item sets x and y.
+    /// @return The intersection of the itemsets x and y.
     auto set_intersection(const itemset_t &x, const itemset_t &y) -> itemset_t;
 
-    /// Calculates the union of two item sets.
+    /// Calculates the union of two itemsets.
     /// @param x The first itemset
     /// @param y The second itemset
     /// @return The union of itemsets x and y
     auto set_union(const itemset_t &x, const itemset_t &y) -> itemset_t;
 
-    /// Removes an item form the given item set.
-    /// @param x The item set.
+    /// Removes an item form the given itemset.
+    /// @param x The itemset.
     /// @param item The item to be removed.
-    /// @return An item set which contains all item from item set x expect the given item.
+    /// @return An itemset which contains all item from itemset x expect the given item.
     auto remove_from_itemset(const itemset_t &x, const item_t &item) -> itemset_t;
 
-    /// Insert an item to the given item set.
-    /// @param x The item set.
+    /// Insert an item to the given itemset.
+    /// @param x The itemset.
     /// @param item The item to be to inserted.
     /// @return The itemset which contains the new item.
     auto add_to_itemset(const itemset_t &x, const item_t &item) -> itemset_t;
 
-    /// Gets an value indicating whether item set x contains item set y as a subset.
-    /// @param x The left hand side item set (super set).
-    /// @param y The right hand side item set (sub set).
-    /// @return True if item set x contains item set y as a subset; false otherwise.
+    /// Gets an value indicating whether itemset x contains itemset y as a subset.
+    /// @param x The left hand side itemset (super set).
+    /// @param y The right hand side itemset (sub set).
+    /// @return True if itemset x contains itemset y as a subset; false otherwise.
     auto is_subset(const itemset_t &x, const itemset_t &y) -> bool;
 
-    /// Gets the 1-element item sets from the transactions.
+    /// Gets the 1-element itemsets from the transactions.
     /// @param transactions The transaction data base.
-    /// @return The 1-element item sets.
+    /// @return The 1-element itemsets.
     auto get_candidates(const transactions_t &transactions) -> itemset_collection_t;
 
     /// @brief Gets candidate itemsets of a specified length from a given collection.
@@ -109,12 +111,12 @@ namespace rules {
     /// @return itemset_collection_t Candidate itemsets of the specified length.
     auto get_candidates(const itemset_collection_t &collection, size_t k) -> itemset_collection_t;
 
-    /// Gets frequent item set from the given candidate item sets.
-    /// @param candidates The candidate item set collection.
+    /// Gets frequent itemset from the given candidate itemsets.
+    /// @param candidates The candidate itemset collection.
     /// @param min_support The minimal support.
     /// @param global_support_counter The support counter.
     /// @param transactions The transaction data base.
-    /// @return The frequent item set.
+    /// @return The frequent itemset.
     auto prune(
             const itemset_collection_t &candidates,
             float min_support,

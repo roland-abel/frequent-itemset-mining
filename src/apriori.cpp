@@ -29,6 +29,7 @@
 #include "apriori.h"
 
 namespace rules {
+
     namespace rng = std::ranges;
     using namespace std::views;
 
@@ -158,10 +159,11 @@ namespace rules {
                     continue;
                 }
 
-                const float conf = static_cast<float>(support_counter.at(set_union(u, i))) / static_cast<float>(
-                        support_counter.at(i));
+                const float conf = static_cast<float>(
+                        support_counter.at(set_union(u, i))) / static_cast<float>(support_counter.at(i));
+
                 if (conf >= min_conf) {
-                    // Add rule: "X1 intersection X2 => Y1 union Y2"
+                    // add rule: "X1 intersection X2 => Y1 union Y2"
                     candidates.insert(std::make_tuple(
                             set_intersection(x1, x2),
                             set_union(y1, y2)));
@@ -237,10 +239,10 @@ namespace rules {
             const float min_support,
             const float min_conf) -> apriori_result_t {
 
-        // first determine all frequent item sets
+        // first determine all frequent itemsets
         const auto &[frequent_itemsets, support_counter] = get_frequent_itemsets(transactions, min_support);
 
-        // determine all rules that can be derived from the frequent item sets
+        // determine all rules that can be derived from the frequent itemsets
         const auto rules = get_association_rules(frequent_itemsets, support_counter, min_conf);
         return apriori_result_t{rules, frequent_itemsets, support_counter};
     }

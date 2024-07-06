@@ -38,6 +38,7 @@ set(CMAKE_CXX_EXTENSIONS ON)
 set(EXECUTABLE_NAME rule)
 set(PROJECT_NAME association-rules)
 set(RULES_LIB rules)
+set(INCLUDE_DIR ./include)
 
 add_executable(
         ${EXECUTABLE_NAME}
@@ -46,7 +47,9 @@ add_executable(
 )
 
 find_package(CLI11 CONFIG REQUIRED)
+
 target_link_libraries(${EXECUTABLE_NAME} PRIVATE CLI11::CLI11)
+target_include_directories(${EXECUTABLE_NAME} PRIVATE ${INCLUDE_DIR})
 
 add_subdirectory(test)
 add_subdirectory(src)
