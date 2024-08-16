@@ -27,6 +27,7 @@
 
 add_library(${RULES_LIB}
         apriori.cpp
+        fp_growth.cpp
 )
 
 set(INCLUDE_DIR ../include)
