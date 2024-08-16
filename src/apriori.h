@@ -1,8 +1,9 @@
 /// @file apriori.h
 /// @brief
+/// @see: https://www.macs.hw.ac.uk/~dwcorne/Teaching/agrawal94fast.pdf
 ///
 /// @author Roland Abel
-/// @date December 8, 2023
+/// @date July 07, 2024
 ///
 /// Copyright (c) 2024 Roland Abel
 ///
@@ -30,151 +31,96 @@
 
 #include <set>
 #include <unordered_map>
-#include <algorithm>
-#include <ranges>
-#include <vector>
-#include <map>
+#include <iostream>
 
-#include "config.h"
+namespace rules::apriori {
 
-namespace rules {
-
-    // An item.
+    // The item type.
     using item_t = unsigned long;
 
-    // An itemset.
+    // The itemset type.
     using itemset_t = std::set<item_t>;
 
-    // Collection of itemsets.
-    using itemset_collection_t = std::set<itemset_t>;
+    // Type of collection of itemsets.
+    using itemsets_t = std::set<itemset_t>;
 
-    // Transaction database type.
+    // The transaction database type.
     using transactions_t = std::multiset<itemset_t>;
 
-    // Frequency of the itemsets.
-    using support_counter_t = std::map<itemset_t, size_t>;
+    // The associate rule type which contains a premise and a conclusion (premise -> conclusion).
+    using rule_t = std::tuple<itemset_t, itemset_t>;
 
-    // Frequent itemsets. The vector contains at index (k-1) the k-element frequent itemsets.
-    using frequent_itemsets_t = std::vector<itemset_t>;
+    // Type of collection of rules.
+    using rules_t = std::set<rule_t>;
 
-    // An associate rule containing the premise and the conclusion.
-    // premise => conclusion
-    using associated_rule_t = std::tuple<itemset_t, itemset_t>;
+    /// Hash function for an itemset.
+    /// @param x The given x.
+    /// @return The hash code for the given x.
+    static std::size_t hash_code(const itemset_t &x);
 
-    // A vector of associate rules.
-    using association_rules_t = std::set<associated_rule_t>;
+    // Type for counting the frequents of itemsets.
+    using frequencies_t = std::unordered_map<size_t, size_t>;
 
-    // Result type of the frequent itemset determination.
-    using frequent_itemsets_result_t = std::tuple<frequent_itemsets_t, support_counter_t>;
+    /// Overloads the output stream operator to output an itemset to an ostream.
+    /// @param os The output stream to write to.
+    /// @param x The itemset to output.
+    /// @return The output stream after writing the itemset.
+    std::ostream &operator<<(std::ostream &os, const itemset_t &x);
 
-    // The result type of the Apriori algorithm.
-    using apriori_result_t = std::tuple<association_rules_t, frequent_itemsets_t, support_counter_t>;
+    /// Overloads the output stream operator to output an rule to an ostream.
+    /// @param os The output stream to write to.
+    /// @param r The rule to output.
+    /// @return The output stream after writing the rule.
+    std::ostream &operator<<(std::ostream &os, const rule_t &r);
 
-    /// Calculates the intersection of two itemsets.
-    /// @param x The first x.
-    /// @param y The second x.
-    /// @return The intersection of the itemsets x and y.
-    auto set_intersection(const itemset_t &x, const itemset_t &y) -> itemset_t;
+    /// Computes the union of two itemsets.
+    /// @param x The first itemset.
+    /// @param y The second itemset.
+    /// @return The union of the two itemsets.
+    itemset_t set_union(const itemset_t &x, const itemset_t &y);
 
-    /// Calculates the union of two itemsets.
-    /// @param x The first itemset
-    /// @param y The second itemset
-    /// @return The union of itemsets x and y
-    auto set_union(const itemset_t &x, const itemset_t &y) -> itemset_t;
+    /// Computes the difference of two itemsets (elements in x but not in y).
+    /// @param x The first itemset.
+    /// @param y The second itemset.
+    /// @return The difference of the two sets.
+    itemset_t set_difference(const itemset_t &x, const itemset_t &y);
 
-    /// Removes an item form the given itemset.
-    /// @param x The itemset.
-    /// @param item The item to be removed.
-    /// @return An itemset which contains all item from itemset x expect the given item.
-    auto remove_from_itemset(const itemset_t &x, const item_t &item) -> itemset_t;
+    /// Computes the confidence level of rule x -> y given a set of frequencies.
+    /// @param frequencies The frequencies of itemsets.
+    /// @param x The premise of the rule.
+    /// @param y The conclusion of the rule.
+    /// @return The confidence level of the rule x -> y.
+    float get_confidence(const frequencies_t &frequencies, const itemset_t &x, const itemset_t &y);
 
-    /// Insert an item to the given itemset.
-    /// @param x The itemset.
-    /// @param item The item to be to inserted.
-    /// @return The itemset which contains the new item.
-    auto add_to_itemset(const itemset_t &x, const item_t &item) -> itemset_t;
+    /// @brief Creates itemsets of the length k from the given itemsets of length k-1 by self-joining.
+    /// @param k The size of the returned itemsets.
+    /// @return The k-element frequent itemsets.
+    auto apriori_gen(const itemsets_t &itemsets, size_t k) -> itemsets_t;
 
-    /// Gets an value indicating whether itemset x contains itemset y as a subset.
-    /// @param x The left hand side itemset (super set).
-    /// @param y The right hand side itemset (sub set).
-    /// @return True if itemset x contains itemset y as a subset; false otherwise.
-    auto is_subset(const itemset_t &x, const itemset_t &y) -> bool;
-
-    /// Gets the 1-element itemsets from the transactions.
-    /// @param transactions The transaction data base.
-    /// @return The 1-element itemsets.
-    auto get_candidates(const transactions_t &transactions) -> itemset_collection_t;
-
-    /// @brief Gets candidate itemsets of a specified length from a given collection.
-    /// @param collection The collection from which candidate itemsets are to be retrieved.
-    /// @param k Length of the candidate itemsets to be retrieved.
-    /// @return itemset_collection_t Candidate itemsets of the specified length.
-    auto get_candidates(const itemset_collection_t &collection, size_t k) -> itemset_collection_t;
-
-    /// Gets frequent itemset from the given candidate itemsets.
-    /// @param candidates The candidate itemset collection.
-    /// @param min_support The minimal support.
-    /// @param global_support_counter The support counter.
-    /// @param transactions The transaction data base.
-    /// @return The frequent itemset.
-    auto prune(
-            const itemset_collection_t &candidates,
-            float min_support,
-            support_counter_t &global_support_counter,
-            const transactions_t &transactions) -> itemset_collection_t;
-
-    /// @brief Gets candidate association rules for a given itemset based on support values and minimum confidence.
-    /// @param itemset The itemset for which candidate association rules are to be retrieved.
-    /// @param support_counter The support counter containing support values for itemsets.
-    /// @param min_confidence The minimum confidence threshold for association rules.
-    /// @return association_rules_t Candidate association rules satisfying the given conditions.
-    auto get_rule_candidates(
-            const itemset_t &itemset,
-            const support_counter_t &support_counter,
-            float min_confidence) -> association_rules_t;
-
-    /// @brief Retrieves association rules based on the given rules, support counter, minimum confidence, and length.
-    /// @param rules The initial set of association rules.
-    /// @param support_counter The support counter containing support values for itemsets.
-    /// @param min_conf The minimum confidence threshold for association rules.
-    /// @param k Length of the association rules.
-    /// @return association_rules_t The association rules satisfying the given conditions.
-    auto get_association_rules(
-            const association_rules_t &rules,
-            const support_counter_t &support_counter,
-            float min_conf,
-            size_t k) -> association_rules_t;
-
-    /// @brief Gets association rules for a given itemset based on support values and minimum confidence.
-    /// @param itemset The itemset for which association rules are to be retrieved.
-    /// @param support_counter The support counter containing support values for itemsets.
-    /// @param min_conf The minimum confidence threshold for association rules.
-    /// @return association_rules_t The association rules satisfying the given conditions.
-    auto get_association_rules(
-            const itemset_t &itemset,
-            const support_counter_t &support_counter,
-            float min_conf) -> association_rules_t;
-
-    /// @brief Retrieves association rules based on frequent itemsets, support counter, and minimum confidence.
-    /// @param frequent_itemsets The frequent itemsets from which association rules are to be generated.
-    /// @param support_counter The support counter containing support values for itemsets.
-    /// @param min_conf The minimum confidence threshold for association rules.
-    /// @return association_rules_t The association rules satisfying the given conditions.
-    auto get_association_rules(
-            const frequent_itemsets_t &frequent_itemsets,
-            const support_counter_t &support_counter,
-            float min_conf) -> association_rules_t;
-
-    /// @brief Computes frequent itemsets and their support values from transactions based on a minimum support threshold.
-    /// @param transactions The transactions from which frequent itemsets are to be extracted.
-    /// @param min_support The minimum support threshold for itemsets to be considered frequent.
-    /// @return std::tuple<frequent_itemsets_t, support_counter_t> A tuple containing frequent itemsets and their support counter.
-    auto get_frequent_itemsets(const transactions_t &transactions, float min_support) -> frequent_itemsets_result_t;
-
-    /// @brief Executes the Apriori algorithm to find association rules.
-    /// @param transactions The transactions database.
+    /// @brief Creates the collection of all frequent itemsets by apply the Apriori principle:
+    /// If an itemset is frequent, then all of its subsets must also be frequent.
+    /// @param transactions The itemsets database.
     /// @param min_support The minimum support threshold for frequent itemsets.
-    /// @param min_conf The minimum confidence threshold for association rules.
-    /// @return apriori_result_t Result of the Apriori algorithm.
-    auto apriori(const transactions_t &transactions, float min_support, float min_conf) -> apriori_result_t;
+    /// @return Pair of the frequent itemsets with regard to min_support and their frequents.
+    auto frequent_itemsets(const transactions_t &itemsets, float min_support) -> std::pair<itemsets_t, frequencies_t>;
+
+    /// @brief Creates association rules based on one frequent itemset.
+    /// @param z The frequent itemset for which the rules are generated.
+    /// @param frequencies The frequencies of the frequent itemsets.
+    /// @param min_confidence The minimum confidence threshold for the rules.
+    /// @return rules_t The association rules.
+    auto generate_rules(
+            const itemset_t &z,
+            const frequencies_t &frequencies,
+            float min_confidence) -> rules_t;
+
+    /// @brief Creates association rules based on the collection of frequent itemsets.
+    /// @param itemsets The collection of frequent itemsets.
+    /// @param frequencies The frequencies of the frequent itemsets.
+    /// @param min_confidence The minimum confidence threshold for the rules.
+    /// @return rules_t The association rules.
+    auto generate_rules(
+            const itemsets_t &itemsets,
+            const frequencies_t &frequencies,
+            float min_confidence) -> rules_t;
 }

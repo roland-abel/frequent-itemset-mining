@@ -27,51 +27,42 @@
 /// THE SOFTWARE.
 
 #include <gtest/gtest.h>
+#include <ranges>
 #include "apriori.h"
 
 using namespace rules;
+using namespace rules::apriori;
+
+namespace {
+    float eps = 1e-4;
+}
 
 class AprioriTests : public ::testing::Test {
 protected:
-
     enum Items {
-        Milk, Bread, Cheese, Butter, Coffee, Sugar, Flour
+        Milk, Bread, Cheese, Butter, Coffee, Sugar, Flour, Cream
     };
 
-    static inline rules::itemset_t all_items = {
-            Milk, Bread, Cheese, Butter, Coffee, Sugar, Flour
-    };
-
-    static inline rules::transactions_t get_transactions() {
+    static inline transactions_t get_transactions() {
         return {
-                {Milk,   Cheese, Butter, Bread,  Sugar,  Flour},
+                {Milk,   Cheese, Butter, Bread,  Sugar,  Flour, Cream},
                 {Cheese, Butter, Bread,  Coffee, Sugar,  Flour},
                 {Milk,   Butter, Coffee, Sugar,  Flour},
                 {Milk,   Butter},
                 {Milk,   Butter, Coffee},
                 {Milk,   Flour},
                 {Milk,   Cheese, Butter, Bread,  Coffee, Sugar, Flour},
-                {},
+                {Cream},
                 {Milk,   Cheese, Butter, Sugar},
                 {Milk,   Cheese, Bread,  Coffee, Sugar,  Flour}
         };
     }
 };
 
-TEST_F(AprioriTests, IsSubsetTest) {
-    EXPECT_TRUE(is_subset({}, {}));
-    EXPECT_TRUE(is_subset({}, {Bread}));
-    EXPECT_TRUE(is_subset({Sugar, Milk, Bread}, {Milk, Bread, Sugar}));
-    EXPECT_TRUE(is_subset({Milk, Sugar}, {Milk, Bread, Sugar}));
-
-    EXPECT_FALSE(is_subset({Milk}, {}));
-    EXPECT_FALSE(is_subset({Milk, Coffee}, {Milk, Bread, Sugar}));
-}
-
-TEST_F(AprioriTests, SetIntersectionTest) {
-    EXPECT_EQ(set_intersection({Milk, Coffee, Bread}, {}), itemset_t{});
-    EXPECT_EQ(set_intersection({Milk, Coffee, Bread}, {Coffee}), itemset_t{Coffee});
-    EXPECT_EQ(set_intersection({Coffee, Bread, Sugar}, {Coffee, Sugar, Milk}), itemset_t({Coffee, Sugar}));
+TEST_F(AprioriTests, SetDifferenceTest) {
+    EXPECT_EQ(set_difference({Milk, Coffee, Bread}, {Milk, Coffee, Bread}), itemset_t{});
+    EXPECT_EQ(set_difference({Milk, Coffee, Bread}, {Coffee}), itemset_t({Milk, Bread}));
+    EXPECT_EQ(set_difference({Coffee, Bread, Sugar}, {Coffee, Sugar, Milk}), itemset_t({Bread}));
 }
 
 TEST_F(AprioriTests, SetUnionTest) {
@@ -84,105 +75,199 @@ TEST_F(AprioriTests, NumberOfTransactionsTest) {
     EXPECT_EQ(get_transactions().size(), 10);
 }
 
-TEST_F(AprioriTests, GetOneElementItemsetsTest) {
-    const auto &transactions = get_transactions();
-    const auto itemset_collection = get_candidates(transactions);
-
-    EXPECT_EQ(itemset_collection.size(), 7);
-}
-
-TEST_F(AprioriTests, GetPruneTest) {
-    const auto &transactions = get_transactions();
-    const auto candidate_itemsets = get_candidates(transactions);
-
-    auto support_counter = support_counter_t{};
-    const auto min_support = 0.4f;
-
-    auto frequent_itemsets = prune(
-            candidate_itemsets,
-            min_support,
-            support_counter,
-            transactions);
-
-    EXPECT_EQ(frequent_itemsets.size(), 7);
-
-    EXPECT_EQ(support_counter[{Milk}], 8);
-    EXPECT_EQ(support_counter[{Bread}], 4);
-    EXPECT_EQ(support_counter[{Cheese}], 5);
-    EXPECT_EQ(support_counter[{Butter}], 7);
-    EXPECT_EQ(support_counter[{Coffee}], 5);
-    EXPECT_EQ(support_counter[{Sugar}], 6);
-    EXPECT_EQ(support_counter[{Flour}], 6);
-}
-
-TEST_F(AprioriTests, GetCandidatesTest) {
-    const auto &transactions = get_transactions();
-    const auto itemsets = get_candidates(transactions);
-
-    EXPECT_EQ(get_candidates(itemsets, 2).size(), 21);
-}
-
-TEST_F(AprioriTests, GetFrequentItemsetsTest) {
-    auto get_count_by_size = [](const auto &itemsets, int k) {
-        return std::ranges::count_if(itemsets.begin(), itemsets.end(), [k](const auto &x) { return x.size() == k; });
+TEST_F(AprioriTests, AprioriGenTest) {
+    const itemsets_t itemsets = {
+            {Milk,   Bread,  Cheese, Coffee},
+            {Milk,   Bread,  Cheese, Flour},
+            {Butter, Coffee, Sugar,  Flour},
+            {Butter, Coffee, Sugar,  Cream}
     };
 
-    const auto &transactions = get_transactions();
-    const auto min_support = 0.4f;
+    auto candidates = apriori_gen(itemsets, 5);
 
-    const auto [frequent_itemsets, _] = get_frequent_itemsets(transactions, min_support);
-
-    EXPECT_EQ(get_count_by_size(frequent_itemsets, 1), 7);
-    EXPECT_EQ(get_count_by_size(frequent_itemsets, 2), 17);
-    EXPECT_EQ(get_count_by_size(frequent_itemsets, 3), 10);
-    EXPECT_EQ(get_count_by_size(frequent_itemsets, 4), 1);
+    EXPECT_EQ(candidates.size(), 2);
+    EXPECT_TRUE(candidates.contains({Milk, Bread, Cheese, Coffee, Flour}));
+    EXPECT_TRUE(candidates.contains({Butter, Coffee, Sugar, Flour, Cream}));
 }
 
-TEST_F(AprioriTests, AssociationRulesFormItemsetTest) {
-    const auto &transactions = get_transactions();
-
+TEST_F(AprioriTests, FrequentItemsetsTest) {
     const auto min_support = 0.4f;
-    const auto min_conf = 0.9f;
 
-    const itemset_t itemset = {Cheese, Bread, Flour, Sugar};
+    const auto &transactions = get_transactions();
+    const auto [itemsets, frequencies] = frequent_itemsets(transactions, min_support);
 
-    const auto [frequent_itemsets, support_counter] = get_frequent_itemsets(transactions, min_support);
-    const auto rules = get_association_rules(itemset, support_counter, min_conf);
+    EXPECT_EQ(itemsets.size(), 35);
+    EXPECT_EQ(itemsets.size(), frequencies.size());
+
+    // 1-itemsets
+    EXPECT_TRUE(itemsets.contains({Milk}));
+    EXPECT_TRUE(itemsets.contains({Bread}));
+    EXPECT_TRUE(itemsets.contains({Cheese}));
+    EXPECT_TRUE(itemsets.contains({Butter}));
+    EXPECT_TRUE(itemsets.contains({Coffee}));
+    EXPECT_TRUE(itemsets.contains({Sugar}));
+    EXPECT_TRUE(itemsets.contains({Flour}));
+
+    // 2-itemsets
+    EXPECT_TRUE(itemsets.contains({Milk, Cheese}));
+    EXPECT_TRUE(itemsets.contains({Milk, Butter}));
+    EXPECT_TRUE(itemsets.contains({Milk, Coffee}));
+    EXPECT_TRUE(itemsets.contains({Milk, Sugar}));
+    EXPECT_TRUE(itemsets.contains({Milk, Flour}));
+    EXPECT_TRUE(itemsets.contains({Bread, Cheese}));
+    EXPECT_TRUE(itemsets.contains({Bread, Sugar}));
+    EXPECT_TRUE(itemsets.contains({Bread, Flour}));
+    EXPECT_TRUE(itemsets.contains({Cheese, Butter}));
+    EXPECT_TRUE(itemsets.contains({Cheese, Sugar}));
+    EXPECT_TRUE(itemsets.contains({Cheese, Flour}));
+    EXPECT_TRUE(itemsets.contains({Butter, Coffee}));
+    EXPECT_TRUE(itemsets.contains({Butter, Sugar}));
+    EXPECT_TRUE(itemsets.contains({Butter, Flour}));
+    EXPECT_TRUE(itemsets.contains({Coffee, Sugar}));
+    EXPECT_TRUE(itemsets.contains({Coffee, Flour}));
+    EXPECT_TRUE(itemsets.contains({Sugar, Flour}));
+
+    // 3-itemsets
+    EXPECT_TRUE(itemsets.contains({Milk, Cheese, Sugar}));
+    EXPECT_TRUE(itemsets.contains({Milk, Butter, Sugar}));
+    EXPECT_TRUE(itemsets.contains({Milk, Sugar, Flour}));
+    EXPECT_TRUE(itemsets.contains({Bread, Cheese, Sugar}));
+    EXPECT_TRUE(itemsets.contains({Bread, Cheese, Flour}));
+    EXPECT_TRUE(itemsets.contains({Bread, Sugar, Flour}));
+    EXPECT_TRUE(itemsets.contains({Cheese, Butter, Sugar}));
+    EXPECT_TRUE(itemsets.contains({Cheese, Sugar, Flour}));
+    EXPECT_TRUE(itemsets.contains({Butter, Sugar, Flour}));
+    EXPECT_TRUE(itemsets.contains({Coffee, Sugar, Flour}));
+
+    // 4-itemsets
+    EXPECT_TRUE(itemsets.contains({Bread, Cheese, Sugar, Flour}));
+}
+
+TEST_F(AprioriTests, ConfidenceTest) {
+    const auto min_support = 0.4f;
+
+    const auto &transactions = get_transactions();
+    const auto [itemsets, frequencies] = frequent_itemsets(transactions, min_support);
+
+    EXPECT_NEAR(get_confidence(frequencies, itemset_t({Bread, Flour, Sugar}), itemset_t({Cheese})), 1.0, eps);
+    EXPECT_NEAR(get_confidence(frequencies, itemset_t({Sugar, Flour}), itemset_t({Milk})), 0.8, eps);
+    EXPECT_NEAR(get_confidence(frequencies, itemset_t({Flour}), itemset_t({Milk})), 0.8333, eps);
+    EXPECT_NEAR(get_confidence(frequencies, itemset_t({Milk}), itemset_t({Butter})), 0.75, eps);
+}
+
+TEST_F(AprioriTests, GenerateRulesForOneItemsetTest) {
+    const auto min_support = 0.4f;
+    const auto min_confidence = 0.9f;
+
+    const auto &transactions = get_transactions();
+    const auto [itemsets, frequencies] = frequent_itemsets(transactions, min_support);
+
+    const itemset_t z = {Cheese, Bread, Sugar, Flour};
+    const auto rules = generate_rules(z, frequencies, min_confidence);
+
+    auto check_rule = [&](const itemset_t &premise, const itemset_t &conclusion, float conf) -> bool {
+        return rules.contains({premise, conclusion})
+               && std::abs(get_confidence(frequencies, premise, conclusion) - conf) < eps;
+    };
 
     EXPECT_EQ(rules.size(), 9);
 
-    EXPECT_TRUE(rules.contains({{Bread, Flour, Sugar}, {Cheese}}));
-    EXPECT_TRUE(rules.contains({{Cheese, Flour, Sugar}, {Bread}}));
-    EXPECT_TRUE(rules.contains({{Cheese, Bread, Sugar}, {Flour}}));
-    EXPECT_TRUE(rules.contains({{Cheese, Bread, Flour}, {Sugar}}));
+    EXPECT_TRUE(check_rule({Bread, Flour, Sugar}, {Cheese}, 1.0));
+    EXPECT_TRUE(check_rule({Cheese, Flour, Sugar}, {Bread}, 1.0));
+    EXPECT_TRUE(check_rule({Cheese, Bread, Sugar}, {Flour}, 1.0));
+    EXPECT_TRUE(check_rule({Cheese, Bread, Flour}, {Sugar}, 1.0));
 
-    EXPECT_TRUE(rules.contains({{Bread, Flour}, {Cheese, Sugar}}));
-    EXPECT_TRUE(rules.contains({{Bread, Cheese}, {Flour, Sugar}}));
-    EXPECT_TRUE(rules.contains({{Bread, Sugar}, {Cheese, Flour}}));
-    EXPECT_TRUE(rules.contains({{Cheese, Flour}, {Sugar, Bread}}));
+    EXPECT_TRUE(check_rule({Bread, Flour}, {Cheese, Sugar}, 1.0));
+    EXPECT_TRUE(check_rule({Bread, Cheese}, {Flour, Sugar}, 1.0));
+    EXPECT_TRUE(check_rule({Bread, Sugar}, {Cheese, Flour}, 1.0));
+    EXPECT_TRUE(check_rule({Cheese, Flour}, {Sugar, Bread}, 1.0));
 
-    EXPECT_TRUE(rules.contains({{Bread}, {Cheese, Flour, Sugar}}));
+    EXPECT_TRUE(check_rule({Bread}, {Cheese, Flour, Sugar}, 1.0));
 }
 
-TEST_F(AprioriTests, AprioriTest) {
-    const auto &transactions = get_transactions();
-
+TEST_F(AprioriTests, GenerateRulesTest) {
     const auto min_support = 0.4f;
-    const auto min_conf = 0.9f;
-    const auto &[rules, frequent_itemsets, support_counter] = apriori(transactions, min_support, min_conf);
+    const auto min_confidence = 0.75f;
 
-    EXPECT_EQ(frequent_itemsets.size(), 35);
-    EXPECT_EQ(rules.size(), 29);
+    const auto &transactions = get_transactions();
+    const auto [itemsets, frequencies] = frequent_itemsets(transactions, min_support);
+    const auto rules = generate_rules(itemsets, frequencies, min_confidence);
 
-    EXPECT_TRUE(rules.contains({{Bread, Flour, Sugar}, {Cheese}}));
-    EXPECT_TRUE(rules.contains({{Cheese, Flour, Sugar}, {Bread}}));
-    EXPECT_TRUE(rules.contains({{Cheese, Bread, Sugar}, {Flour}}));
-    EXPECT_TRUE(rules.contains({{Cheese, Bread, Flour}, {Sugar}}));
+    auto check_rule = [&](const itemset_t &premise, const itemset_t &conclusion, float conf) -> bool {
+        return rules.contains({premise, conclusion})
+               && std::abs(get_confidence(frequencies, premise, conclusion) - conf) < eps;
+    };
 
-    EXPECT_TRUE(rules.contains({{Bread, Flour}, {Cheese, Sugar}}));
-    EXPECT_TRUE(rules.contains({{Bread, Cheese}, {Flour, Sugar}}));
-    EXPECT_TRUE(rules.contains({{Bread, Sugar}, {Cheese, Flour}}));
-    EXPECT_TRUE(rules.contains({{Cheese, Flour}, {Sugar, Bread}}));
+    EXPECT_EQ(rules.size(), 70);
 
-    EXPECT_TRUE(rules.contains({{Bread}, {Cheese, Flour, Sugar}}));
+    EXPECT_TRUE(check_rule({Milk}, {Butter}, 0.75));
+    EXPECT_TRUE(check_rule({Milk, Cheese}, {Sugar}, 1));
+    EXPECT_TRUE(check_rule({Milk, Sugar}, {Cheese}, 0.8));
+    EXPECT_TRUE(check_rule({Milk, Sugar}, {Butter}, 0.8));
+    EXPECT_TRUE(check_rule({Milk, Sugar}, {Flour}, 0.8));
+    EXPECT_TRUE(check_rule({Milk, Flour}, {Sugar}, 0.8));
+    EXPECT_TRUE(check_rule({Bread}, {Cheese}, 1));
+    EXPECT_TRUE(check_rule({Bread}, {Cheese, Sugar}, 1));
+    EXPECT_TRUE(check_rule({Bread}, {Cheese, Sugar, Flour}, 1));
+    EXPECT_TRUE(check_rule({Bread}, {Cheese, Flour}, 1));
+    EXPECT_TRUE(check_rule({Bread}, {Sugar}, 1));
+    EXPECT_TRUE(check_rule({Bread}, {Sugar, Flour}, 1));
+    EXPECT_TRUE(check_rule({Bread}, {Flour}, 1));
+    EXPECT_TRUE(check_rule({Bread, Cheese}, {Sugar}, 1));
+    EXPECT_TRUE(check_rule({Bread, Cheese}, {Sugar, Flour}, 1));
+    EXPECT_TRUE(check_rule({Bread, Cheese}, {Flour}, 1));
+    EXPECT_TRUE(check_rule({Bread, Cheese, Sugar}, {Flour}, 1));
+    EXPECT_TRUE(check_rule({Bread, Cheese, Flour}, {Sugar}, 1));
+    EXPECT_TRUE(check_rule({Bread, Sugar}, {Cheese}, 1));
+    EXPECT_TRUE(check_rule({Bread, Sugar}, {Cheese, Flour}, 1));
+    EXPECT_TRUE(check_rule({Bread, Sugar}, {Flour}, 1));
+    EXPECT_TRUE(check_rule({Bread, Sugar, Flour}, {Cheese}, 1));
+    EXPECT_TRUE(check_rule({Bread, Flour}, {Cheese}, 1));
+    EXPECT_TRUE(check_rule({Bread, Flour}, {Cheese, Sugar}, 1));
+    EXPECT_TRUE(check_rule({Bread, Flour}, {Sugar}, 1));
+    EXPECT_TRUE(check_rule({Cheese}, {Milk}, 0.8));
+    EXPECT_TRUE(check_rule({Cheese}, {Milk, Sugar}, 0.8));
+    EXPECT_TRUE(check_rule({Cheese}, {Bread}, 0.8));
+    EXPECT_TRUE(check_rule({Cheese}, {Bread, Sugar}, 0.8));
+    EXPECT_TRUE(check_rule({Cheese}, {Bread, Sugar, Flour}, 0.8));
+    EXPECT_TRUE(check_rule({Cheese}, {Bread, Flour}, 0.8));
+    EXPECT_TRUE(check_rule({Cheese}, {Butter}, 0.8));
+    EXPECT_TRUE(check_rule({Cheese}, {Butter, Sugar}, 0.8));
+    EXPECT_TRUE(check_rule({Cheese}, {Sugar}, 1));
+    EXPECT_TRUE(check_rule({Cheese}, {Sugar, Flour}, 0.8));
+    EXPECT_TRUE(check_rule({Cheese}, {Flour}, 0.8));
+    EXPECT_TRUE(check_rule({Cheese, Butter}, {Sugar}, 1));
+    EXPECT_TRUE(check_rule({Cheese, Sugar}, {Milk}, 0.8));
+    EXPECT_TRUE(check_rule({Cheese, Sugar}, {Bread}, 0.8));
+    EXPECT_TRUE(check_rule({Cheese, Sugar}, {Bread, Flour}, 0.8));
+    EXPECT_TRUE(check_rule({Cheese, Sugar}, {Butter}, 0.8));
+    EXPECT_TRUE(check_rule({Cheese, Sugar}, {Flour}, 0.8));
+    EXPECT_TRUE(check_rule({Cheese, Sugar, Flour}, {Bread}, 1));
+    EXPECT_TRUE(check_rule({Cheese, Flour}, {Bread}, 1));
+    EXPECT_TRUE(check_rule({Cheese, Flour}, {Bread, Sugar}, 1));
+    EXPECT_TRUE(check_rule({Cheese, Flour}, {Sugar}, 1));
+    EXPECT_TRUE(check_rule({Butter}, {Milk}, 0.857143));
+    EXPECT_TRUE(check_rule({Butter, Sugar}, {Milk}, 0.8));
+    EXPECT_TRUE(check_rule({Butter, Sugar}, {Cheese}, 0.8));
+    EXPECT_TRUE(check_rule({Butter, Sugar}, {Flour}, 0.8));
+    EXPECT_TRUE(check_rule({Butter, Flour}, {Sugar}, 1));
+    EXPECT_TRUE(check_rule({Coffee}, {Milk}, 0.8));
+    EXPECT_TRUE(check_rule({Coffee}, {Butter}, 0.8));
+    EXPECT_TRUE(check_rule({Coffee}, {Sugar}, 0.8));
+    EXPECT_TRUE(check_rule({Coffee}, {Sugar, Flour}, 0.8));
+    EXPECT_TRUE(check_rule({Coffee}, {Flour}, 0.8));
+    EXPECT_TRUE(check_rule({Coffee, Sugar}, {Flour}, 1));
+    EXPECT_TRUE(check_rule({Coffee, Flour}, {Sugar}, 1));
+    EXPECT_TRUE(check_rule({Sugar}, {Milk}, 0.833333));
+    EXPECT_TRUE(check_rule({Sugar}, {Cheese}, 0.833333));
+    EXPECT_TRUE(check_rule({Sugar}, {3}, 0.833333));
+    EXPECT_TRUE(check_rule({Sugar}, {Flour}, 0.833333));
+    EXPECT_TRUE(check_rule({Sugar, Flour}, {Milk}, 0.8));
+    EXPECT_TRUE(check_rule({Sugar, Flour}, {Bread}, 0.8));
+    EXPECT_TRUE(check_rule({Sugar, Flour}, {Bread, Cheese}, 0.8));
+    EXPECT_TRUE(check_rule({Sugar, Flour}, {Cheese}, 0.8));
+    EXPECT_TRUE(check_rule({Sugar, Flour}, {Butter}, 0.8));
+    EXPECT_TRUE(check_rule({Sugar, Flour}, {Coffee}, 0.8));
+    EXPECT_TRUE(check_rule({Flour}, {Milk}, 0.833333));
+    EXPECT_TRUE(check_rule({Flour}, {Sugar}, 0.833333));
 }

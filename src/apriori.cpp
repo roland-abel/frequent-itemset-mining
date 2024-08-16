@@ -2,7 +2,7 @@
 /// @brief
 ///
 /// @author Roland Abel
-/// @date December 8, 2023
+/// @date July 07, 2024
 ///
 /// Copyright (c) 2024 Roland Abel
 ///
@@ -26,224 +26,233 @@
 /// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 /// THE SOFTWARE.
 
+#include <algorithm>
+#include <ranges>
+#include <sstream>
+
 #include "apriori.h"
 
-namespace rules {
+namespace rules::apriori {
 
-    namespace rng = std::ranges;
-    using namespace std::views;
-
-    auto set_intersection(const itemset_t &x, const itemset_t &y) -> itemset_t {
-        itemset_t items{};
-        rng::set_intersection(x, y, std::inserter(items, items.begin()));
-        return items;
-    }
-
-    auto set_union(const itemset_t &x, const itemset_t &y) -> itemset_t {
-        itemset_t items{};
-        rng::set_union(x, y, std::inserter(items, items.begin()));
-        return items;
-    }
-
-    auto remove_from_itemset(const itemset_t &x, const item_t &item) -> itemset_t {
-        return x | filter([&](const auto &i) { return i != item; }) | rng::to<itemset_t>();
-    }
-
-    auto add_to_itemset(const itemset_t &x, const item_t &item) -> itemset_t {
-        auto y = x;
-        y.insert(item);
-        return y;
-    }
-
-    auto is_subset(const itemset_t &x, const itemset_t &y) -> bool {
-        return rng::includes(y, x);
-    }
-
-    auto get_candidates(const transactions_t &transactions) -> itemset_collection_t {
-        auto candidates = itemset_collection_t{};
-
-        for (const auto &x: transactions) {
-            for (const auto item: x) {
-                candidates.insert(itemset_t{item});
+    std::ostream &operator<<(std::ostream &os, const itemset_t &x) {
+        os << "{";
+        for (auto itr = x.begin(); itr != x.end(); ++itr) {
+            os << *itr;
+            if (std::next(itr) != x.end()) {
+                os << ", ";
             }
         }
-        return candidates;
+        os << "}";
+        return os;
     }
 
-    auto get_candidates(const itemset_collection_t &collection, const size_t k) -> itemset_collection_t {
-        itemset_collection_t candidates{};
+    std::ostream &operator<<(std::ostream &os, const rule_t &r) {
+        const auto &[premise, conclusion] = r;
+        os << premise << " -> " << conclusion;
+        return os;
+    }
 
-        auto has_subset = [k](const itemset_t &x, const itemset_t &y) -> bool {
-            // check whether the itemset y is a (k-2)-element subset of the itemset x
-            return std::equal(x.cbegin(), std::next(x.cbegin(), static_cast<signed>(k) - 2), y.cbegin());
+    itemset_t set_union(const itemset_t &x, const itemset_t &y) {
+        itemset_t d{};
+        std::ranges::set_union(x, y, std::inserter(d, d.end()));
+        return d;
+    };
+
+    itemset_t set_difference(const itemset_t &x, const itemset_t &y) {
+        itemset_t d{};
+        std::ranges::set_difference(x, y, std::inserter(d, d.end()));
+        return d;
+    };
+
+    float get_confidence(const frequencies_t &frequencies, const itemset_t &x, const itemset_t &y) {
+        return static_cast<float>(frequencies.at(hash_code(set_union(x, y)))) / static_cast<float>(frequencies.at(hash_code(x)));
+    };
+
+    static std::size_t hash_code(const itemset_t &x) {
+        std::size_t hash = 0;
+        for (const auto &item: x) {
+            hash ^= std::hash<item_t>()(item) + 0x9e3779b9 + (hash << 6) + (hash >> 2);
+        }
+        return hash;
+    }
+
+    auto apriori_gen(const itemsets_t &itemsets, size_t k) -> itemsets_t {
+        // check whether the k-2 first items of x and y are match
+        auto first_items_match = [&](const itemset_t &x, const itemset_t &y) -> std::pair<bool, itemset_t> {
+            auto x_iter = x.begin();
+            auto y_iter = y.begin();
+
+            for (auto i = 0; i < k - 2; i++, x_iter++, y_iter++) {
+                if (*x_iter != *y_iter) {
+                    // the first k-2 items are not match
+                    return std::make_pair(false, itemset_t{});
+                }
+            }
+
+            // create new candidate (k+1)-itemset
+            itemset_t z{};
+            std::copy(x.begin(), std::prev(x_iter, -1), std::inserter(z, z.begin()));
+
+            z.insert(*x_iter);
+            z.insert(*y_iter);
+
+            return std::make_pair(true, z);
         };
 
-        // self-join
-        for (auto x_iter = collection.begin(); x_iter != collection.end(); ++x_iter) {
-            for (auto y_iter = next(x_iter); y_iter != collection.end(); ++y_iter) {
-                const auto &x = *x_iter;
-                if (const auto &y = *y_iter; has_subset(x, y)) {
-                    if (const auto u = set_union(x, y); u.size() == k)
-                        candidates.insert(u);
+        auto candidates = itemsets_t{};
+
+        // find all pairs of itemsets where the first k − 1 items are identical (self-join).
+        for (auto x = itemsets.begin(); x != itemsets.end(); x++) {
+            for (auto y = std::next(x); y != itemsets.end(); y++) {
+                auto [match, z] = first_items_match(*x, *y);
+                if (!match) {
+                    continue;
                 }
-            }
-        }
-        return std::move(candidates);
-    }
-
-    auto prune(
-            const itemset_collection_t &candidates,
-            const float min_support,
-            support_counter_t &global_support_counter,
-            const transactions_t &transactions) -> itemset_collection_t {
-        support_counter_t counter{};
-
-        for (const auto &t: transactions) {
-            for (const auto &y: candidates) {
-                if (is_subset(y, t)) {
-                    global_support_counter[y] += 1;
-                    counter[y] += 1;
-                }
-            }
-        }
-
-        auto itemsets = itemset_collection_t{};
-        const auto total = transactions.size();
-
-        for (auto const &[x, count]: counter) {
-            const auto support = static_cast<float>(count) / static_cast<float>(total);
-            if (support >= min_support) {
-                itemsets.insert(x);
-            }
-        }
-
-        return std::move(itemsets);
-    }
-
-    auto get_rule_candidates(
-            const itemset_t &itemset,
-            const support_counter_t &support_counter,
-            const float min_confidence) -> association_rules_t {
-
-        auto candidates = association_rules_t{};
-        for (const auto &item: itemset) {
-            const auto &x = remove_from_itemset(itemset, item);
-            const auto &y = add_to_itemset(itemset_t{}, item);
-            const auto &u = set_union(x, y);
-
-            const float conf = static_cast<float>(support_counter.at(u)) / static_cast<float>(support_counter.at(x));
-            if (conf >= min_confidence) {
-                candidates.insert(associated_rule_t(x, y));
+                candidates.insert(z);
             }
         }
         return candidates;
     }
 
-    auto get_association_rules(
-            const association_rules_t &rules,
-            const support_counter_t &support_counter,
-            const float min_conf,
-            const size_t k) -> association_rules_t {
-        auto candidates = association_rules_t{};
+    auto frequent_itemsets(const transactions_t &transactions, float min_support) -> std::pair<itemsets_t, frequencies_t> {
+        auto frequencies = frequencies_t{};
 
-        // self-join
-        for (auto r_iter = rules.begin(); r_iter != rules.end(); ++r_iter) {
-            for (auto s_iter = next(r_iter); s_iter != rules.end(); ++s_iter) {
-                const auto &[x1, y1] = *r_iter;
-                const auto &[x2, y2] = *s_iter;
+        const auto count = static_cast<float>(transactions.size());
+        const auto min_frequency = count * min_support;
 
-                const auto u = set_union(y1, y2);
-                const auto i = set_intersection(x1, x2);
+        auto has_support = [&](const auto &x, const auto &frequencies) {
+            return static_cast<float>(frequencies.at(hash_code(x))) / count >= min_support;
+        };
 
-                if (u.size() != k) {
-                    continue;
-                }
-
-                const float conf = static_cast<float>(
-                        support_counter.at(set_union(u, i))) / static_cast<float>(support_counter.at(i));
-
-                if (conf >= min_conf) {
-                    // add rule: "X1 intersection X2 => Y1 union Y2"
-                    candidates.insert(std::make_tuple(
-                            set_intersection(x1, x2),
-                            set_union(y1, y2)));
+        auto prune = [&](itemsets_t &itemsets) -> itemsets_t {
+            for (const auto &t: transactions) {
+                for (const auto &x: itemsets) {
+                    if (std::ranges::includes(t, x)) {
+                        frequencies[hash_code(x)]++;
+                    }
                 }
             }
+
+            std::erase_if(itemsets, [&](const auto &x) { return !has_support(x, frequencies); });
+            std::erase_if(frequencies, [&](const auto &f) { return f.second < min_frequency; });
+
+            return itemsets;
+        };
+
+        auto find_frequent_one_itemsets = [&]() {
+            auto itemsets = itemsets_t{};
+            for (const auto &t: transactions) {
+                for (const auto item: t) {
+                    const auto x = itemset_t{item};
+                    itemsets.insert(x);
+                }
+            }
+
+            prune(itemsets);
+            return itemsets;
+        };
+
+        auto frequent_itemsets = itemsets_t{};
+
+        // find all 1-element itemsets
+        auto itemsets = find_frequent_one_itemsets();
+        frequent_itemsets.insert_range(itemsets);
+
+        for (auto k = 2; !itemsets.empty(); k++) {
+            // create k-itemsets from the previous (k-1)-itemsets
+            itemsets = apriori_gen(itemsets, k);
+
+            // remove all itemsets with low support
+            prune(itemsets);
+
+            // insert frequent itemsets
+            frequent_itemsets.insert_range(itemsets);
         }
-        return std::move(candidates);
+
+        return std::make_pair(frequent_itemsets, frequencies);
     }
 
-    auto get_association_rules(
-            const itemset_t &itemset,
-            const support_counter_t &support_counter,
-            const float min_conf) -> association_rules_t {
-        auto all_rules = association_rules_t{};
-        auto rules = get_rule_candidates(itemset, support_counter, min_conf);
+    auto generate_rules(
+            const itemset_t &z,
+            const frequencies_t &frequencies,
+            float min_confidence) -> rules_t {
 
-        all_rules.insert(rules.begin(), rules.end());
+        // Gets the confidence of the rule of the form "x -> y" with and x=z\y.
+        auto confidence = [&](const auto &x, const auto &y) -> float {
+            return static_cast<float>(frequencies.at(hash_code(set_union(z, y)))) / static_cast<float>(frequencies.at(hash_code(x)));
+        };
 
-        auto k = 2;
-        while (!rules.empty()) {
-            auto next_rules = get_association_rules(rules, support_counter, min_conf, k);
-            all_rules.insert(next_rules.begin(), next_rules.end());
+        auto get_conclusions = [](const rules_t &rules) -> itemsets_t {
+            itemsets_t conclusions{};
+            for (const auto &[_, conclusion]: rules) {
+                conclusions.insert(conclusion);
+            }
+            return conclusions;
+        };
 
-            rules = std::move(next_rules);
-            k += 1;
+        /// For all conclusions y generate all rules of the form "x -> y" with and x=z\y.
+        auto generate_rules = [&](itemsets_t &conclusions) -> rules_t {
+            auto rules = rules_t{};
+
+            for (auto it = conclusions.begin(); it != conclusions.end();) {
+                const auto y = *it;
+                const auto &x = set_difference(z, y);
+
+                if (x.empty()) {
+                    return rules;
+                }
+
+                // confidence of "z\y -> y"
+                if (confidence(x, y) >= min_confidence) {
+                    // insert rule "z\y -> y"
+                    rules.insert(rule_t(x, y));
+                    ++it;
+                } else {
+                    it = conclusions.erase(it);
+                }
+            }
+            return rules;
+        };
+
+        /// For itemset z generate all rules of the form "x -> y" with |y|=1 and x=z\y.
+        auto create_initial_rules = [&]() -> rules_t {
+            itemsets_t conclusions{};
+            for (const auto &item: z) {
+                const auto conclution = itemsets_t{itemset_t{item}};
+                conclusions.insert(conclution.begin(), conclution.end());
+            }
+            return generate_rules(conclusions);
+        };
+
+        auto associated_rules = rules_t{};
+
+        auto rules = create_initial_rules();
+        associated_rules.insert(rules.begin(), rules.end());
+
+        auto conclusions = get_conclusions(rules);
+
+        for (auto k = 2; !conclusions.empty(); k++) {
+            // Creates k-itemsets from the previous (k-1)-itemsets
+            conclusions = apriori_gen(conclusions, k);
+
+            // Creates rules of the form "z\y -> y" for each conclution y.
+            rules = generate_rules(conclusions);
+            associated_rules.insert(rules.begin(), rules.end());
         }
-        return all_rules;
+        return associated_rules;
     }
 
-    auto get_association_rules(
-            const frequent_itemsets_t &frequent_itemsets,
-            const support_counter_t &support_counter,
-            const float min_conf) -> association_rules_t {
-        auto rules = association_rules_t{};
+    auto generate_rules(
+            const itemsets_t &itemsets,
+            const frequencies_t &frequencies,
+            float min_confidence) -> rules_t {
 
-        for (const auto &itemset: frequent_itemsets | filter([](const auto &x) { return x.size() > 1; })) {
-            const auto r = get_association_rules(itemset, support_counter, min_conf);
-            rules.insert(r.begin(), r.end());
+        auto association_rules = rules_t{};
+        for (const auto &z: itemsets | std::views::filter([](const auto &x) { return x.size() > 1; })) {
+            const auto rules = generate_rules(z, frequencies, min_confidence);
+            association_rules.insert(rules.begin(), rules.end());
         }
-        return rules;
-    }
 
-    auto get_frequent_itemsets(
-            const transactions_t &transactions,
-            const float min_support) -> frequent_itemsets_result_t {
-        auto support_counter = support_counter_t{};
-        auto frequent_itemsets = frequent_itemsets_t{};
-
-        auto candidates = get_candidates(transactions);
-        auto itemsets = prune(
-                candidates,
-                min_support,
-                support_counter,
-                transactions);
-
-        auto k = 2;
-        while (!itemsets.empty()) {
-            frequent_itemsets.insert(
-                    frequent_itemsets.cend(),
-                    itemsets.cbegin(),
-                    itemsets.cend());
-
-            candidates = get_candidates(itemsets, k);
-            itemsets = prune(candidates, min_support, support_counter, transactions);
-
-            k += 1;
-        }
-        return std::make_tuple(frequent_itemsets, support_counter);
-    }
-
-    auto apriori(
-            const transactions_t &transactions,
-            const float min_support,
-            const float min_conf) -> apriori_result_t {
-
-        // first determine all frequent itemsets
-        const auto &[frequent_itemsets, support_counter] = get_frequent_itemsets(transactions, min_support);
-
-        // determine all rules that can be derived from the frequent itemsets
-        const auto rules = get_association_rules(frequent_itemsets, support_counter, min_conf);
-        return apriori_result_t{rules, frequent_itemsets, support_counter};
+        return association_rules;
     }
 }
