@@ -33,6 +33,7 @@ enable_testing()
 file(GLOB TESTS "**_tests.cpp")
 add_executable(${UNIT_TEST_NAME}
         ${TESTS}
+        test_data.cpp
         test_main.cpp)
 
 target_include_directories(${UNIT_TEST_NAME} PUBLIC ../include)

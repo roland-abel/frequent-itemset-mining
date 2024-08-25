@@ -29,7 +29,6 @@
 #include <algorithm>
 #include <ranges>
 #include <sstream>
-
 #include "apriori.h"
 
 namespace rules::apriori {
@@ -68,7 +67,7 @@ namespace rules::apriori {
         return static_cast<float>(frequencies.at(hash_code(set_union(x, y)))) / static_cast<float>(frequencies.at(hash_code(x)));
     };
 
-    static std::size_t hash_code(const itemset_t &x) {
+    std::size_t hash_code(const itemset_t &x) {
         std::size_t hash = 0;
         for (const auto &item: x) {
             hash ^= std::hash<item_t>()(item) + 0x9e3779b9 + (hash << 6) + (hash >> 2);

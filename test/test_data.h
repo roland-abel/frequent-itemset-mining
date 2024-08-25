@@ -1,10 +1,10 @@
-/// @file test_main.cpp
-/// @brief Unit test main.
+/// @file test_data.h
+/// @brief
 ///
 /// @author Roland Abel
-/// @date July 2, 2024
+/// @date August 25, 2024
 ///
-/// Copyright (c) 2023 Roland Abel
+/// Copyright (c) 2024 Roland Abel
 ///
 /// This software is released under the MIT License.
 ///
@@ -26,9 +26,26 @@
 /// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 /// THE SOFTWARE.
 
-#include <gtest/gtest.h>
+#pragma once
 
-int main(int argc, char **argv) {
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
+#include "apriori.h"
+
+namespace rules::tests {
+
+    using transactions_t = rules::apriori::transactions_t;
+
+    enum Items {
+        Milk = 1,
+        Bread,
+        Cheese,
+        Butter,
+        Coffee,
+        Sugar,
+        Flour,
+        Cream
+    };
+
+    /// Gets the test data for the Apriori- and FP-Growth algorithms.
+    /// @return The test transactions.
+    transactions_t get_transactions();
 }

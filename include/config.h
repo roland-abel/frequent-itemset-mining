@@ -46,5 +46,8 @@ namespace rules {
         algorithm_t algorithm;
         uint8_t max_length;
         bool is_verbose;
+
+//        min_lift=3,
+//        min_length=2,
     };
 }

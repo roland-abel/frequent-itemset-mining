@@ -29,34 +29,15 @@
 #include <gtest/gtest.h>
 #include <ranges>
 #include "apriori.h"
+#include "test_data.h"
 
 using namespace rules;
 using namespace rules::apriori;
-
-namespace {
-    float eps = 1e-4;
-}
+using namespace rules::tests;
 
 class AprioriTests : public ::testing::Test {
 protected:
-    enum Items {
-        Milk, Bread, Cheese, Butter, Coffee, Sugar, Flour, Cream
-    };
-
-    static inline transactions_t get_transactions() {
-        return {
-                {Milk,   Cheese, Butter, Bread,  Sugar,  Flour, Cream},
-                {Cheese, Butter, Bread,  Coffee, Sugar,  Flour},
-                {Milk,   Butter, Coffee, Sugar,  Flour},
-                {Milk,   Butter},
-                {Milk,   Butter, Coffee},
-                {Milk,   Flour},
-                {Milk,   Cheese, Butter, Bread,  Coffee, Sugar, Flour},
-                {Cream},
-                {Milk,   Cheese, Butter, Sugar},
-                {Milk,   Cheese, Bread,  Coffee, Sugar,  Flour}
-        };
-    }
+    float eps = 1e-4;
 };
 
 TEST_F(AprioriTests, SetDifferenceTest) {
@@ -75,6 +56,17 @@ TEST_F(AprioriTests, NumberOfTransactionsTest) {
     EXPECT_EQ(get_transactions().size(), 10);
 }
 
+TEST_F(AprioriTests, HashCodeTest) {
+    const auto code1 = hash_code(itemset_t{Coffee, Milk, Bread});
+    const auto code2 = hash_code(itemset_t{Milk, Coffee, Bread});
+
+    const auto code3 = hash_code(itemset_t{Coffee, Milk, Bread});
+    const auto code4 = hash_code(itemset_t{Coffee, Milk, Sugar});
+
+    EXPECT_EQ(code1, code2);
+    EXPECT_NE(code3, code4);
+}
+
 TEST_F(AprioriTests, AprioriGenTest) {
     const itemsets_t itemsets = {
             {Milk,   Bread,  Cheese, Coffee},
@@ -85,7 +77,7 @@ TEST_F(AprioriTests, AprioriGenTest) {
 
     auto candidates = apriori_gen(itemsets, 5);
 
-    EXPECT_EQ(candidates.size(), 2);
+    ASSERT_EQ(candidates.size(), 2);
     EXPECT_TRUE(candidates.contains({Milk, Bread, Cheese, Coffee, Flour}));
     EXPECT_TRUE(candidates.contains({Butter, Coffee, Sugar, Flour, Cream}));
 }

@@ -28,7 +28,7 @@
 cmake_minimum_required(VERSION 3.22.1)
 project(association-rules
         VERSION 1.0.0
-        DESCRIPTION "Implementation of the Apriori Algorithm"
+        DESCRIPTION "Implementation of the Apriori and FP-Growth algorithms"
         LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 23)

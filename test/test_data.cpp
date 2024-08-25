@@ -1,10 +1,10 @@
-/// @file test_main.cpp
-/// @brief Unit test main.
+/// @file test_data.cpp
+/// @brief
 ///
 /// @author Roland Abel
-/// @date July 2, 2024
+/// @date August 25, 2024
 ///
-/// Copyright (c) 2023 Roland Abel
+/// Copyright (c) 2024 Roland Abel
 ///
 /// This software is released under the MIT License.
 ///
@@ -26,9 +26,21 @@
 /// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 /// THE SOFTWARE.
 
-#include <gtest/gtest.h>
+#include "test_data.h"
 
-int main(int argc, char **argv) {
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
+using namespace rules::tests;
+
+rules::tests::transactions_t rules::tests::get_transactions() {
+    return {
+            {Milk,   Cheese, Butter, Bread,  Sugar,  Flour, Cream},
+            {Cheese, Butter, Bread,  Coffee, Sugar,  Flour},
+            {Milk,   Butter, Coffee, Sugar,  Flour},
+            {Milk,   Butter},
+            {Milk,   Butter, Coffee},
+            {Milk,   Flour},
+            {Milk,   Cheese, Butter, Bread,  Coffee, Sugar, Flour},
+            {Cream},
+            {Milk,   Cheese, Butter, Sugar},
+            {Milk,   Cheese, Bread,  Coffee, Sugar,  Flour}
+    };
 }
