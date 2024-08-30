@@ -82,11 +82,11 @@ TEST_F(AprioriTests, AprioriGenTest) {
     EXPECT_TRUE(candidates.contains({Butter, Coffee, Sugar, Flour, Cream}));
 }
 
-TEST_F(AprioriTests, FrequentItemsetsTest) {
+TEST_F(AprioriTests, AprioriAlgorithmTest) {
     const auto min_support = 0.4f;
 
     const auto &transactions = get_transactions();
-    const auto [itemsets, frequencies] = frequent_itemsets(transactions, min_support);
+    const auto [itemsets, frequencies] = apriori_algorithm(transactions, min_support);
 
     EXPECT_EQ(itemsets.size(), 35);
     EXPECT_EQ(itemsets.size(), frequencies.size());
@@ -139,7 +139,7 @@ TEST_F(AprioriTests, ConfidenceTest) {
     const auto min_support = 0.4f;
 
     const auto &transactions = get_transactions();
-    const auto [itemsets, frequencies] = frequent_itemsets(transactions, min_support);
+    const auto [itemsets, frequencies] = apriori_algorithm(transactions, min_support);
 
     EXPECT_NEAR(get_confidence(frequencies, itemset_t({Bread, Flour, Sugar}), itemset_t({Cheese})), 1.0, eps);
     EXPECT_NEAR(get_confidence(frequencies, itemset_t({Sugar, Flour}), itemset_t({Milk})), 0.8, eps);
@@ -152,7 +152,7 @@ TEST_F(AprioriTests, GenerateRulesForOneItemsetTest) {
     const auto min_confidence = 0.9f;
 
     const auto &transactions = get_transactions();
-    const auto [itemsets, frequencies] = frequent_itemsets(transactions, min_support);
+    const auto [itemsets, frequencies] = apriori_algorithm(transactions, min_support);
 
     const itemset_t z = {Cheese, Bread, Sugar, Flour};
     const auto rules = generate_rules(z, frequencies, min_confidence);
@@ -182,7 +182,7 @@ TEST_F(AprioriTests, GenerateRulesTest) {
     const auto min_confidence = 0.75f;
 
     const auto &transactions = get_transactions();
-    const auto [itemsets, frequencies] = frequent_itemsets(transactions, min_support);
+    const auto [itemsets, frequencies] = apriori_algorithm(transactions, min_support);
     const auto rules = generate_rules(itemsets, frequencies, min_confidence);
 
     auto check_rule = [&](const itemset_t &premise, const itemset_t &conclusion, float conf) -> bool {

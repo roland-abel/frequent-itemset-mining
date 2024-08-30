@@ -82,7 +82,7 @@ namespace rules::apriori {
     /// @param transactions The itemsets database.
     /// @param min_support The minimum support threshold for frequent itemsets.
     /// @return Pair of the frequent itemsets with regard to min_support and their frequents.
-    auto frequent_itemsets(const transactions_t &itemsets, float min_support) -> std::pair<itemsets_t, frequencies_t>;
+    auto apriori_algorithm(const transactions_t &itemsets, float min_support) -> std::pair<itemsets_t, frequencies_t>;
 
     /// @brief Creates association rules based on one frequent itemset.
     /// @param z The frequent itemset for which the rules are generated.

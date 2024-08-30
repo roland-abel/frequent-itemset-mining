@@ -119,14 +119,14 @@ namespace rules::fp_growth {
     /// @return A list of items from the x that are also in the frequent items list, maintaining their order.
     auto filter_and_sort_items(const itemset_t &itemset, const items_t &frequent_items) -> items_t;
 
-    /// Builds a FP-tree from the given transactions based on frequent items and minimum support.
-    /// @param transactions A collection of transactions, where each transaction is a set of items.
+    /// Builds a FP-tree from the given transactions_ based on frequent items and minimum support.
+    /// @param transactions A collection of transactions_, where each transaction is a set of items.
     /// @param frequent_items A list of items considered frequent, based on the minimum support.
     /// @return A shared pointer to the root node of the constructed FP-tree.
     auto build_fp_tree(const transactions_t &transactions, const items_t &frequent_items) -> node_ptr;
 
-    /// Builds a FP-tree from the given transactions based on the minimum support.
-    /// @param itemsets A collection of transactions, where each transaction is a set of items.
+    /// Builds a FP-tree from the given transactions_ based on the minimum support.
+    /// @param itemsets A collection of transactions_, where each transaction is a set of items.
     /// @param min_support_abs The minimum support threshold for an item to be considered frequent.
     /// @return A shared pointer to the root node of the constructed FP-tree.
     auto build_fp_tree(const transactions_t &itemsets, size_t min_support_abs) -> node_ptr;
@@ -145,12 +145,12 @@ namespace rules::fp_growth {
 
     /// Generates the conditional transaction from the given FP-Tree.
     /// @param node The current node in the FP-Tree being processed.
-    /// @param item  The item for which conditional transactions are being generated.
-    /// @return The transactions that will be populated with the conditional transactions.
+    /// @param item  The item for which conditional transactions_ are being generated.
+    /// @return The transactions_ that will be populated with the conditional transactions_.
     auto conditional_transactions(const node_ptr &node, item_t item) -> transactions_t;
 
-    /// Applies the FP-Growth algorithm to find frequent itemsets from the given transactions.
-    /// @param transactions A collection of transactions, where each transaction is a set of items.
+    /// Applies the FP-Growth algorithm to find frequent itemsets from the given transactions_.
+    /// @param transactions A collection of transactions_, where each transaction is a set of items.
     /// @param min_support_abs The minimum support threshold for an itemset to be considered frequent.
     /// @return A set of frequent itemsets, where each itemset is a collection of items that meet
     /// the minimum support threshold.

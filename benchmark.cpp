@@ -29,30 +29,80 @@
 #include <benchmark/benchmark.h>
 #include <vector>
 #include <algorithm>
+#include <random>
+#include "apriori.h"
+#include "fp_growth.h"
+#include "reader.h"
 
-// Beispielalgorithmus
-void SortAlgorithm(std::vector<int>& v) {
-    std::sort(v.begin(), v.end());
-}
+using namespace std;
+using namespace rules::apriori;
+using namespace rules::fp_growth;
 
-// Benchmark-Funktion
-static void BM_SortAlgorithm(benchmark::State& state) {
-    std::vector<int> v(state.range(0));
-    for (auto _ : state) {
-        // Vorbereitung: Erzeuge zufällige Daten für den Test
-        std::generate(v.begin(), v.end(), std::rand);
+namespace {
+    static auto generate_test_transactions(size_t num_transactions, size_t max_items) -> transactions_t {
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_int_distribution<size_t> dist(0, max_items - 1);
+        std::uniform_int_distribution<size_t> size_dist(1, max_items);
 
-        // Zu benchmarkender Algorithmus
-        SortAlgorithm(v);
+        auto fill_itemset = [&](itemset_t &itemset) -> itemset_t {
+            size_t num_items = size_dist(gen);
+            for (size_t j = 0; j < num_items; ++j) {
+                itemset.insert(dist(gen));
+            }
+            return itemset;
+        };
 
-        // Ein optionaler Rücksetzpunkt, wenn du den Zustand zwischen den Iterationen bereinigen musst.
-        benchmark::ClobberMemory();
+        return transactions_t(num_transactions, itemset_t{})
+               | std::views::transform(fill_itemset)
+               | std::ranges::to<transactions_t>();
     }
 }
 
-// Registriere die Benchmark-Funktion mit verschiedenen Eingabegrößen
-BENCHMARK(BM_SortAlgorithm)->Range(1 << 10, 1 << 18);
-BENCHMARK(BM_SortAlgorithm)->Range(1 << 15, 1 << 25);
+class BenchmarkFixture : public benchmark::Fixture {
+public:
 
+    void SetUp(const ::benchmark::State &state) override {
+        size_t num_transactions = state.range(0);
+
+        transactions_ = generate_test_transactions(num_transactions, max_items_);
+        min_support_ = 0.9;
+        min_support_abs_ = static_cast<size_t>(min_support_ * transactions_.size());
+    }
+
+    inline const transactions_t &get_transactions() const { return transactions_; };
+
+    inline const float &min_support() const { return min_support_; };
+
+    inline size_t min_support_abs() const { return min_support_abs_; };
+
+private:
+    transactions_t transactions_;
+    float min_support_{};
+    size_t min_support_abs_{};
+    size_t max_items_ = 50;
+};
+
+BENCHMARK_DEFINE_F(BenchmarkFixture, AprioriBenchmark)(benchmark::State &state) {
+    for (auto _: state) {
+        apriori_algorithm(get_transactions(), min_support());
+    }
+}
+
+BENCHMARK_DEFINE_F(BenchmarkFixture, FPGrowthBenchmark)(benchmark::State &state) {
+    for (auto _: state) {
+        fp_growth_algorithm(get_transactions(), min_support_abs());
+    }
+}
+
+BENCHMARK_REGISTER_F(BenchmarkFixture, AprioriBenchmark)
+        ->RangeMultiplier(10)
+        ->Range(10, 1e6)
+        ->Unit(benchmark::kMillisecond);
+
+BENCHMARK_REGISTER_F(BenchmarkFixture, FPGrowthBenchmark)
+        ->RangeMultiplier(10)
+        ->Range(10, 1e6)
+        ->Unit(benchmark::kMillisecond);
 
 BENCHMARK_MAIN();

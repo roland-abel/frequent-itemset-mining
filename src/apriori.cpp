@@ -113,7 +113,7 @@ namespace rules::apriori {
         return candidates;
     }
 
-    auto frequent_itemsets(const transactions_t &transactions, float min_support) -> std::pair<itemsets_t, frequencies_t> {
+    auto apriori_algorithm(const transactions_t &transactions, float min_support) -> std::pair<itemsets_t, frequencies_t> {
         auto frequencies = frequencies_t{};
 
         const auto count = static_cast<float>(transactions.size());
