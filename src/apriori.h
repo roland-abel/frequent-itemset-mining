@@ -32,34 +32,14 @@
 #include <set>
 #include <unordered_map>
 #include <iostream>
+#include "dtypes.h"
 
 namespace rules::apriori {
-
-    // The item type.
-    using item_t = unsigned long;
-
-    // The itemset type.
-    using itemset_t = std::set<item_t>;
-
-    // Collection of itemsets.
-    using itemsets_t = std::set<itemset_t>;
-
-    // The transaction database type.
-    using transactions_t = std::vector<itemset_t>;
-
-    // The associate rule type which contains a premise and a conclusion (premise -> conclusion).
-    using rule_t = std::tuple<itemset_t, itemset_t>;
-
-    // Collection of rules.
-    using rules_t = std::set<rule_t>;
 
     /// Hash function for an itemset.
     /// @param x The given x.
     /// @return The hash code for the given x.
     std::size_t hash_code(const itemset_t &x);
-
-    // Type for counting frequents of itemsets.
-    using frequencies_t = std::unordered_map<size_t, size_t>;
 
     /// Overloads the output stream operator to output an itemset to an ostream.
     /// @param os The output stream to write to.

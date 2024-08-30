@@ -1,8 +1,9 @@
-/// @file test_data.h
+/// @file apriori.h
 /// @brief
+/// @see: https://www.macs.hw.ac.uk/~dwcorne/Teaching/agrawal94fast.pdf
 ///
 /// @author Roland Abel
-/// @date August 25, 2024
+/// @date July 07, 2024
 ///
 /// Copyright (c) 2024 Roland Abel
 ///
@@ -28,24 +29,29 @@
 
 #pragma once
 
-#include "apriori.h"
+#include <set>
+#include <unordered_map>
 
-namespace rules::tests {
+namespace rules {
 
-    using transactions_t = rules::transactions_t;
+    // The item type.
+    using item_t = unsigned long;
 
-    enum Items {
-        Milk = 1,
-        Bread,
-        Cheese,
-        Butter,
-        Coffee,
-        Sugar,
-        Flour,
-        Cream
-    };
+    // The itemset type.
+    using itemset_t = std::set<item_t>;
 
-    /// Gets the test data for the Apriori- and FP-Growth algorithms.
-    /// @return The test transactions.
-    transactions_t get_transactions();
+    // Collection of itemsets.
+    using itemsets_t = std::set<itemset_t>;
+
+    // The transaction database type.
+    using transactions_t = std::vector<itemset_t>;
+
+    // The associate rule type which contains a premise and a conclusion (premise -> conclusion).
+    using rule_t = std::tuple<itemset_t, itemset_t>;
+
+    // Collection of rules.
+    using rules_t = std::set<rule_t>;
+
+    // Type for counting frequents of itemsets.
+    using frequencies_t = std::unordered_map<size_t, size_t>;
 }

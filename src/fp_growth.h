@@ -33,21 +33,20 @@
 #include <utility>
 #include <ranges>
 #include <optional>
-#include "apriori.h"
+#include "dtypes.h"
 
 namespace rules::fp_growth {
 
     struct node_t;
 
-    using item_t = rules::apriori::item_t;
-    using itemset_t = rules::apriori::itemset_t;
-    using itemsets_t = rules::apriori::itemsets_t;
-    using transactions_t = rules::apriori::transactions_t;
+    using item_t = rules::item_t;
+    using itemset_t = rules::itemset_t;
+    using itemsets_t = rules::itemsets_t;
+    using transactions_t = rules::transactions_t;
 
     using items_t = std::vector<item_t>;
     using frequencies_t = std::unordered_map<item_t, size_t>;
     using node_ptr = std::shared_ptr<node_t>;
-    using node_opt = std::optional<node_ptr>;
     using children_t = std::vector<node_ptr>;
 
     /// Represents a node in a FP-tree tree
@@ -85,7 +84,7 @@ namespace rules::fp_growth {
         /// Finds a child node with the specified item.
         /// @param child_item The item to find in the children.
         /// @return An optional shared pointer to the child node if found; otherwise, std::nullopt
-        node_opt find_child_item(const item_t &child_item) const;
+        std::optional<node_ptr> find_child_item(const item_t &child_item) const;
 
         /// Checks if there exists a path in the tree matching the given items and frequencies.
         /// @param items A vector of items to be matched in the tree path.
@@ -109,7 +108,9 @@ namespace rules::fp_growth {
     /// @param transactions A collection of transactions where each transaction is a set of items.
     /// @param min_support_abs The minimum support threshold for items to be considered frequent.
     /// @return A list of items that exceed the minimum support threshold, sorted in order of frequency.
-    auto find_frequent_items(const transactions_t &transactions, size_t min_support_abs) -> std::pair<items_t, frequencies_t>;
+    auto find_frequent_items(
+            const transactions_t &transactions,
+            size_t min_support_abs) -> std::pair<items_t, frequencies_t>;
 
     /// Sorts the items in the x according to the order defined by the frequent items list
     /// and removes any items not in the frequent items list.
@@ -134,7 +135,7 @@ namespace rules::fp_growth {
     /// @param root A pointer to the current root in the FP-tree.
     /// @return A pair where the first element is a boolean indicating whether the tree has a single path,
     /// and the second element is an itemset representing the sequence of items along that path.
-    auto tree_has_single_path(const node_ptr &root) -> std::pair<bool, itemset_t>;
+    auto tree_has_single_path(const node_ptr &root) -> std::optional<itemset_t>;
 
     /// Gets the frequency of the given item.
     /// @param root The
@@ -151,6 +152,7 @@ namespace rules::fp_growth {
     /// Applies the FP-Growth algorithm to find frequent itemsets from the given transactions.
     /// @param transactions A collection of transactions, where each transaction is a set of items.
     /// @param min_support_abs The minimum support threshold for an itemset to be considered frequent.
-    /// @return A set of frequent itemsets, where each itemset is a collection of items that meet the minimum support threshold.
+    /// @return A set of frequent itemsets, where each itemset is a collection of items that meet
+    /// the minimum support threshold.
     auto fp_growth_algorithm(const transactions_t &transactions, size_t min_support_abs) -> itemsets_t;
 }
