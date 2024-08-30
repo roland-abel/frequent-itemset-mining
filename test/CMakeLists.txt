@@ -36,7 +36,7 @@ add_executable(${UNIT_TEST_NAME}
         test_data.cpp
         test_main.cpp)
 
-target_include_directories(${UNIT_TEST_NAME} PUBLIC ../include)
+target_include_directories(${UNIT_TEST_NAME} PUBLIC ${CMAKE_SOURCE_DIR}/include)
 target_link_libraries(${UNIT_TEST_NAME}
         ${RULES_LIB}
         GTest::gtest

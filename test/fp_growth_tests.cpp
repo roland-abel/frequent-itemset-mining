@@ -101,13 +101,14 @@ TEST_F(FPGrowthTests, TreeHasSinglePathTest) {
     const auto &root = node_t::create_root();
     root->add_child(Milk, 5)->add_child(Cheese, 4)->add_child(Coffee, 2);
 
-    const auto &[has_single_path, items_along_path] = tree_has_single_path(root);
-    EXPECT_TRUE(has_single_path);
+    const auto &items_along_path = tree_has_single_path(root);
+    EXPECT_TRUE(items_along_path.has_value());
 
-    EXPECT_FALSE(items_along_path.contains(root->item));
-    EXPECT_TRUE(items_along_path.contains(Milk));
-    EXPECT_TRUE(items_along_path.contains(Cheese));
-    EXPECT_TRUE(items_along_path.contains(Coffee));
+    const auto &path = items_along_path.value();
+    EXPECT_FALSE(path.contains(root->item));
+    EXPECT_TRUE(path.contains(Milk));
+    EXPECT_TRUE(path.contains(Cheese));
+    EXPECT_TRUE(path.contains(Coffee));
 }
 
 TEST_F(FPGrowthTests, TreeHasNoSinglePathTest) {
@@ -117,9 +118,8 @@ TEST_F(FPGrowthTests, TreeHasNoSinglePathTest) {
     child->add_child(Butter, 4)->add_child(Flour, 1);
     child->add_child(Coffee, 3)->add_child(Cheese, 1);
 
-    const auto &[has_single_path, items_along_path] = tree_has_single_path(root);
-    EXPECT_FALSE(has_single_path);
-    EXPECT_TRUE(items_along_path.empty());
+    const auto &items_along_path = tree_has_single_path(root);
+    EXPECT_FALSE(items_along_path.has_value());
 }
 
 TEST_F(FPGrowthTests, PowerSetTest) {

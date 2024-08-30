@@ -2,7 +2,7 @@
 /// @brief
 ///
 /// @author Roland Abel
-/// @date July  5, 2004
+/// @date July 5, 2004
 ///
 /// Copyright (c) 2024 Roland Abel
 ///

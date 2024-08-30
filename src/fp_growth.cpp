@@ -49,7 +49,7 @@ namespace rules::fp_growth {
         return child;
     }
 
-    node_opt node_t::find_child_item(const item_t &child_item) const {
+    std::optional<node_ptr> node_t::find_child_item(const item_t &child_item) const {
         const auto it = std::find_if(children.begin(), children.end(), [&](const node_ptr &node) {
             return node->item == child_item;
         });
@@ -86,7 +86,7 @@ namespace rules::fp_growth {
 
     auto power_set(const itemset_t &items, bool include_empty_set) -> itemsets_t {
         itemsets_t result{};
-        const size_t num_subsets = static_cast<size_t>(std::pow(2, items.size()));
+        const auto num_subsets = static_cast<size_t>(std::pow(2, items.size()));
 
         for (size_t i = 0; i < num_subsets; ++i) {
             itemset_t subset;
@@ -153,7 +153,7 @@ namespace rules::fp_growth {
         for (auto it = items.begin(); it != items.end(); it++) {
             const auto item = *it;
             auto node = current->find_child_item(item)
-                    .or_else([&]() -> node_opt { return current->add_child(item, 0); })
+                    .or_else([&]() ->  std::optional<node_ptr> { return current->add_child(item, 0); })
                     .value();
 
             node->frequency++;
@@ -242,23 +242,23 @@ namespace rules::fp_growth {
         return transactions;
     }
 
-    auto tree_has_single_path(const node_ptr &root) -> std::pair<bool, itemset_t> {
+    auto tree_has_single_path(const node_ptr &root) -> std::optional<itemset_t> {
         itemset_t items_along_path{};
 
         if (root->children.size() != 1) {
-            return {false, {}};
+            return std::nullopt;
         }
 
         node_ptr current = root->children.at(0);
         while (true) {
             const auto num_children = current->children.size();
             if (num_children > 1) {
-                return {false, {}};
+                return std::nullopt;
             }
 
             items_along_path.insert(current->item);
             if (num_children == 0) {
-                return {true, items_along_path};
+                return items_along_path;
             }
 
             current = current->children.at(0);
@@ -275,10 +275,10 @@ namespace rules::fp_growth {
 
         const auto &[frequent_items, _] = find_frequent_items(transactions, min_support_abs);
         const auto &root = build_fp_tree(transactions, frequent_items);
-        const auto &[has_single_path, items_along_path] = tree_has_single_path(root);
+        const auto &items_along_path = tree_has_single_path(root);
 
-        if (has_single_path) {
-            return power_set(items_along_path, false);
+        if (items_along_path.has_value()) {
+            return power_set(items_along_path.value(), false);
         } else {
             // traverses all frequent items in the reversed order
             for (auto it = frequent_items.rbegin(); it != frequent_items.rend(); ++it) {
