@@ -193,23 +193,6 @@ namespace rules::fp_growth {
         return frequency;
     }
 
-//    auto collect_items(const node_ptr &root) -> itemset_t {
-//        itemset_t items{};
-//
-//        std::function<void(const node_ptr &)> collect_items_ = [&](const node_ptr &root) {
-//            if (!root->is_root()) {
-//                items.insert(root->item);
-//            }
-//
-//            std::ranges::for_each(root->children, [&](const auto &child) {
-//                collect_items_(child);
-//            });
-//        };
-//
-//        collect_items_(root);
-//        return items;
-//    }
-
     auto conditional_transactions(const node_ptr &root, item_t item) -> transactions_t {
         transactions_t transactions{};
 
