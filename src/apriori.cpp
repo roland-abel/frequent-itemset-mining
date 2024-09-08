@@ -63,6 +63,10 @@ namespace rules::apriori {
         return d;
     };
 
+    float get_support(const frequencies_t &frequencies, const itemset_t &x, size_t num_transactions) {
+        return static_cast<float>(frequencies.at(hash_code(x))) / num_transactions;
+    }
+
     float get_confidence(const frequencies_t &frequencies, const itemset_t &x, const itemset_t &y) {
         return static_cast<float>(frequencies.at(hash_code(set_union(x, y)))) / static_cast<float>(frequencies.at(hash_code(x)));
     };
@@ -119,8 +123,8 @@ namespace rules::apriori {
         const auto count = static_cast<float>(transactions.size());
         const auto min_frequency = count * min_support;
 
-        auto has_support = [&](const auto &x, const auto &frequencies) {
-            return static_cast<float>(frequencies.at(hash_code(x))) / count >= min_support;
+        auto has_support = [&](const auto &itemset, const auto &frequencies) {
+            return static_cast<float>(frequencies.at(hash_code(itemset))) / count >= min_support;
         };
 
         auto prune = [&](itemsets_t &itemsets) -> itemsets_t {
