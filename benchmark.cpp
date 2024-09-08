@@ -39,7 +39,7 @@ using namespace rules::apriori;
 using namespace rules::fp_growth;
 
 namespace {
-    static auto generate_test_transactions(size_t num_transactions, size_t max_items) -> transactions_t {
+    static auto generate_test_transactions(size_t num_transactions, size_t max_items = 50) -> transactions_t {
         std::random_device rd;
         std::mt19937 gen(rd());
         std::uniform_int_distribution<size_t> dist(0, max_items - 1);
@@ -97,12 +97,12 @@ BENCHMARK_DEFINE_F(BenchmarkFixture, FPGrowthBenchmark)(benchmark::State &state)
 
 BENCHMARK_REGISTER_F(BenchmarkFixture, AprioriBenchmark)
         ->RangeMultiplier(10)
-        ->Range(10, 1e6)
+        ->Range(10, 1e5)
         ->Unit(benchmark::kMillisecond);
 
 BENCHMARK_REGISTER_F(BenchmarkFixture, FPGrowthBenchmark)
         ->RangeMultiplier(10)
-        ->Range(10, 1e6)
+        ->Range(10, 1e5)
         ->Unit(benchmark::kMillisecond);
 
 BENCHMARK_MAIN();
