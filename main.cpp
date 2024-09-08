@@ -29,18 +29,19 @@
 #include <iostream>
 #include <string>
 #include "CLI/CLI.hpp"
-#include "config.h"
+#include "dtypes.h"
 
 using namespace std;
 using namespace rules;
+using namespace rules::config;
 
 namespace {
-    const auto map_string_to_algorithm = std::map<std::string, algorithm_t>{
+    static const std::map<std::string, algorithm_t> map_string_to_algorithm{
             {"apriori",   algorithm_t::APRIORI},
-            {"fp-growth", algorithm_t::FP_GROWTH}
+            {"fp-growth", algorithm_t::FP_GROWTH},
     };
 
-    const auto map_algorithm_to_string = std::map<algorithm_t, std::string>{
+    static const std::map<algorithm_t, std::string> map_algorithm_to_string{
             {algorithm_t::APRIORI,   "apriori"},
             {algorithm_t::FP_GROWTH, "fp-growth"}
     };
@@ -52,6 +53,7 @@ namespace {
 }
 
 void add_options(CLI::App &app, configuration_t &config) {
+
     app.add_option("-i, --input", config.input_path)
             ->description("Path to the input file containing the transaction data set")
             ->required()
@@ -77,7 +79,7 @@ void add_options(CLI::App &app, configuration_t &config) {
     app.add_option("-a, --algorithm", config.algorithm)
             ->description("Specifies which algorithm to use. Accepted values are 'apriori' and 'fp-growth'")
             ->default_val(algorithm_t::APRIORI)
-            ->transform(CLI::CheckedTransformer(map_string_to_algorithm))
+            ->transform(CLI::CheckedTransformer(map_string_to_algorithm, CLI::ignore_case))
             ->option_text("('apriori' or 'fp-growth')");
 
     app.add_option("-m, --max-length", config.max_length)

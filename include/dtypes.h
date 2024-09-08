@@ -1,4 +1,4 @@
-/// @file apriori.h
+/// @file APRIORI.h
 /// @brief
 /// @see: https://www.macs.hw.ac.uk/~dwcorne/Teaching/agrawal94fast.pdf
 ///
@@ -29,6 +29,7 @@
 
 #pragma once
 
+#include <chrono>
 #include <set>
 #include <unordered_map>
 
@@ -46,7 +47,8 @@ namespace rules {
     // The transaction database type.
     using transactions_t = std::vector<itemset_t>;
 
-    // The associate rule type which contains a premise and a conclusion (premise -> conclusion).
+    // The associate rule type which contains a premise
+    // and a conclusion (premise -> conclusion).
     using rule_t = std::tuple<itemset_t, itemset_t>;
 
     // Collection of rules.
@@ -54,4 +56,94 @@ namespace rules {
 
     // Type for counting frequents of itemsets.
     using frequencies_t = std::unordered_map<size_t, size_t>;
+
+    // Date time type
+    using datetime_t = std::chrono::sys_time<std::chrono::seconds>;
+
+    ///
+    /// @param year
+    /// @param month
+    /// @param day
+    /// @param hours
+    /// @param minutes
+    /// @param seconds
+    /// @return
+    auto to_datetime(
+            std::chrono::year year,
+            std::chrono::month month,
+            std::chrono::day day,
+            std::chrono::hours hours,
+            std::chrono::minutes minutes,
+            std::chrono::seconds seconds) -> datetime_t;
+
+    ///
+    /// @param datetime
+    /// @return
+    auto iso8601_datetime(const datetime_t &datetime) -> std::string;
+
+    ///
+    /// @return
+    auto current_datetime() -> datetime_t;
+
+    ///
+    enum class algorithm_t : int {
+        UNKNOWN,
+        APRIORI,
+        FP_GROWTH,
+    };
+
+    ///
+    /// @param algorithm
+    /// @return
+    auto to_string(algorithm_t algorithm) -> std::string;
+
+    ///
+    /// @param str
+    /// @return
+    auto to_algorithm(std::string_view str) -> algorithm_t;
+
+    namespace config {
+
+        ///
+        enum class input_format_t {
+            CVS,
+            JSON
+        };
+
+        ///
+        struct configuration_t {
+            std::string input_path;
+            std::string output_path;
+            float min_support;
+            float min_confidence;
+            algorithm_t algorithm;
+            uint8_t max_length;
+            bool is_verbose;
+            // min_lift=3,
+            // min_length=2,
+        };
+    }
+
+    namespace io {
+
+        // Reader/writer error codes
+        enum class io_error_t {
+            FILE_NOT_FOUND,
+            INVALID_FORMAT,
+            VALUE_OUT_OF_RANGE,
+            UNKNOWN_ERROR,
+            EMPTY_ERROR
+        };
+
+        ///
+        struct frequency_output_t {
+            itemsets_t itemsets{};
+            frequencies_t frequencies{};
+            float min_support{};
+            size_t num_items{};
+            size_t num_transactions{};
+            datetime_t creation_datetime{current_datetime()};
+            algorithm_t algorithm{algorithm_t::UNKNOWN};
+        };
+    }
 }
