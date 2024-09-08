@@ -28,42 +28,55 @@
 
 #include "reader.h"
 
-auto rules::io::read_transactions(std::istream &input) -> rules::io::read_result_t {
+auto rules::io::read_csv(std::istream &input, const csv_config_t &config) -> rules::io::read_result_t {
     transactions_t transactions;
     std::string line;
 
     if ((input.bad() || input.fail())) {
-        return std::unexpected(error_t::UNKNOWN_ERROR);
+        return std::unexpected(io_error_t::UNKNOWN_ERROR);
+    }
+
+    for (auto i = 0; i < config.skip_rows; ++i) {
+        std::getline(input, line);
     }
 
     while (std::getline(input, line)) {
-        std::istringstream iss(line);
-        itemset_t itemset;
-        std::size_t number;
+        itemset_t itemset{};
 
-        while (iss >> number) {
-            itemset.insert(number);
+        std::stringstream line_stream(line);
+        std::string number;
+
+        try {
+            while (std::getline(line_stream, number, config.separator)) {
+                size_t value = std::stoull(number);
+                itemset.insert(value);
+            }
+        } catch (const std::invalid_argument &) {
+            return std::unexpected(io_error_t::INVALID_FORMAT);
+        }
+        catch (const std::out_of_range &) {
+            return std::unexpected(io_error_t::VALUE_OUT_OF_RANGE);
         }
 
-        if (iss.fail() && !iss.eof()) {
-            return std::unexpected(error_t::INVALID_FORMAT);
+        if (line_stream.fail() && !line_stream.eof()) {
+            return std::unexpected(io_error_t::INVALID_FORMAT);
         }
 
         transactions.push_back(std::move(itemset));
     }
 
     if (transactions.empty()) {
-        return std::unexpected(error_t::EMPTY_ERROR);
+        return std::unexpected(io_error_t::EMPTY_ERROR);
     }
 
     return transactions;
 }
 
-auto rules::io::read_transactions(const std::string &filename) -> rules::io::read_result_t {
+auto rules::io::read_csv(const std::string &filename, const csv_config_t &config) -> rules::io::read_result_t {
     std::ifstream file(filename);
     if (!file.is_open()) {
-        return std::unexpected(error_t::FILE_NOT_FOUND);
+        return std::unexpected(io_error_t::FILE_NOT_FOUND);
     }
 
-    return read_transactions(file);
+    return read_csv(file, config);
 }

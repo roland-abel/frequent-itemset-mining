@@ -35,24 +35,21 @@
 
 namespace rules::io {
 
-    // Reader/writer error codes
-    enum class error_t {
-        FILE_NOT_FOUND,
-        INVALID_FORMAT,
-        UNKNOWN_ERROR,
-        EMPTY_ERROR
+    struct csv_config_t {
+        size_t skip_rows = 0;
+        char separator = ' ';
     };
 
-    // Result type for the `read_transactions` function.
-    using read_result_t = std::expected<transactions_t, error_t>;
+    /// Result type for the @refitem read_csv` function.
+    using read_result_t = std::expected<transactions_t, io_error_t>;
 
-    /// Function to read transactions from an input stream
-    /// @param input The input stream to read from. This could be a file stream or any other stream.
-    /// @return An expected result containing a vector of item sets if successful, or an error code if failed.
-    auto read_transactions(std::istream &input) -> read_result_t;
+    /// Reads the transactions from the input stream as CSV.
+    /// @param input The input stream to read from.
+    /// @return The transactions if successful, or an error code if failed.
+    auto read_csv(std::istream &input, const csv_config_t &config = csv_config_t{}) -> read_result_t;
 
-    /// Function to read transactions from a file
+    /// Reads transactions from the given file.
     /// @param filename The name of the file to read from.
-    /// @return An expected result containing a vector of item sets if successful, or an error code if failed.
-    auto read_transactions(const std::string &filename) -> read_result_t;
+    /// @return The transactions if successful, or an error code if failed.
+    auto read_csv(const std::string &filename, const csv_config_t &config = csv_config_t{}) -> read_result_t;
 }
