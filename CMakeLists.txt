@@ -36,17 +36,17 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS ON)
 
 set(EXECUTABLE_NAME rule)
-set(BENCHMARK_NAME benchmark)
+set(BENCHMARK_NAME benchmark-tests)
 set(PROJECT_NAME association-rules)
 set(RULES_LIB rules)
 set(INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include)
 set(DATA_FILES ${CMAKE_SOURCE_DIR}/data/retail.dat)
-
 set(OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
 
 add_executable(
         ${EXECUTABLE_NAME}
         main.cpp
+        src/dtypes.cpp
         src/apriori.cpp
         src/fp_growth.cpp
         src/reader.cpp
@@ -63,30 +63,16 @@ add_executable(
 find_package(CLI11 CONFIG REQUIRED)
 find_package(benchmark CONFIG REQUIRED)
 
-target_link_libraries(${BENCHMARK_NAME} PRIVATE
-        benchmark::benchmark
-        benchmark::benchmark_main
-)
+target_link_libraries(${BENCHMARK_NAME} PRIVATE benchmark::benchmark benchmark::benchmark_main)
+target_link_libraries(${EXECUTABLE_NAME} PRIVATE CLI11::CLI11)
 
-target_include_directories(${BENCHMARK_NAME}
-        PRIVATE ${INCLUDE_DIR}
-)
+target_include_directories(${BENCHMARK_NAME} PRIVATE ${INCLUDE_DIR})
+target_include_directories(${EXECUTABLE_NAME} PRIVATE ${INCLUDE_DIR})
 
 add_custom_command(
         TARGET ${BENCHMARK_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different ${DATA_FILES} ${CMAKE_BINARY_DIR}
-        COMMENT "Kopiere die Resource-Datei in das Output-Verzeichnis"
 )
-
-
-target_link_libraries(${EXECUTABLE_NAME} PRIVATE
-        CLI11::CLI11
-)
-
-target_include_directories(${EXECUTABLE_NAME}
-        PRIVATE ${INCLUDE_DIR}
-)
-
 
 add_subdirectory(test)
 add_subdirectory(src)

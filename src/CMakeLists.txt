@@ -25,13 +25,20 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+set(INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include)
+
+find_package(nlohmann_json CONFIG REQUIRED)
+
 add_library(${RULES_LIB}
+        dtypes.cpp
         apriori.cpp
         fp_growth.cpp
         reader.cpp
+        writer.cpp
 )
 
-set(INCLUDE_DIR ../include)
+target_link_libraries(${RULES_LIB} PRIVATE nlohmann_json::nlohmann_json)
+set(INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include)
 
 target_include_directories(${RULES_LIB} PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}

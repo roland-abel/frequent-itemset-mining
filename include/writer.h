@@ -1,8 +1,8 @@
-/// @file config.h
+/// @file writer.h
 /// @brief
 ///
 /// @author Roland Abel
-/// @date July 05, 2024
+/// @date August 31, 2024
 ///
 /// Copyright (c) 2024 Roland Abel
 ///
@@ -28,26 +28,40 @@
 
 #pragma once
 
+#include <fstream>
 #include <iostream>
-#include <string>
+#include <expected>
+#include <format>
+#include "dtypes.h"
 
-namespace rules {
+namespace rules::io {
 
-    enum class algorithm_t {
-        APRIORI,
-        FP_GROWTH
-    };
+    ///
+    /// @param os
+    /// @param result
+    /// @return
+    std::ostream& operator<<(std::ostream& os, const frequency_output_t& result);
 
-    struct configuration_t {
-        std::string input_path;
-        std::string output_path;
-        float min_support;
-        float min_confidence;
-        algorithm_t algorithm;
-        uint8_t max_length;
-        bool is_verbose;
+    ///
+    /// @param os
+    /// @param output
+    /// @return
+    auto to_json(std::ostream& os, const frequency_output_t &output);
 
-//        min_lift=3,
-//        min_length=2,
-    };
+    ///
+    /// @param filename
+    /// @param output
+    /// @return
+    auto to_json(const std::string &filename, const frequency_output_t &output) -> io_error_t;
+
+    ///
+    /// @param output
+    /// @return
+    auto to_json(const frequency_output_t &output) -> std::string;
+
+    ///
+    /// @param is
+    /// @param result
+    /// @return
+    std::istream& operator>>(std::istream& is, frequency_output_t& result);
 }
