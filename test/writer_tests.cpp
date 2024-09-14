@@ -52,7 +52,7 @@ protected:
 
         for (const auto &[itemset, frequency]: itemsets_frequencies) {
             itemsets.insert(itemset);
-            frequencies[rules::apriori::hash_code(itemset)] = frequency;
+            frequencies[rules::hash_code(itemset)] = frequency;
         }
         return {itemsets, frequencies};
     }
@@ -92,7 +92,7 @@ TEST_F(WriterTests, WriterEmptyTest) {
     EXPECT_TRUE(deserialized.itemsets.contains({Coffee, Milk, Bread}));
 
     const auto get_frequency = [&](const itemset_t x) {
-        return deserialized.frequencies[apriori::hash_code(x)];
+        return deserialized.frequencies[hash_code(x)];
     };
 
     EXPECT_EQ(get_frequency({Milk, Bread, Butter}), 63);

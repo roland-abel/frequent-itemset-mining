@@ -72,7 +72,7 @@ namespace rules::io {
         };
 
         for (const auto &itemset: result.itemsets) {
-            const auto frequency = result.frequencies.at(apriori::hash_code(itemset));
+            const auto frequency = result.frequencies.at(hash_code(itemset));
             document_json["frequent_itemsets"].push_back(json{
                     {"itemset",   itemset},
                     {"frequency", frequency},
@@ -97,7 +97,7 @@ namespace rules::io {
         for (const auto x: frequent_itemsets) {
             const auto itemset = x["itemset"].template get<itemset_t>();
             const auto frequency = x["frequency"].template get<size_t>();
-            const auto hash = apriori::hash_code(itemset);
+            const auto hash = hash_code(itemset);
 
             result.frequencies[hash] = frequency;
             result.itemsets.insert(itemset);
@@ -106,6 +106,10 @@ namespace rules::io {
     }
 
     auto to_json(const frequency_output_t &output) -> std::string {
+        auto get_support = [&](const itemset_t &x) {
+            return static_cast<float>(output.frequencies.at(hash_code(x)) / output.num_transactions);
+        };
+
         json document_json{};
         document_json["metadata"] = {
                 {"min_support",      std::format("{:.2f}", output.min_support)},
@@ -116,7 +120,7 @@ namespace rules::io {
         };
 
         for (const auto &itemset: output.itemsets) {
-            const auto support = rules::apriori::get_support(output.frequencies, itemset, output.num_transactions);
+            const auto support = get_support(itemset);
             document_json["frequent_itemsets"].push_back(nlohmann::json{
                     {"itemset", itemset},
                     {"support", std::format("{:.2f}", support)},
