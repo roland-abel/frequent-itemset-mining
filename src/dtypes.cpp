@@ -60,6 +60,14 @@ namespace rules {
         return it != map_string_to_algorithm.end() ? it->second : algorithm_t::UNKNOWN;
     }
 
+    code_t hash_code(const itemset_t &x) {
+        code_t hash = 0;
+        for (const auto &item: x) {
+            hash ^= std::hash<item_t>()(item) + 0x9e3779b9 + (hash << 6) + (hash >> 2);
+        }
+        return hash;
+    }
+
     auto to_datetime(
             std::chrono::year year,
             std::chrono::month month,

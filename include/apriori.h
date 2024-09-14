@@ -36,11 +36,6 @@
 
 namespace rules::apriori {
 
-    /// Hash function for an itemset.
-    /// @param itemset The given itemset.
-    /// @return The hash code for the given x.
-    std::size_t hash_code(const itemset_t &itemset);
-
     /// Overloads the output stream operator to output an itemset to an ostream.
     /// @param os The output stream to write to.
     /// @param x The itemset to output.
@@ -65,13 +60,6 @@ namespace rules::apriori {
     /// @return The difference of the two sets.
     itemset_t set_difference(const itemset_t &x, const itemset_t &y);
 
-    /// Computes the support for a given itemset.
-    /// @param frequencies The frequencies of itemsets.
-    /// @param x The itemset.
-    /// @param num_transactions Number of transactions.
-    /// @return The support of x.
-    float get_support(const frequencies_t &frequencies, const itemset_t &x, size_t num_transactions);
-
     /// Computes the confidence level of rule x -> y given a set of frequencies.
     /// @param frequencies The frequencies of itemsets.
     /// @param x The premise of the rule.
@@ -89,7 +77,7 @@ namespace rules::apriori {
     /// @param transactions The itemsets database.
     /// @param min_support The minimum support threshold for frequent itemsets.
     /// @return Pair of the frequent itemsets with regard to min_support and their frequents.
-    auto apriori_algorithm(const transactions_t &itemsets, float min_support) -> std::pair<itemsets_t, frequencies_t>;
+    auto apriori_algorithm(const transactions_t &itemsets, size_t min_support) -> std::pair<itemsets_t, frequencies_t>;
 
     /// @brief Creates association rules based on one frequent itemset.
     /// @param z The frequent itemset for which the rules are generated.

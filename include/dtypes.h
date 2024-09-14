@@ -1,6 +1,5 @@
-/// @file APRIORI.h
+/// @file dtypes.h
 /// @brief
-/// @see: https://www.macs.hw.ac.uk/~dwcorne/Teaching/agrawal94fast.pdf
 ///
 /// @author Roland Abel
 /// @date July 07, 2024
@@ -54,11 +53,22 @@ namespace rules {
     // Collection of rules.
     using rules_t = std::set<rule_t>;
 
-    // Type for counting frequents of itemsets.
-    using frequencies_t = std::unordered_map<size_t, size_t>;
+    // Hash code type
+    using code_t = unsigned long;
+
+    // Type for counting frequents of itemsets. The key is the hash code of an item set.
+    using frequencies_t = std::unordered_map<code_t, size_t>;
+
+    // Type for counting frequents of an item.
+    using item_counts_t = std::unordered_map<item_t , size_t>;
 
     // Date time type
     using datetime_t = std::chrono::sys_time<std::chrono::seconds>;
+
+    /// Hash function for an itemset.
+    /// @param itemset The given itemset.
+    /// @return The hash code for the given x.
+    code_t hash_code(const itemset_t &itemset);
 
     ///
     /// @param year

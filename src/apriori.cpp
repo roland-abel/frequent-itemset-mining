@@ -63,21 +63,9 @@ namespace rules::apriori {
         return d;
     };
 
-    float get_support(const frequencies_t &frequencies, const itemset_t &x, size_t num_transactions) {
-        return static_cast<float>(frequencies.at(hash_code(x))) / num_transactions;
-    }
-
     float get_confidence(const frequencies_t &frequencies, const itemset_t &x, const itemset_t &y) {
         return static_cast<float>(frequencies.at(hash_code(set_union(x, y)))) / static_cast<float>(frequencies.at(hash_code(x)));
     };
-
-    std::size_t hash_code(const itemset_t &x) {
-        std::size_t hash = 0;
-        for (const auto &item: x) {
-            hash ^= std::hash<item_t>()(item) + 0x9e3779b9 + (hash << 6) + (hash >> 2);
-        }
-        return hash;
-    }
 
     auto apriori_gen(const itemsets_t &itemsets, size_t k) -> itemsets_t {
         // check whether the k-2 first items of x and y are match
@@ -117,14 +105,11 @@ namespace rules::apriori {
         return candidates;
     }
 
-    auto apriori_algorithm(const transactions_t &transactions, float min_support) -> std::pair<itemsets_t, frequencies_t> {
+    auto apriori_algorithm(const transactions_t &transactions, size_t min_support) -> std::pair<itemsets_t, frequencies_t> {
         auto frequencies = frequencies_t{};
 
-        const auto count = static_cast<float>(transactions.size());
-        const auto min_frequency = count * min_support;
-
         auto has_support = [&](const auto &itemset, const auto &frequencies) {
-            return static_cast<float>(frequencies.at(hash_code(itemset))) / count >= min_support;
+            return static_cast<float>(frequencies.at(hash_code(itemset))) >= min_support;
         };
 
         auto prune = [&](itemsets_t &itemsets) -> itemsets_t {
@@ -137,7 +122,7 @@ namespace rules::apriori {
             }
 
             std::erase_if(itemsets, [&](const auto &x) { return !has_support(x, frequencies); });
-            std::erase_if(frequencies, [&](const auto &f) { return f.second < min_frequency; });
+            std::erase_if(frequencies, [&](const auto &f) { return f.second < min_support; });
 
             return itemsets;
         };

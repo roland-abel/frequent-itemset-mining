@@ -56,17 +56,6 @@ TEST_F(AprioriTests, NumberOfTransactionsTest) {
     EXPECT_EQ(get_transactions().size(), 10);
 }
 
-TEST_F(AprioriTests, HashCodeTest) {
-    const auto code1 = hash_code(itemset_t{Coffee, Milk, Bread});
-    const auto code2 = hash_code(itemset_t{Milk, Coffee, Bread});
-
-    const auto code3 = hash_code(itemset_t{Coffee, Milk, Bread});
-    const auto code4 = hash_code(itemset_t{Coffee, Milk, Sugar});
-
-    EXPECT_EQ(code1, code2);
-    EXPECT_NE(code3, code4);
-}
-
 TEST_F(AprioriTests, AprioriGenTest) {
     const itemsets_t itemsets = {
             {Milk,   Bread,  Cheese, Coffee},
@@ -83,7 +72,7 @@ TEST_F(AprioriTests, AprioriGenTest) {
 }
 
 TEST_F(AprioriTests, AprioriAlgorithmTest) {
-    const auto min_support = 0.4f;
+    const auto min_support = 4;
 
     const auto &transactions = get_transactions();
     const auto [itemsets, frequencies] = apriori_algorithm(transactions, min_support);
@@ -136,7 +125,7 @@ TEST_F(AprioriTests, AprioriAlgorithmTest) {
 }
 
 TEST_F(AprioriTests, ConfidenceTest) {
-    const auto min_support = 0.4f;
+    const auto min_support = 4;
 
     const auto &transactions = get_transactions();
     const auto [itemsets, frequencies] = apriori_algorithm(transactions, min_support);
@@ -148,7 +137,7 @@ TEST_F(AprioriTests, ConfidenceTest) {
 }
 
 TEST_F(AprioriTests, GenerateRulesForOneItemsetTest) {
-    const auto min_support = 0.4f;
+    const auto min_support = 4;
     const auto min_confidence = 0.9f;
 
     const auto &transactions = get_transactions();
@@ -178,7 +167,7 @@ TEST_F(AprioriTests, GenerateRulesForOneItemsetTest) {
 }
 
 TEST_F(AprioriTests, GenerateRulesTest) {
-    const auto min_support = 0.4f;
+    const auto min_support = 4;
     const auto min_confidence = 0.75f;
 
     const auto &transactions = get_transactions();

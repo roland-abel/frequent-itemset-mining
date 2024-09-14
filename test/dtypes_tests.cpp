@@ -28,9 +28,11 @@
 
 #include <gtest/gtest.h>
 #include "dtypes.h"
+#include "test_data.h"
 
 using namespace std::chrono;
 using namespace rules;
+using namespace rules::tests;
 
 TEST(DTypesTests, AlgorithmToStringTest) {
     EXPECT_EQ(to_string(algorithm_t::APRIORI), "apriori");
@@ -47,4 +49,15 @@ TEST(DTypesTests, AlgorithmToEnumTest) {
 TEST(DTypesTests, Iso8601DatetimeTest) {
     const auto dt = to_datetime(year{2024}, month{9}, day{1}, hours{14}, minutes{30}, seconds{5});
     EXPECT_EQ(iso8601_datetime(dt), "2024-09-01T14:30:05Z");
+}
+
+TEST(DTypesTests, HashCodeTest) {
+    const auto code1 = hash_code(itemset_t{Coffee, Milk, Bread});
+    const auto code2 = hash_code(itemset_t{Milk, Coffee, Bread});
+
+    const auto code3 = hash_code(itemset_t{Coffee, Milk, Bread});
+    const auto code4 = hash_code(itemset_t{Coffee, Milk, Sugar});
+
+    EXPECT_EQ(code1, code2);
+    EXPECT_NE(code3, code4);
 }
