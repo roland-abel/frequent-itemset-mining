@@ -63,72 +63,62 @@ namespace {
 class BenchmarkFixture : public benchmark::Fixture {
 public:
     void SetUp(const ::benchmark::State &state) override {
-        size_t num_transactions = state.range(0);
-
-        transactions_ = generate_test_transactions(num_transactions, max_items_);
-        min_support_ = 0.9;
+        const std::string_view filename = "data/mushroom.dat";
+        transactions_ = rules::io::read_csv(filename).value();
+        min_support_ = 0.95;
     }
 
-    inline const transactions_t &get_transactions() const {
+    const transactions_t &get_transactions() const {
         return transactions_;
     };
 
-    inline const float &min_support() const {
-        return min_support_;
-    };
-
-    inline size_t min_support_abs() const {
+    const size_t get_min_support() const {
         return static_cast<size_t>(min_support_ * transactions_.size());
     };
 
 private:
     transactions_t transactions_{};
     float min_support_{};
-    size_t max_items_ = 150;
 };
 
 BENCHMARK_DEFINE_F(BenchmarkFixture, AprioriBenchmark)(benchmark::State &state) {
     for (auto _: state) {
-        rules::apriori::apriori_algorithm(get_transactions(), min_support());
+        rules::apriori::apriori_algorithm(get_transactions(), get_min_support());
     }
 }
 
 BENCHMARK_DEFINE_F(BenchmarkFixture, FPGrowthBenchmark)(benchmark::State &state) {
     for (auto _: state) {
-        rules::fp_growth::fp_growth_algorithm(get_transactions(), min_support_abs());
+        rules::fp_growth::fp_growth_algorithm(get_transactions(), get_min_support());
     }
 }
 
 BENCHMARK_DEFINE_F(BenchmarkFixture, EclatBenchmark)(benchmark::State &state) {
     for (auto _: state) {
-        rules::eclat::eclat_algorithm(get_transactions(), min_support_abs());
+        rules::eclat::eclat_algorithm(get_transactions(), get_min_support());
     }
 }
 
 BENCHMARK_DEFINE_F(BenchmarkFixture, RelimBenchmark)(benchmark::State &state) {
     for (auto _: state) {
-        rules::relim::relim_algorithm(get_transactions(), min_support_abs());
+        rules::relim::relim_algorithm(get_transactions(), get_min_support());
     }
 }
 
 BENCHMARK_REGISTER_F(BenchmarkFixture, AprioriBenchmark)
-        ->RangeMultiplier(10)
-        ->Range(10, 1e5)
-        ->Unit(benchmark::kMillisecond);
+        ->Unit(benchmark::kMillisecond)
+        ->MinTime(1.0);
 
 BENCHMARK_REGISTER_F(BenchmarkFixture, FPGrowthBenchmark)
-        ->RangeMultiplier(10)
-        ->Range(10, 1e5)
-        ->Unit(benchmark::kMillisecond);
+        ->Unit(benchmark::kMillisecond)
+        ->MinTime(1.0);
 
 BENCHMARK_REGISTER_F(BenchmarkFixture, EclatBenchmark)
-        ->RangeMultiplier(10)
-        ->Range(10, 1e5)
-        ->Unit(benchmark::kMillisecond);
+        ->Unit(benchmark::kMillisecond)
+        ->MinTime(1.0);
 
 BENCHMARK_REGISTER_F(BenchmarkFixture, RelimBenchmark)
-        ->RangeMultiplier(10)
-        ->Range(10, 1e5)
-        ->Unit(benchmark::kMillisecond);
+        ->Unit(benchmark::kMillisecond)
+        ->MinTime(1.0);
 
 BENCHMARK_MAIN();

@@ -40,8 +40,9 @@ set(BENCHMARK_NAME benchmark-tests)
 set(PROJECT_NAME association-rules)
 set(RULES_LIB rules)
 set(INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include)
-set(DATA_FILES ${CMAKE_SOURCE_DIR}/data/retail.dat)
 set(OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
+
+file(GLOB DATA_FILES "${CMAKE_SOURCE_DIR}/data/*")
 
 add_executable(
         ${EXECUTABLE_NAME}
@@ -76,8 +77,16 @@ target_include_directories(${EXECUTABLE_NAME} PRIVATE ${INCLUDE_DIR})
 
 add_custom_command(
         TARGET ${BENCHMARK_NAME} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${DATA_FILES} ${CMAKE_BINARY_DIR}
+        COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/data
 )
+
+foreach(DATA_FILE IN LISTS DATA_FILES)
+    add_custom_command(
+            TARGET ${BENCHMARK_NAME} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            ${DATA_FILE} ${CMAKE_BINARY_DIR}/data
+    )
+endforeach()
 
 add_subdirectory(test)
 add_subdirectory(src)

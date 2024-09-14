@@ -72,8 +72,8 @@ auto rules::io::read_csv(std::istream &input, const csv_config_t &config) -> rul
     return transactions;
 }
 
-auto rules::io::read_csv(const std::string &filename, const csv_config_t &config) -> rules::io::read_result_t {
-    std::ifstream file(filename);
+auto rules::io::read_csv(const std::string_view &filename, const csv_config_t &config) -> rules::io::read_result_t {
+    std::ifstream file(filename.data());
     if (!file.is_open()) {
         return std::unexpected(io_error_t::FILE_NOT_FOUND);
     }
