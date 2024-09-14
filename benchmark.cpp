@@ -30,16 +30,17 @@
 #include <vector>
 #include <algorithm>
 #include <random>
+#include "reader.h"
 #include "apriori.h"
 #include "fp_growth.h"
-#include "reader.h"
+#include "eclat.h"
+#include "relim.h"
 
 using namespace std;
-using namespace rules::apriori;
-using namespace rules::fp_growth;
+using namespace rules;
 
 namespace {
-    static auto generate_test_transactions(size_t num_transactions, size_t max_items = 50) -> transactions_t {
+    static auto generate_test_transactions(size_t num_transactions, size_t max_items) -> transactions_t {
         std::random_device rd;
         std::mt19937 gen(rd());
         std::uniform_int_distribution<size_t> dist(0, max_items - 1);
@@ -61,37 +62,52 @@ namespace {
 
 class BenchmarkFixture : public benchmark::Fixture {
 public:
-
     void SetUp(const ::benchmark::State &state) override {
         size_t num_transactions = state.range(0);
 
         transactions_ = generate_test_transactions(num_transactions, max_items_);
         min_support_ = 0.9;
-        min_support_abs_ = static_cast<size_t>(min_support_ * transactions_.size());
     }
 
-    inline const transactions_t &get_transactions() const { return transactions_; };
+    inline const transactions_t &get_transactions() const {
+        return transactions_;
+    };
 
-    inline const float &min_support() const { return min_support_; };
+    inline const float &min_support() const {
+        return min_support_;
+    };
 
-    inline size_t min_support_abs() const { return min_support_abs_; };
+    inline size_t min_support_abs() const {
+        return static_cast<size_t>(min_support_ * transactions_.size());
+    };
 
 private:
-    transactions_t transactions_;
+    transactions_t transactions_{};
     float min_support_{};
-    size_t min_support_abs_{};
-    size_t max_items_ = 50;
+    size_t max_items_ = 150;
 };
 
 BENCHMARK_DEFINE_F(BenchmarkFixture, AprioriBenchmark)(benchmark::State &state) {
     for (auto _: state) {
-        apriori_algorithm(get_transactions(), min_support());
+        rules::apriori::apriori_algorithm(get_transactions(), min_support());
     }
 }
 
 BENCHMARK_DEFINE_F(BenchmarkFixture, FPGrowthBenchmark)(benchmark::State &state) {
     for (auto _: state) {
-        fp_growth_algorithm(get_transactions(), min_support_abs());
+        rules::fp_growth::fp_growth_algorithm(get_transactions(), min_support_abs());
+    }
+}
+
+BENCHMARK_DEFINE_F(BenchmarkFixture, EclatBenchmark)(benchmark::State &state) {
+    for (auto _: state) {
+        rules::eclat::eclat_algorithm(get_transactions(), min_support_abs());
+    }
+}
+
+BENCHMARK_DEFINE_F(BenchmarkFixture, RelimBenchmark)(benchmark::State &state) {
+    for (auto _: state) {
+        rules::relim::relim_algorithm(get_transactions(), min_support_abs());
     }
 }
 
@@ -101,6 +117,16 @@ BENCHMARK_REGISTER_F(BenchmarkFixture, AprioriBenchmark)
         ->Unit(benchmark::kMillisecond);
 
 BENCHMARK_REGISTER_F(BenchmarkFixture, FPGrowthBenchmark)
+        ->RangeMultiplier(10)
+        ->Range(10, 1e5)
+        ->Unit(benchmark::kMillisecond);
+
+BENCHMARK_REGISTER_F(BenchmarkFixture, EclatBenchmark)
+        ->RangeMultiplier(10)
+        ->Range(10, 1e5)
+        ->Unit(benchmark::kMillisecond);
+
+BENCHMARK_REGISTER_F(BenchmarkFixture, RelimBenchmark)
         ->RangeMultiplier(10)
         ->Range(10, 1e5)
         ->Unit(benchmark::kMillisecond);
