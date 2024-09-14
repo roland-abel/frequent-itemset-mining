@@ -31,10 +31,13 @@ find_package(nlohmann_json CONFIG REQUIRED)
 
 add_library(${RULES_LIB}
         dtypes.cpp
-        apriori.cpp
-        fp_growth.cpp
         reader.cpp
         writer.cpp
+        apriori.cpp
+        fp_tree.cpp
+        fp_growth.cpp
+        eclat.cpp
+        relim.cpp
 )
 
 target_link_libraries(${RULES_LIB} PRIVATE nlohmann_json::nlohmann_json)

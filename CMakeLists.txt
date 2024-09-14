@@ -47,6 +47,7 @@ add_executable(
         ${EXECUTABLE_NAME}
         main.cpp
         src/dtypes.cpp
+        src/fp_tree.cpp
         src/apriori.cpp
         src/fp_growth.cpp
         src/reader.cpp
@@ -55,9 +56,13 @@ add_executable(
 add_executable(
         ${BENCHMARK_NAME}
         benchmark.cpp
+        src/reader.cpp
+        src/dtypes.cpp
+        src/fp_tree.cpp
         src/apriori.cpp
         src/fp_growth.cpp
-        src/reader.cpp
+        src/eclat.cpp
+        src/relim.cpp
 )
 
 find_package(CLI11 CONFIG REQUIRED)
