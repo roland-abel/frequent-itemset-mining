@@ -40,10 +40,10 @@ namespace rules::eclat {
         return tidset;
     }
 
-    auto to_vertical_transactions(const transactions_t &transactions) -> vertical_transactions_t {
-        vertical_transactions_t vertical_trans{};
-        for (tid_t tid = 0; tid < transactions.size(); ++tid) {
-            const auto &trans = transactions[tid];
+    auto to_vertical_database(const database_t &database) -> vertical_database_t {
+        vertical_database_t vertical_trans{};
+        for (tid_t tid = 0; tid < database.size(); ++tid) {
+            const auto &trans = database[tid];
 
             for (const auto &item: trans) {
                 vertical_trans[item].insert(tid);
@@ -52,12 +52,12 @@ namespace rules::eclat {
         return vertical_trans;
     }
 
-    auto eclat_algorithm(const transactions_t &transactions, size_t min_support) -> itemsets_t {
+    auto eclat_algorithm(const database_t &database, size_t min_support) -> itemsets_t {
         itemsets_t frequent_itemsets{};
 
         // Creates initial tids.
         auto all_tids = [&]() -> tidset_t {
-            return std::views::iota(size_t{0}, transactions.size()) | std::ranges::to<tidset_t>();
+            return std::views::iota(size_t{0}, database.size()) | std::ranges::to<tidset_t>();
         };
 
         auto create_frequent_itemset = [&](const item_t &item, const itemset_t &prefix) -> itemset_t {
@@ -68,9 +68,9 @@ namespace rules::eclat {
             return itemset;
         };
 
-        std::function<void(const itemset_t &, const vertical_transactions_t &, const tidset_t &)> eclat_ = [&](
+        std::function<void(const itemset_t &, const vertical_database_t &, const tidset_t &)> eclat_ = [&](
                 const itemset_t &prefix,
-                const vertical_transactions_t &vertical_trans,
+                const vertical_database_t &vertical_trans,
                 const tidset_t &current_tidset) -> void {
 
             for (auto it = vertical_trans.begin(); it != vertical_trans.end(); ++it) {
@@ -79,7 +79,7 @@ namespace rules::eclat {
 
                 if (new_tidset.size() >= min_support) {
                     const auto &new_itemset = create_frequent_itemset(item, prefix);
-                    vertical_transactions_t new_vertical_trans{};
+                    vertical_database_t new_vertical_trans{};
 
                     for (auto jt = std::next(it); jt != vertical_trans.end(); ++jt) {
                         const auto &[new_item, new_item_tidset] = *jt;
@@ -96,7 +96,7 @@ namespace rules::eclat {
             }
         };
 
-        const auto &vertical_trans = to_vertical_transactions(transactions);
+        const auto &vertical_trans = to_vertical_database(database);
         eclat_({}, vertical_trans, all_tids());
 
         return frequent_itemsets;

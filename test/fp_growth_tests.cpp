@@ -83,7 +83,7 @@ TEST_F(FPGrowthTests, InsertIntoAllItemsetsTest) {
 TEST_F(FPGrowthTests, GetFrequentItemsTest) {
     const auto min_support = 4;
 
-    const auto &item_counts = get_item_counts(get_transactions());
+    const auto &item_counts = get_item_counts(get_database());
     const auto &[items, frequencies] = get_frequent_items(item_counts, min_support);
 
     ASSERT_EQ(items.size(), 7);
@@ -109,7 +109,7 @@ TEST_F(FPGrowthTests, GetFrequentItemsTest) {
 TEST_F(FPGrowthTests, SortAndFilterItems1Test) {
     const auto min_support = 4;
 
-    const auto &item_counts = get_item_counts(get_transactions());
+    const auto &item_counts = get_item_counts(get_database());
     const auto &[frequent_items, _] = get_frequent_items(item_counts, min_support);
     const itemset_t &itemset = {Milk, Bread, Cheese, Butter, Coffee, Sugar, Flour, Cream};
 
@@ -139,7 +139,7 @@ TEST_F(FPGrowthTests, SortAndFilterItems2Test) {
 
 TEST_F(FPGrowthTests, BuildFpTreeFormEmptyTransactionsTest) {
     const auto min_support = 4;
-    const auto &root = build_fp_tree(transactions_t{}, min_support);
+    const auto &root = build_fp_tree(database_t{}, min_support);
 
     EXPECT_EQ(root->children.size(), 0);
     EXPECT_EQ(root->item, 0);
@@ -150,7 +150,7 @@ TEST_F(FPGrowthTests, BuildFpTreeFormEmptyTransactionsTest) {
 TEST_F(FPGrowthTests, BuildFpTreeTest) {
     const auto min_support = 4;
 
-    const auto &root = build_fp_tree(get_transactions(), min_support);
+    const auto &root = build_fp_tree(get_database(), min_support);
     ASSERT_EQ(root->children.size(), 2);
 
     EXPECT_TRUE(root->has_path_with_frequencies({Milk, Flour}, {8, 1}));
@@ -165,7 +165,7 @@ TEST_F(FPGrowthTests, BuildFpTreeTest) {
 
 TEST_F(FPGrowthTests, ConditionalTransactions1Test) {
     const auto min_support = 4;
-    const auto &root = build_fp_tree(get_transactions(), min_support);
+    const auto &root = build_fp_tree(get_database(), min_support);
     const auto &trans = conditional_transactions(root, Flour);
 
     ASSERT_EQ(trans.size(), 6);
@@ -179,7 +179,7 @@ TEST_F(FPGrowthTests, ConditionalTransactions1Test) {
 
 TEST_F(FPGrowthTests, ConditionalTransactions2Test) {
     const auto min_support = 4;
-    const auto &root = build_fp_tree(get_transactions(), min_support);
+    const auto &root = build_fp_tree(get_database(), min_support);
     const auto &trans = conditional_transactions(root, Bread);
 
     ASSERT_EQ(trans.size(), 4);
@@ -191,7 +191,7 @@ TEST_F(FPGrowthTests, ConditionalTransactions2Test) {
 
 TEST_F(FPGrowthTests, FpGrowthAlgorithmTest) {
     const auto min_support = 4;
-    const auto &transactions = get_transactions();
+    const auto &transactions = get_database();
 
     const auto &itemsets = fp_growth_algorithm(transactions, min_support);
     EXPECT_EQ(itemsets.size(), 35);

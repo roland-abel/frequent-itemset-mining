@@ -40,8 +40,8 @@ protected:
 };
 
 TEST_F(EclatTests, ToVerticalTransactionsTest) {
-    const auto &trans = get_transactions();
-    const auto &vertical_trans = to_vertical_transactions(trans);
+    const auto &trans = get_database();
+    const auto &vertical_trans = to_vertical_database(trans);
 
     ASSERT_EQ(trans.size(), 10);
     ASSERT_EQ(vertical_trans.size(), 8);
@@ -66,7 +66,7 @@ TEST_F(EclatTests, SetIntersectionOfTidsTest) {
 
 TEST_F(EclatTests, EclatAlgorithmTest) {
     const auto min_support = 4;
-    const auto &transactions = get_transactions();
+    const auto &transactions = get_database();
 
     const auto &itemsets = eclat_algorithm(transactions, min_support);
     EXPECT_EQ(itemsets.size(), 35);

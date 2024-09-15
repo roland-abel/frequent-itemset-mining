@@ -72,12 +72,12 @@ namespace rules::apriori {
     /// @return The k-element frequent itemsets.
     auto apriori_gen(const itemsets_t &itemsets, size_t k) -> itemsets_t;
 
-    /// @brief Creates the collection of all frequent itemsets by apply the Apriori principle:
+    /// @brief Creates the collection of all frequent database by apply the Apriori principle:
     /// If an itemset is frequent, then all of its subsets must also be frequent.
-    /// @param transactions The itemsets database.
-    /// @param min_support The minimum support threshold for frequent itemsets.
-    /// @return Pair of the frequent itemsets with regard to min_support and their frequents.
-    auto apriori_algorithm(const transactions_t &itemsets, size_t min_support) -> std::pair<itemsets_t, frequencies_t>;
+    /// @param database The database database.
+    /// @param min_support The minimum support threshold for frequent database.
+    /// @return Pair of the frequent database with regard to min_support and their frequents.
+    auto apriori_algorithm(const database_t &database, size_t min_support) -> std::pair<itemsets_t, frequencies_t>;
 
     /// @brief Creates association rules based on one frequent itemset.
     /// @param z The frequent itemset for which the rules are generated.

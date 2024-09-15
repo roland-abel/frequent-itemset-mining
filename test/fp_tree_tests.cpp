@@ -125,7 +125,7 @@ TEST_F(FPTreeTests, TreeHasNoSinglePathTest) {
 
 TEST_F(FPTreeTests, GetItemFrequencyTest) {
     const auto min_support = 4;
-    const auto &root = build_fp_tree(get_transactions(), min_support);
+    const auto &root = build_fp_tree(get_database(), min_support);
 
     EXPECT_EQ(get_item_frequency(root, Milk), 8);
     EXPECT_EQ(get_item_frequency(root, Butter), 7);

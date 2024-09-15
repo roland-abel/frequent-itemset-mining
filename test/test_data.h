@@ -32,7 +32,7 @@
 
 namespace rules::tests {
 
-    using transactions_t = rules::transactions_t;
+    using database_t = rules::database_t;
 
     enum Items {
         Milk = 1,
@@ -47,5 +47,5 @@ namespace rules::tests {
 
     /// Gets the test data for the Apriori- and FP-Growth algorithms.
     /// @return The test transactions.
-    transactions_t get_transactions();
+    database_t get_database();
 }

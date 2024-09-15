@@ -44,7 +44,7 @@ namespace rules {
     using itemsets_t = std::set<itemset_t>;
 
     // The transaction database type.
-    using transactions_t = std::vector<itemset_t>;
+    using database_t = std::vector<itemset_t>;
 
     // The associate rule type which contains a premise
     // and a conclusion (premise -> conclusion).

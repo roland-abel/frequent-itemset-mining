@@ -1,5 +1,5 @@
 /// @file reader_tests.cpp
-/// @brief Unit test for the read transactions function.
+/// @brief Unit test for the readers function.
 ///
 /// @author Roland Abel
 /// @date August 30, 2024

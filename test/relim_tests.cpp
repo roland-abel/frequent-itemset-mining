@@ -40,7 +40,7 @@ protected:
 };
 
 TEST_F(RelimTests, GetItemCountsTest) {
-    const auto &trans = get_transactions();
+    const auto &trans = get_database();
     const auto &counts = get_item_counts(trans);
 
     ASSERT_EQ(counts.size(), 8);
@@ -57,7 +57,7 @@ TEST_F(RelimTests, GetItemCountsTest) {
 
 TEST_F(RelimTests, RelimAlgorithmTest) {
     const auto min_support = 4;
-    const auto &transactions = get_transactions();
+    const auto &transactions = get_database();
 
     const auto &itemsets = relim_algorithm(transactions, min_support);
     EXPECT_EQ(itemsets.size(), 35);

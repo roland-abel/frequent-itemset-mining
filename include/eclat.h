@@ -43,7 +43,7 @@ namespace rules::eclat {
     using tidset_t = std::set<tid_t>;
 
     // The vertical transaction database type.
-    using vertical_transactions_t = std::unordered_map<item_t, tidset_t>;
+    using vertical_database_t = std::unordered_map<item_t, tidset_t>;
 
     /// Computes the intersection of two tidsets.
     /// @param x The first itemset.
@@ -52,13 +52,13 @@ namespace rules::eclat {
     auto set_intersection(const tidset_t &x, const tidset_t &y) -> tidset_t;
 
     /// Converts the given transaction data to a vertical representation of the data.
-    /// @param transactions The transaction data
+    /// @param database The transaction data
     /// @return The vertical representation of the transaction data.
-    auto to_vertical_transactions(const transactions_t &transactions) -> vertical_transactions_t;
+    auto to_vertical_database(const database_t &database) -> vertical_database_t;
 
     ///
-    /// @param transactions
+    /// @param database
     /// @param min_support
     /// @return
-    auto eclat_algorithm(const transactions_t &transactions, size_t min_support) -> itemsets_t;
+    auto eclat_algorithm(const database_t &database, size_t min_support) -> itemsets_t;
 }

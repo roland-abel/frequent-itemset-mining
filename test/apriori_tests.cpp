@@ -53,7 +53,7 @@ TEST_F(AprioriTests, SetUnionTest) {
 }
 
 TEST_F(AprioriTests, NumberOfTransactionsTest) {
-    EXPECT_EQ(get_transactions().size(), 10);
+    EXPECT_EQ(get_database().size(), 10);
 }
 
 TEST_F(AprioriTests, AprioriGenTest) {
@@ -74,7 +74,7 @@ TEST_F(AprioriTests, AprioriGenTest) {
 TEST_F(AprioriTests, AprioriAlgorithmTest) {
     const auto min_support = 4;
 
-    const auto &transactions = get_transactions();
+    const auto &transactions = get_database();
     const auto [itemsets, frequencies] = apriori_algorithm(transactions, min_support);
 
     EXPECT_EQ(itemsets.size(), 35);
@@ -127,7 +127,7 @@ TEST_F(AprioriTests, AprioriAlgorithmTest) {
 TEST_F(AprioriTests, ConfidenceTest) {
     const auto min_support = 4;
 
-    const auto &transactions = get_transactions();
+    const auto &transactions = get_database();
     const auto [itemsets, frequencies] = apriori_algorithm(transactions, min_support);
 
     EXPECT_NEAR(get_confidence(frequencies, itemset_t({Bread, Flour, Sugar}), itemset_t({Cheese})), 1.0, eps);
@@ -140,7 +140,7 @@ TEST_F(AprioriTests, GenerateRulesForOneItemsetTest) {
     const auto min_support = 4;
     const auto min_confidence = 0.9f;
 
-    const auto &transactions = get_transactions();
+    const auto &transactions = get_database();
     const auto [itemsets, frequencies] = apriori_algorithm(transactions, min_support);
 
     const itemset_t z = {Cheese, Bread, Sugar, Flour};
@@ -170,7 +170,7 @@ TEST_F(AprioriTests, GenerateRulesTest) {
     const auto min_support = 4;
     const auto min_confidence = 0.75f;
 
-    const auto &transactions = get_transactions();
+    const auto &transactions = get_database();
     const auto [itemsets, frequencies] = apriori_algorithm(transactions, min_support);
     const auto rules = generate_rules(itemsets, frequencies, min_confidence);
 

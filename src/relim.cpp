@@ -33,16 +33,16 @@
 
 namespace rules::relim {
 
-    auto get_item_counts(const transactions_t &transactions) -> item_counts_t {
+    auto get_item_counts(const database_t &database) -> item_counts_t {
         item_counts_t item_counts{};
 
-        for (const auto &item: transactions | std::views::join) {
+        for (const auto &item: database | std::views::join) {
             ++item_counts[item];
         }
         return item_counts;
     }
 
-    auto relim_algorithm(const transactions_t &transactions, size_t min_support) -> itemsets_t {
+    auto relim_algorithm(const database_t &database, size_t min_support) -> itemsets_t {
         auto is_frequent = [=](const auto &kv) { return kv.second >= min_support; };
         auto get_item = [](const auto &kv) { return kv.first; };
 
@@ -56,11 +56,8 @@ namespace rules::relim {
             return itemset;
         };
 
-        std::function<void(const transactions_t &, const itemset_t &)> relim_ = [&](
-                const transactions_t &transactions,
-                const itemset_t &prefix) -> void {
-
-            const auto &frequent_items = get_item_counts(transactions)
+        std::function<void(const database_t &, const itemset_t &)> relim_ = [&](const database_t &db, const itemset_t &prefix) -> void {
+            const auto &frequent_items = get_item_counts(db)
                                          | std::views::filter(is_frequent)
                                          | std::views::transform(get_item)
                                          | std::ranges::to<std::vector>();
@@ -68,8 +65,8 @@ namespace rules::relim {
             for (const auto &item: frequent_items) {
                 const auto &new_itemset = create_frequent_itemset(item, prefix);
 
-                transactions_t new_transactions{};
-                for (const auto &trans: transactions) {
+                database_t new_transactions{};
+                for (const auto &trans: db) {
                     if (trans.contains(item)) {
                         itemset_t reduced_transaction = trans;
                         reduced_transaction.erase(item);
@@ -83,7 +80,7 @@ namespace rules::relim {
             }
         };
 
-        relim_(transactions, {});
+        relim_(database, {});
         return frequent_itemsets;
     }
 }

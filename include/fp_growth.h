@@ -43,7 +43,7 @@ namespace rules::fp_growth {
     using item_t = rules::item_t;
     using itemset_t = rules::itemset_t;
     using itemsets_t = rules::itemsets_t;
-    using transactions_t = rules::transactions_t;
+    using database_t = rules::database_t;
 
     /// Compare function for item
     using itemset_compare_fn = std::function<bool(const item_t &x, const item_t &y)>;
@@ -63,9 +63,9 @@ namespace rules::fp_growth {
     auto filter_items(const item_counts_t &item_counts, size_t min_support) -> itemset_filter_fn;
 
     ///
-    /// @param transactions
+    /// @param database
     /// @return
-    auto get_item_counts(const transactions_t &transactions) -> item_counts_t;
+    auto get_item_counts(const database_t &database) -> item_counts_t;
 
     /// Gets a sorted list of frequent items from the given transactions.
     /// @param item_counts
@@ -100,28 +100,28 @@ namespace rules::fp_growth {
     /// @return
     auto filter_and_sort_items_(const item_counts_t &item_counts, size_t min_support) -> filter_and_sort_fn;
 
-    /// Builds a FP-tree from the given transactions based on frequent items and minimum support.
-    /// @param transactions A collection of transactions, where each transaction is a set of items.
+    /// Builds a FP-tree from the given database based on frequent items and minimum support.
+    /// @param database A collection of transactions, where each transaction is a set of items.
     /// @param filter_and_sort
     /// @return A shared pointer to the root node of the constructed FP-tree.
-    auto build_fp_tree(const transactions_t &transactions, const filter_and_sort_fn &filter_and_sort) -> node_ptr;
+    auto build_fp_tree(const database_t &database, const filter_and_sort_fn &filter_and_sort) -> node_ptr;
 
-    /// Builds a FP-tree from the given transactions based on the minimum support.
-    /// @param transactions A collection of transactions, where each transaction is a set of items.
+    /// Builds a FP-tree from the given database based on the minimum support.
+    /// @param database A collection of transactions, where each transaction is a set of items.
     /// @param min_support The minimum support threshold for an item to be considered frequent.
     /// @return A shared pointer to the root node of the constructed FP-tree.
-    auto build_fp_tree(const transactions_t &transactions, size_t min_support) -> node_ptr;
+    auto build_fp_tree(const database_t &database, size_t min_support) -> node_ptr;
 
     /// Generates the conditional transaction from the given FP-Tree.
     /// @param node The current node in the FP-Tree being processed.
-    /// @param item  The item for which conditional transactions_ are being generated.
-    /// @return The transactions_ that will be populated with the conditional transactions_.
-    auto conditional_transactions(const node_ptr &node, item_t item) -> transactions_t;
+    /// @param item  The item for which conditional database_ are being generated.
+    /// @return The database_ that will be populated with the conditional database_.
+    auto conditional_transactions(const node_ptr &node, item_t item) -> database_t;
 
-    /// Applies the FP-Growth algorithm to find frequent itemsets from the given transactions_.
-    /// @param transactions A collection of transactions, where each transaction is a set of items.
+    /// Applies the FP-Growth algorithm to find frequent itemsets from the given database_.
+    /// @param database A collection of transactions, where each transaction is a set of items.
     /// @param min_support The minimum support threshold for an itemset to be considered frequent.
     /// @return A set of frequent itemsets, where each itemset is a collection of items that meet
     /// the minimum support threshold.
-    auto fp_growth_algorithm(const transactions_t &transactions, size_t min_support) -> itemsets_t;
+    auto fp_growth_algorithm(const database_t &database, size_t min_support) -> itemsets_t;
 }

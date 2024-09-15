@@ -29,7 +29,7 @@
 #include "reader.h"
 
 auto rules::io::read_csv(std::istream &input, const csv_config_t &config) -> rules::io::read_result_t {
-    transactions_t transactions;
+    database_t database{};
     std::string line;
 
     if ((input.bad() || input.fail())) {
@@ -62,14 +62,14 @@ auto rules::io::read_csv(std::istream &input, const csv_config_t &config) -> rul
             return std::unexpected(io_error_t::INVALID_FORMAT);
         }
 
-        transactions.push_back(std::move(itemset));
+        database.push_back(std::move(itemset));
     }
 
-    if (transactions.empty()) {
+    if (database.empty()) {
         return std::unexpected(io_error_t::EMPTY_ERROR);
     }
 
-    return transactions;
+    return database;
 }
 
 auto rules::io::read_csv(const std::string_view &filename, const csv_config_t &config) -> rules::io::read_result_t {

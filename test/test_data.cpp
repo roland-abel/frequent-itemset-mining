@@ -30,7 +30,7 @@
 
 using namespace rules::tests;
 
-rules::tests::transactions_t rules::tests::get_transactions() {
+rules::tests::database_t rules::tests::get_database() {
     return {
             {Milk,   Cheese, Butter, Bread,  Sugar,  Flour, Cream},
             {Cheese, Butter, Bread,  Coffee, Sugar,  Flour},

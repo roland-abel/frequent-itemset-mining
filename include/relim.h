@@ -38,13 +38,13 @@
 namespace rules::relim {
 
     ///
-    /// @param transactions
+    /// @param database
     /// @return
-    auto get_item_counts(const transactions_t &transactions) -> item_counts_t;
+    auto get_item_counts(const database_t &database) -> item_counts_t;
 
     ///
-    /// @param transactions
+    /// @param db
     /// @param min_support
     /// @return
-    auto relim_algorithm(const transactions_t &transactions, size_t min_support) -> itemsets_t;
+    auto relim_algorithm(const database_t &db, size_t min_support) -> itemsets_t;
 }

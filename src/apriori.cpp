@@ -105,7 +105,7 @@ namespace rules::apriori {
         return candidates;
     }
 
-    auto apriori_algorithm(const transactions_t &transactions, size_t min_support) -> std::pair<itemsets_t, frequencies_t> {
+    auto apriori_algorithm(const database_t &database, size_t min_support) -> std::pair<itemsets_t, frequencies_t> {
         auto frequencies = frequencies_t{};
 
         auto has_support = [&](const auto &itemset, const auto &frequencies) {
@@ -113,7 +113,7 @@ namespace rules::apriori {
         };
 
         auto prune = [&](itemsets_t &itemsets) -> itemsets_t {
-            for (const auto &t: transactions) {
+            for (const auto &t: database) {
                 for (const auto &x: itemsets) {
                     if (std::ranges::includes(t, x)) {
                         frequencies[hash_code(x)]++;
@@ -129,7 +129,7 @@ namespace rules::apriori {
 
         auto find_frequent_one_itemsets = [&]() {
             auto itemsets = itemsets_t{};
-            for (const auto &t: transactions) {
+            for (const auto &t: database) {
                 for (const auto item: t) {
                     const auto x = itemset_t{item};
                     itemsets.insert(x);

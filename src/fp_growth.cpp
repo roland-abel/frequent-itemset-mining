@@ -84,9 +84,9 @@ namespace rules::fp_growth {
         };
     }
 
-    auto get_item_counts(const transactions_t &transactions) -> item_counts_t {
+    auto get_item_counts(const database_t &database) -> item_counts_t {
         auto item_counts = item_counts_t{};
-        for (const auto &item: transactions | std::views::join) {
+        for (const auto &item: database | std::views::join) {
             ++item_counts[item];
         }
         return item_counts;
@@ -125,7 +125,7 @@ namespace rules::fp_growth {
         };
     }
 
-    auto build_fp_tree(const transactions_t &transactions, const items_t &frequent_items) -> node_ptr {
+    auto build_fp_tree(const database_t &transactions, const items_t &frequent_items) -> node_ptr {
         auto root = node_t::create_root();
         auto insert_items = [&](const items_t &items) {
             auto current = root;
@@ -147,15 +147,15 @@ namespace rules::fp_growth {
         return root;
     }
 
-    auto build_fp_tree(const transactions_t &transactions, size_t min_support) -> node_ptr {
-        const auto &item_counts = get_item_counts(transactions);
+    auto build_fp_tree(const database_t &database, size_t min_support) -> node_ptr {
+        const auto &item_counts = get_item_counts(database);
         const auto &[frequent_items, _] = get_frequent_items(item_counts, min_support);
 
-        return build_fp_tree(transactions, frequent_items);
+        return build_fp_tree(database, frequent_items);
     }
 
-    auto conditional_transactions(const node_ptr &root, item_t item) -> transactions_t {
-        transactions_t transactions{};
+    auto conditional_transactions(const node_ptr &root, item_t item) -> database_t {
+        database_t transactions{};
 
         std::function<void(const node_ptr &)> conditional_transactions_ = [&](const node_ptr &node) -> void {
             // traverses from a given node to the root and collects the items along the path with regard to the frequency
@@ -186,7 +186,7 @@ namespace rules::fp_growth {
         return transactions;
     }
 
-    auto fp_growth_algorithm(const transactions_t &transactions, size_t min_support) -> itemsets_t {
+    auto fp_growth_algorithm(const database_t &database, size_t min_support) -> itemsets_t {
         itemsets_t frequent_itemsets{};
 
         const auto update_frequent_itemsets = [&](const item_t &item, const itemsets_t &itemsets) {
@@ -194,9 +194,9 @@ namespace rules::fp_growth {
             std::ranges::merge(frequent_itemsets, itemsets, std::inserter(frequent_itemsets, frequent_itemsets.end()));
         };
 
-        const auto &item_counts = get_item_counts(transactions);
+        const auto &item_counts = get_item_counts(database);
         const auto &[frequent_items, _] = get_frequent_items(item_counts, min_support);
-        const auto &root = build_fp_tree(transactions, frequent_items);
+        const auto &root = build_fp_tree(database, frequent_items);
         const auto &items_along_path = tree_has_single_path(root);
 
         if (items_along_path.has_value()) {
