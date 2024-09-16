@@ -28,7 +28,6 @@
 
 #include <algorithm>
 #include <ranges>
-#include <sstream>
 #include "apriori.h"
 
 namespace rules::apriori {

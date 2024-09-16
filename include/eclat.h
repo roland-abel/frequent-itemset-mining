@@ -28,10 +28,6 @@
 
 #pragma once
 
-#include <set>
-#include <unordered_map>
-#include <iostream>
-#include <algorithm>
 #include "dtypes.h"
 
 namespace rules::eclat {

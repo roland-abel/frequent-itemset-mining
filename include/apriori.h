@@ -29,9 +29,6 @@
 
 #pragma once
 
-#include <set>
-#include <unordered_map>
-#include <iostream>
 #include "dtypes.h"
 
 namespace rules::apriori {
