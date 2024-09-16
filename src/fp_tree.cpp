@@ -28,6 +28,7 @@
 
 #include <execution>
 #include <ranges>
+#include <functional>
 #include "fp_tree.h"
 
 namespace rules::fp_tree {
@@ -124,5 +125,106 @@ namespace rules::fp_tree {
 
             current = current->children.at(0);
         }
+    }
+
+    auto power_set(const itemset_t &items, bool include_empty_set) -> itemsets_t {
+        itemsets_t result{};
+        const auto num_subsets = static_cast<size_t>(std::pow(2, items.size()));
+
+        for (size_t i = 0; i < num_subsets; ++i) {
+            itemset_t subset;
+            size_t bit_position = 0;
+
+            for (const auto &item: items) {
+                if (i & (1 << bit_position)) {
+                    subset.insert(item);
+                }
+                ++bit_position;
+            }
+
+            if (include_empty_set || !subset.empty()) {
+                result.insert(std::move(subset));
+            }
+        }
+        return result;
+    }
+
+    auto insert_into_each_itemsets(const itemsets_t &itemsets, item_t item) -> itemsets_t {
+        const auto copy_and_insert = [item](const auto &subset) -> itemset_t {
+            auto result = subset; // call copy-constructor
+            result.insert(item);
+            return result;
+        };
+
+        return itemsets
+               | std::views::transform(copy_and_insert)
+               | std::ranges::to<itemsets_t>();
+    }
+
+    auto get_item_counts(const database_t &database) -> item_counts_t {
+        auto item_counts = item_counts_t{};
+        for (const auto &item: database | std::views::join) {
+            ++item_counts[item];
+        }
+        return item_counts;
+    }
+
+    auto get_frequent_items(const item_counts_t &item_counts, size_t min_support) -> std::pair<items_t, item_counts_t> {
+        auto is_frequent = [=](const auto &kv) { return kv.second >= min_support; };
+
+        auto item_compare = [&](const item_t &x, const item_t &y) {
+            return item_counts.at(x) > item_counts.at(y);
+        };
+
+        auto items = item_counts
+                     | filter(is_frequent)
+                     | std::views::keys
+                     | std::ranges::to<std::vector>();
+
+        std::ranges::sort(items, item_compare);
+        return {items, item_counts};
+    }
+
+    auto filter_and_sort_items(const itemset_t &itemset, const items_t &frequent_items) -> items_t {
+        auto is_frequent = [&](const auto &item) { return itemset.contains(item); };
+
+        auto items = frequent_items
+                     | std::views::filter(is_frequent)
+                     | std::ranges::to<std::vector>();
+
+        std::sort(std::execution::par_unseq, items.begin(), items.end(), [&](const item_t &x, const item_t &y) {
+            return std::ranges::find(frequent_items, x) < std::ranges::find(frequent_items, y);
+        });
+
+        return items;
+    }
+
+    auto build_fp_tree(const database_t &transactions, const items_t &frequent_items) -> node_ptr {
+        auto root = node_t::create_root();
+        auto insert_items = [&](const items_t &items) {
+            auto current = root;
+            for (auto it = items.begin(); it != items.end(); it++) {
+                const auto item = *it;
+                auto node = current->find_child_item(item)
+                        .or_else([&]() -> std::optional<node_ptr> { return current->add_child(item, 0); })
+                        .value();
+
+                node->frequency++;
+                current = node;
+            }
+        };
+
+        for (const auto &trans: transactions) {
+            const auto &items = filter_and_sort_items(trans, frequent_items);
+            insert_items(items);
+        }
+        return root;
+    }
+
+    auto build_fp_tree(const database_t &database, size_t min_support) -> node_ptr {
+        const auto &item_counts = get_item_counts(database);
+        const auto &[frequent_items, _] = get_frequent_items(item_counts, min_support);
+
+        return build_fp_tree(database, frequent_items);
     }
 }

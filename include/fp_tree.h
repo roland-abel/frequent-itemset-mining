@@ -28,11 +28,6 @@
 
 #pragma once
 
-#include <memory>
-#include <algorithm>
-#include <utility>
-#include <optional>
-#include <functional>
 #include "dtypes.h"
 
 namespace rules::fp_tree {
@@ -99,4 +94,45 @@ namespace rules::fp_tree {
     /// @return A pair where the first element is a boolean indicating whether the tree has a single path,
     /// and the second element is an itemset representing the sequence of items along that path.
     auto tree_has_single_path(const node_ptr &root) -> std::optional<itemset_t>;
+
+    ///
+    /// @param database
+    /// @return
+    auto get_item_counts(const database_t &database) -> item_counts_t;
+
+    /// Gets a sorted list of frequent items from the given transactions.
+    /// @param item_counts
+    /// @param min_support The minimum support threshold for items to be considered frequent.
+    /// @return A list of items that exceed the minimum support threshold, sorted in order of frequency.
+    auto get_frequent_items(const item_counts_t &item_counts, size_t min_support) -> std::pair<items_t, item_counts_t>;
+
+    /// Creates the power set of the given set of items.
+    /// @param items The input itemset for which the power set is to created.
+    /// @return The set of all subsets of the given items.
+    auto power_set(const itemset_t &items, bool include_empty_set = true) -> itemsets_t;
+
+    /// Insert a specified item into each subset of the given itemsets.
+    /// @param itemsets The set of itemsets to be expanded.
+    /// @param item The item to be added to each subset within the itemsets.
+    /// @return A new set of itemsets where each original subset has been expanded with the given item.
+    auto insert_into_each_itemsets(const itemsets_t &itemsets, item_t item) -> itemsets_t;
+
+    /// Sorts the items in the x according to the order defined by the frequent items list
+    /// and removes any items not in the frequent items list.
+    /// @param itemset The original set of items to be filtered.
+    /// @param frequent_items A list of items considered frequent.
+    /// @return A list of items from the x that are also in the frequent items list, maintaining their order.
+    auto filter_and_sort_items(const itemset_t &itemset, const items_t &frequent_items) -> items_t;
+
+    /// Builds a FP-tree from the given database based on the minimum support.
+    /// @param database A collection of transactions, where each transaction is a set of items.
+    /// @param min_support The minimum support threshold for an item to be considered frequent.
+    /// @return A shared pointer to the root node of the constructed FP-tree.
+    auto build_fp_tree(const database_t &database, size_t min_support) -> node_ptr;
+
+    ///
+    /// @param transactions
+    /// @param frequent_items
+    /// @return
+    auto build_fp_tree(const database_t &transactions, const items_t &frequent_items) -> node_ptr;
 }

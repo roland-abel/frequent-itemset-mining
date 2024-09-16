@@ -136,3 +136,152 @@ TEST_F(FPTreeTests, GetItemFrequencyTest) {
     EXPECT_EQ(get_item_frequency(root, Bread), 4);
     EXPECT_EQ(get_item_frequency(root, Cream), 0);
 }
+
+TEST_F(FPTreeTests, PowerSetTest) {
+    const auto &items = itemset_t{Milk, Butter};
+    const auto &p = power_set(items, false);
+
+    EXPECT_EQ(p.size(), 3);
+    EXPECT_TRUE(p.contains({Milk}));
+    EXPECT_TRUE(p.contains({Butter}));
+    EXPECT_TRUE(p.contains({Milk, Butter}));
+}
+
+TEST_F(FPTreeTests, PowerSetExcludeEmptySetTest) {
+    const auto &items = itemset_t{Milk, Butter, Coffee};
+    const auto &p = power_set(items, true);
+
+    EXPECT_EQ(p.size(), 8);
+    EXPECT_TRUE(p.contains({}));
+    EXPECT_TRUE(p.contains({Milk}));
+    EXPECT_TRUE(p.contains({Butter}));
+    EXPECT_TRUE(p.contains({Coffee}));
+    EXPECT_TRUE(p.contains({Milk, Butter}));
+    EXPECT_TRUE(p.contains({Milk, Coffee}));
+    EXPECT_TRUE(p.contains({Butter, Coffee}));
+    EXPECT_TRUE(p.contains({Milk, Butter, Coffee}));
+}
+
+TEST_F(FPTreeTests, InsertIntoAllItemsetsTest) {
+    const auto &items = itemset_t{Milk, Butter, Coffee};
+    const auto &result = insert_into_each_itemsets(power_set(items), Sugar);
+
+    EXPECT_EQ(result.size(), 8);
+    EXPECT_TRUE(result.contains({Sugar}));
+    EXPECT_TRUE(result.contains({Sugar, Milk}));
+    EXPECT_TRUE(result.contains({Sugar, Butter}));
+    EXPECT_TRUE(result.contains({Sugar, Coffee}));
+    EXPECT_TRUE(result.contains({Sugar, Milk, Butter}));
+    EXPECT_TRUE(result.contains({Sugar, Milk, Coffee}));
+    EXPECT_TRUE(result.contains({Sugar, Butter, Coffee}));
+    EXPECT_TRUE(result.contains({Sugar, Milk, Butter, Coffee}));
+}
+
+TEST_F(FPTreeTests, GetFrequentItemsTest) {
+    const auto min_support = 4;
+
+    const auto &item_counts = get_item_counts(get_database());
+    const auto &[items, frequencies] = get_frequent_items(item_counts, min_support);
+
+    ASSERT_EQ(items.size(), 7);
+    EXPECT_EQ(items[0], Milk);
+    EXPECT_EQ(items[1], Butter);
+    EXPECT_EQ(items[2], Sugar);
+    EXPECT_EQ(items[3], Flour);
+    EXPECT_EQ(items[4], Cheese);
+    EXPECT_EQ(items[5], Coffee);
+    EXPECT_EQ(items[6], Bread);
+
+    ASSERT_EQ(frequencies.size(), 8);
+    EXPECT_EQ(frequencies.at(Milk), 8);
+    EXPECT_EQ(frequencies.at(Butter), 7);
+    EXPECT_EQ(frequencies.at(Sugar), 6);
+    EXPECT_EQ(frequencies.at(Flour), 6);
+    EXPECT_EQ(frequencies.at(Cheese), 5);
+    EXPECT_EQ(frequencies.at(Coffee), 5);
+    EXPECT_EQ(frequencies.at(Bread), 4);
+    EXPECT_EQ(frequencies.at(Cream), 2);
+}
+
+TEST_F(FPTreeTests, SortAndFilterItems1Test) {
+    const auto min_support = 4;
+
+    const auto &item_counts = get_item_counts(get_database());
+    const auto &[frequent_items, _] = get_frequent_items(item_counts, min_support);
+    const itemset_t &itemset = {Milk, Bread, Cheese, Butter, Coffee, Sugar, Flour, Cream};
+
+    const auto &items = filter_and_sort_items(itemset, frequent_items);
+
+    ASSERT_EQ(items.size(), 7);
+    EXPECT_EQ(items[0], Milk);
+    EXPECT_EQ(items[1], Butter);
+    EXPECT_EQ(items[2], Sugar);
+    EXPECT_EQ(items[3], Flour);
+    EXPECT_EQ(items[4], Cheese);
+    EXPECT_EQ(items[5], Coffee);
+    EXPECT_EQ(items[6], Bread);
+}
+
+TEST_F(FPTreeTests, SortAndFilterItems2Test) {
+    const auto &frequent_items = items_t{Milk, Butter, Sugar, Flour, Cheese, Coffee, Bread};
+    const itemset_t &itemset = {Coffee, Cream, Butter, Cheese};
+
+    const auto &items = filter_and_sort_items(itemset, frequent_items);
+
+    EXPECT_EQ(items.size(), 3);
+    EXPECT_EQ(items[0], Butter);
+    EXPECT_EQ(items[1], Cheese);
+    EXPECT_EQ(items[2], Coffee);
+}
+
+TEST_F(FPTreeTests, BuildFpTreeFormEmptyTransactionsTest) {
+    const auto min_support = 4;
+    const auto &root = build_fp_tree(database_t{}, min_support);
+
+    EXPECT_EQ(root->children.size(), 0);
+    EXPECT_EQ(root->item, 0);
+    EXPECT_EQ(root->frequency, 0);
+    EXPECT_EQ(root->parent.lock(), nullptr);
+}
+
+TEST_F(FPTreeTests, BuildFpTreeTest) {
+    const auto min_support = 4;
+
+    const auto &root = build_fp_tree(get_database(), min_support);
+    ASSERT_EQ(root->children.size(), 2);
+
+    EXPECT_TRUE(root->has_path_with_frequencies({Milk, Flour}, {8, 1}));
+    EXPECT_TRUE(root->has_path_with_frequencies({Milk, Sugar, Flour, Cheese, Coffee, Bread}, {8, 1, 1, 1, 1, 1}));
+    EXPECT_TRUE(root->has_path_with_frequencies({Milk, Butter, Coffee}, {8, 6, 1}));
+    EXPECT_TRUE(root->has_path_with_frequencies({Milk, Butter, Sugar, Cheese}, {8, 6, 4, 1}));
+    EXPECT_TRUE(root->has_path_with_frequencies({Milk, Butter, Sugar, Flour, Cheese, Coffee, Bread}, {8, 6, 4, 3, 2, 1, 1}));
+    EXPECT_TRUE(root->has_path_with_frequencies({Milk, Butter, Sugar, Flour, Coffee}, {8, 6, 4, 3, 1}));
+    EXPECT_TRUE(root->has_path_with_frequencies({Butter, Sugar, Flour, Cheese, Coffee, Bread}, {1, 1, 1, 1, 1, 1}));
+    EXPECT_TRUE(root->has_path_with_frequencies({Milk, Butter, Sugar, Flour, Cheese, Bread}, {8, 6, 4, 3, 2, 1}));
+}
+
+TEST_F(FPTreeTests, ConditionalTransactions1Test) {
+    const auto min_support = 4;
+    const auto &root = build_fp_tree(get_database(), min_support);
+    const auto &trans = conditional_transactions(root, Flour);
+
+    ASSERT_EQ(trans.size(), 6);
+    EXPECT_EQ(trans[0], (itemset_t{Milk, Butter, Sugar}));
+    EXPECT_EQ(trans[1], (itemset_t{Milk, Butter, Sugar}));
+    EXPECT_EQ(trans[2], (itemset_t{Milk, Butter, Sugar}));
+    EXPECT_EQ(trans[3], itemset_t{Milk});
+    EXPECT_EQ(trans[4], (itemset_t{{Milk, Sugar}}));
+    EXPECT_EQ(trans[5], (itemset_t{{Sugar, Butter}}));
+}
+
+TEST_F(FPTreeTests, ConditionalTransactions2Test) {
+    const auto min_support = 4;
+    const auto &root = build_fp_tree(get_database(), min_support);
+    const auto &trans = conditional_transactions(root, Bread);
+
+    ASSERT_EQ(trans.size(), 4);
+    EXPECT_EQ(trans[0], (itemset_t{Milk, Butter, Sugar, Flour, Cheese}));
+    EXPECT_EQ(trans[1], (itemset_t{Milk, Butter, Sugar, Flour, Coffee, Cheese}));
+    EXPECT_EQ(trans[2], (itemset_t{Milk, Sugar, Flour, Coffee, Cheese}));
+    EXPECT_EQ(trans[3], (itemset_t{Butter, Sugar, Flour, Coffee, Cheese}));
+}
