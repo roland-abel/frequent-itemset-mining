@@ -38,9 +38,9 @@
 //#include "dtypes.h"
 #include "hash_tree.h"
 
-using namespace rules::hash;
+using namespace fim::hash;
 
-namespace rules::apriori_hash_tree {
+namespace fim::apriori_hash_tree {
 
     // The item type.
     using item_t = unsigned long;

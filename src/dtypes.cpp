@@ -32,7 +32,7 @@
 #include <map>
 #include "dtypes.h"
 
-namespace rules {
+namespace fim {
 
     namespace {
         constexpr std::string_view APRIORI = "apriori";

@@ -30,7 +30,7 @@
 
 #include "dtypes.h"
 
-namespace rules::eclat {
+namespace fim::eclat {
 
     // Transaction id
     using tid_t = size_t;

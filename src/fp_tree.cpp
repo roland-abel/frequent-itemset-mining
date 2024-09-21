@@ -31,7 +31,7 @@
 #include <functional>
 #include "fp_tree.h"
 
-namespace rules::fp_tree {
+namespace fim::fp_tree {
 
     using std::views::filter;
     using std::views::transform;

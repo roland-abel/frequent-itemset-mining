@@ -31,7 +31,7 @@
 #include <ranges>
 #include "dtypes.h"
 
-namespace rules::relim {
+namespace fim::relim {
 
     ///
     /// @param database

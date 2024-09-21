@@ -31,8 +31,8 @@
 #include "test_data.h"
 
 using namespace std::chrono;
-using namespace rules;
-using namespace rules::tests;
+using namespace fim;
+using namespace fim::tests;
 
 TEST(DTypesTests, AlgorithmToStringTest) {
     EXPECT_EQ(to_string(algorithm_t::APRIORI), "apriori");

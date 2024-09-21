@@ -31,14 +31,14 @@
 #include "dtypes.h"
 #include "fp_tree.h"
 
-namespace rules::fp_growth {
+namespace fim::fp_growth {
 
-    using namespace rules::fp_tree;
+    using namespace fim::fp_tree;
 
-    using item_t = rules::item_t;
-    using itemset_t = rules::itemset_t;
-    using itemsets_t = rules::itemsets_t;
-    using database_t = rules::database_t;
+    using item_t = fim::item_t;
+    using itemset_t = fim::itemset_t;
+    using itemsets_t = fim::itemsets_t;
+    using database_t = fim::database_t;
 
     /// Generates the conditional transaction from the given FP-Tree.
     /// @param node The current node in the FP-Tree being processed.

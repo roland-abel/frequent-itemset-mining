@@ -31,14 +31,14 @@
 #include "apriori_hash_tree.h"
 #include "test_data.h"
 
-using namespace rules;
-using namespace rules::apriori_hash_tree;
-using namespace rules::tests;
+using namespace fim;
+using namespace fim::apriori_hash_tree;
+using namespace fim::tests;
 
 class AprioriHashTreeTests : public ::testing::Test {
 protected:
 
-    rules::apriori_hash_tree::database_t get_database() {
+    fim::apriori_hash_tree::database_t get_database() {
         return {
                 {Milk,   Cheese, Butter, Bread,  Sugar,  Flour, Cream},
                 {Cheese, Butter, Bread,  Coffee, Sugar,  Flour},
@@ -97,7 +97,7 @@ TEST_F(AprioriHashTreeTests, AprioriHtAlgorithmTest) {
 
     const auto &db = get_database();
 
-    rules::apriori_hash_tree::database_t sorted_db = db;
+    fim::apriori_hash_tree::database_t sorted_db = db;
     for (auto& transaction : sorted_db) {
         std::sort(transaction.begin(), transaction.end());
     }
@@ -172,14 +172,14 @@ TEST_F(AprioriHashTreeTests, AprioriHtAlgorithmTest) {
 //    const auto [itemsets, frequencies] = apriori_algorithm(database, min_support);
 //
 //    const itemset_t z = {Cheese, Bread, Sugar, Flour};
-//    const auto rules = generate_rules(z, frequencies, min_confidence);
+//    const auto fim = generate_rules(z, frequencies, min_confidence);
 //
 //    auto check_rule = [&](const itemset_t &premise, const itemset_t &conclusion, float conf) -> bool {
-//        return rules.contains({premise, conclusion})
+//        return fim.contains({premise, conclusion})
 //               && std::abs(get_confidence(frequencies, premise, conclusion) - conf) < eps;
 //    };
 //
-//    EXPECT_EQ(rules.size(), 9);
+//    EXPECT_EQ(fim.size(), 9);
 //
 //    EXPECT_TRUE(check_rule({Bread, Flour, Sugar}, {Cheese}, 1.0));
 //    EXPECT_TRUE(check_rule({Cheese, Flour, Sugar}, {Bread}, 1.0));
@@ -200,14 +200,14 @@ TEST_F(AprioriHashTreeTests, AprioriHtAlgorithmTest) {
 //
 //    const auto &database = get_database();
 //    const auto [itemsets, frequencies] = apriori_algorithm(database, min_support);
-//    const auto rules = generate_rules(itemsets, frequencies, min_confidence);
+//    const auto fim = generate_rules(itemsets, frequencies, min_confidence);
 //
 //    auto check_rule = [&](const itemset_t &premise, const itemset_t &conclusion, float conf) -> bool {
-//        return rules.contains({premise, conclusion})
+//        return fim.contains({premise, conclusion})
 //               && std::abs(get_confidence(frequencies, premise, conclusion) - conf) < eps;
 //    };
 //
-//    EXPECT_EQ(rules.size(), 70);
+//    EXPECT_EQ(fim.size(), 70);
 //
 //    EXPECT_TRUE(check_rule({Milk}, {Butter}, 0.75));
 //    EXPECT_TRUE(check_rule({Milk, Cheese}, {Sugar}, 1));

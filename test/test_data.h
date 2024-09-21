@@ -30,9 +30,9 @@
 
 #include "apriori.h"
 
-namespace rules::tests {
+namespace fim::tests {
 
-    using database_t = rules::database_t;
+    using database_t = fim::database_t;
 
     enum Items {
         Milk = 1,

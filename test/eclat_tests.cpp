@@ -31,9 +31,9 @@
 #include "eclat.h"
 #include "test_data.h"
 
-using namespace rules;
-using namespace rules::eclat;
-using namespace rules::tests;
+using namespace fim;
+using namespace fim::eclat;
+using namespace fim::tests;
 
 class EclatTests : public ::testing::Test {
 protected:

@@ -31,10 +31,10 @@
 #include "fp_growth.h"
 #include "test_data.h"
 
-using namespace rules;
-using namespace rules::apriori;
-using namespace rules::fp_growth;
-using namespace rules::tests;
+using namespace fim;
+using namespace fim::apriori;
+using namespace fim::fp_growth;
+using namespace fim::tests;
 
 class FPGrowthTests : public ::testing::Test {
 protected:

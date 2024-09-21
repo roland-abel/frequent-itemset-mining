@@ -30,7 +30,7 @@
 #include "fp_growth.h"
 #include "hash_tree.h"
 
-using namespace rules::hash;
+using namespace fim::hash;
 
 enum Items {
     Milk = 1,

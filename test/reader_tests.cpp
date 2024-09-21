@@ -31,10 +31,10 @@
 #include "reader.h"
 
 using namespace std;
-using namespace rules::io;
-using namespace rules::tests;
+using namespace fim::io;
+using namespace fim::tests;
 
-using itemset_t = rules::itemset_t;
+using itemset_t = fim::itemset_t;
 
 class ReaderTests : public ::testing::Test {
 protected:

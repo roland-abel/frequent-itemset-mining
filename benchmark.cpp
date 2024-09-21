@@ -37,7 +37,7 @@
 #include "relim.h"
 
 using namespace std;
-using namespace rules;
+using namespace fim;
 
 namespace {
     static auto generate_test_database(size_t num_transactions, size_t max_items) -> database_t {
@@ -64,7 +64,7 @@ class BenchmarkFixture : public benchmark::Fixture {
 public:
     void SetUp(const ::benchmark::State &state) override {
         const std::string_view filename = "data/mushroom.dat";
-        database_ = rules::io::read_csv(filename).value();
+        database_ = fim::io::read_csv(filename).value();
         min_support_ = 0.95;
     }
 
@@ -83,25 +83,25 @@ private:
 
 BENCHMARK_DEFINE_F(BenchmarkFixture, AprioriBenchmark)(benchmark::State &state) {
     for (auto _: state) {
-        rules::apriori::apriori_algorithm(get_database(), get_min_support());
+        fim::apriori::apriori_algorithm(get_database(), get_min_support());
     }
 }
 
 BENCHMARK_DEFINE_F(BenchmarkFixture, FPGrowthBenchmark)(benchmark::State &state) {
     for (auto _: state) {
-        rules::fp_growth::fp_growth_algorithm(get_database(), get_min_support());
+        fim::fp_growth::fp_growth_algorithm(get_database(), get_min_support());
     }
 }
 
 BENCHMARK_DEFINE_F(BenchmarkFixture, EclatBenchmark)(benchmark::State &state) {
     for (auto _: state) {
-        rules::eclat::eclat_algorithm(get_database(), get_min_support());
+        fim::eclat::eclat_algorithm(get_database(), get_min_support());
     }
 }
 
 BENCHMARK_DEFINE_F(BenchmarkFixture, RelimBenchmark)(benchmark::State &state) {
     for (auto _: state) {
-        rules::relim::relim_algorithm(get_database(), get_min_support());
+        fim::relim::relim_algorithm(get_database(), get_min_support());
     }
 }
 

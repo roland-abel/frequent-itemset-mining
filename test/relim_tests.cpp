@@ -31,9 +31,9 @@
 #include "relim.h"
 #include "test_data.h"
 
-using namespace rules;
-using namespace rules::relim;
-using namespace rules::tests;
+using namespace fim;
+using namespace fim::relim;
+using namespace fim::tests;
 
 class RelimTests : public ::testing::Test {
 protected:

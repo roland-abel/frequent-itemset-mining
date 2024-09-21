@@ -33,9 +33,9 @@
 #include <utility>
 #include "dtypes.h"
 
-namespace rules::hash {
+namespace fim::hash {
 
-    using item_t = rules::item_t;
+    using item_t = fim::item_t;
     using itemset_t = std::vector<item_t>;
     using itemsets_t = std::vector<itemset_t>;
 

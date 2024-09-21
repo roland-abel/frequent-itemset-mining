@@ -30,7 +30,7 @@
 #include <ranges>
 #include "apriori_hash_tree.h"
 
-namespace rules::apriori_hash_tree {
+namespace fim::apriori_hash_tree {
 
 
 

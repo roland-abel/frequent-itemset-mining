@@ -31,9 +31,9 @@
 #include "writer.h"
 
 using namespace nlohmann;
-using namespace rules::config;
+using namespace fim::config;
 
-namespace rules::io {
+namespace fim::io {
 
 //    namespace {
 //        constexpr std::string_view APRIORI = "Apriori";

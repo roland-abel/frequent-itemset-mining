@@ -32,8 +32,8 @@
 #include "dtypes.h"
 
 using namespace std;
-using namespace rules;
-using namespace rules::config;
+using namespace fim;
+using namespace fim::config;
 
 namespace {
     static const std::map<std::string, algorithm_t> map_string_to_algorithm{
@@ -61,7 +61,7 @@ void add_options(CLI::App &app, configuration_t &config) {
             ->check(CLI::ExistingFile);
 
     app.add_option("-o, --output", config.output_path)
-            ->description("Path to the output file where discovered patterns or association rules will be saved")
+            ->description("Path to the output file where discovered patterns or association fim will be saved")
             ->required()
             ->option_text("(none existing file)")
             ->check(CLI::NonexistentPath);

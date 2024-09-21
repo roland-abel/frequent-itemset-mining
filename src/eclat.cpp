@@ -31,7 +31,7 @@
 #include <functional>
 #include "eclat.h"
 
-namespace rules::eclat {
+namespace fim::eclat {
 
     auto set_intersection(const tidset_t &x, const tidset_t &y) -> tidset_t {
         tidset_t tidset{};

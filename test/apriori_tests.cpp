@@ -31,9 +31,9 @@
 #include "apriori.h"
 #include "test_data.h"
 
-using namespace rules;
-using namespace rules::apriori;
-using namespace rules::tests;
+using namespace fim;
+using namespace fim::apriori;
+using namespace fim::tests;
 
 class AprioriTests : public ::testing::Test {
 protected:

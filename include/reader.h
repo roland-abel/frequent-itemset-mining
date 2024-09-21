@@ -32,7 +32,7 @@
 #include <expected>
 #include "dtypes.h"
 
-namespace rules::io {
+namespace fim::io {
 
     struct csv_config_t {
         size_t skip_rows = 0;

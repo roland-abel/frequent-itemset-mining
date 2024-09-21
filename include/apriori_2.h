@@ -38,7 +38,7 @@
 #include <algorithm>
 #include <iostream>
 
-namespace rules::apriori_2 {
+namespace fim::apriori_2 {
 
     using std::views::transform;
     using std::views::filter;

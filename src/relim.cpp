@@ -31,7 +31,7 @@
 #include <functional>
 #include "relim.h"
 
-namespace rules::relim {
+namespace fim::relim {
 
     auto get_item_counts(const database_t &database) -> item_counts_t {
         item_counts_t item_counts{};

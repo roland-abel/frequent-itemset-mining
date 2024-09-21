@@ -30,7 +30,7 @@
 #include <ranges>
 #include "apriori.h"
 
-namespace rules::apriori {
+namespace fim::apriori {
 
     std::ostream &operator<<(std::ostream &os, const itemset_t &x) {
         os << "{";
@@ -177,7 +177,7 @@ namespace rules::apriori {
             return conclusions;
         };
 
-        /// For all conclusions y generate all rules of the form "x -> y" with and x=z\y.
+        /// For all conclusions y generate all fim of the form "x -> y" with and x=z\y.
         auto generate_rules = [&](itemsets_t &conclusions) -> rules_t {
             auto rules = rules_t{};
 
@@ -201,7 +201,7 @@ namespace rules::apriori {
             return rules;
         };
 
-        /// For itemset z generate all rules of the form "x -> y" with |y|=1 and x=z\y.
+        /// For itemset z generate all fim of the form "x -> y" with |y|=1 and x=z\y.
         auto create_initial_rules = [&]() -> rules_t {
             itemsets_t conclusions{};
             for (const auto &item: z) {
@@ -222,7 +222,7 @@ namespace rules::apriori {
             // Creates k-itemsets from the previous (k-1)-itemsets
             conclusions = apriori_gen(conclusions, k);
 
-            // Creates rules of the form "z\y -> y" for each conclution y.
+            // Creates fim of the form "z\y -> y" for each conclution y.
             rules = generate_rules(conclusions);
             associated_rules.insert(rules.begin(), rules.end());
         }

@@ -30,7 +30,7 @@
 
 #include "dtypes.h"
 
-namespace rules::io {
+namespace fim::io {
 
     ///
     /// @param os

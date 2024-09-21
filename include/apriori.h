@@ -31,7 +31,7 @@
 
 #include "dtypes.h"
 
-namespace rules::apriori {
+namespace fim::apriori {
 
     /// Overloads the output stream operator to output an itemset to an ostream.
     /// @param os The output stream to write to.
@@ -76,21 +76,21 @@ namespace rules::apriori {
     /// @return Pair of the frequent database with regard to min_support and their frequents.
     auto apriori_algorithm(const database_t &database, size_t min_support) -> std::pair<itemsets_t, frequencies_t>;
 
-    /// @brief Creates association rules based on one frequent itemset.
-    /// @param z The frequent itemset for which the rules are generated.
+    /// @brief Creates association fim based on one frequent itemset.
+    /// @param z The frequent itemset for which the fim are generated.
     /// @param frequencies The frequencies of the frequent itemsets.
-    /// @param min_confidence The minimum confidence threshold for the rules.
-    /// @return rules_t The association rules.
+    /// @param min_confidence The minimum confidence threshold for the fim.
+    /// @return rules_t The association fim.
     auto generate_rules(
             const itemset_t &z,
             const frequencies_t &frequencies,
             float min_confidence) -> rules_t;
 
-    /// @brief Creates association rules based on the collection of frequent itemsets.
+    /// @brief Creates association fim based on the collection of frequent itemsets.
     /// @param itemsets The collection of frequent itemsets.
     /// @param frequencies The frequencies of the frequent itemsets.
-    /// @param min_confidence The minimum confidence threshold for the rules.
-    /// @return rules_t The association rules.
+    /// @param min_confidence The minimum confidence threshold for the fim.
+    /// @return rules_t The association fim.
     auto generate_rules(
             const itemsets_t &itemsets,
             const frequencies_t &frequencies,

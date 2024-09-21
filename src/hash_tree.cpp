@@ -29,8 +29,8 @@
 
 #include "hash_tree.h"
 
-using namespace rules;
+using namespace fim;
 
-namespace rules::hash {
+namespace fim::hash {
 
 }

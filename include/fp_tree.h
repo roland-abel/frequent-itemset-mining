@@ -30,10 +30,10 @@
 
 #include "dtypes.h"
 
-namespace rules::fp_tree {
+namespace fim::fp_tree {
     struct node_t;
 
-    using item_t = rules::item_t;
+    using item_t = fim::item_t;
 
     using items_t = std::vector<item_t>;
     using node_ptr = std::shared_ptr<node_t>;

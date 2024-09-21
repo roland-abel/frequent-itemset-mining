@@ -28,9 +28,9 @@
 
 #include "test_data.h"
 
-using namespace rules::tests;
+using namespace fim::tests;
 
-rules::tests::database_t rules::tests::get_database() {
+fim::tests::database_t fim::tests::get_database() {
     return {
             {Milk,   Cheese, Butter, Bread,  Sugar,  Flour, Cream},
             {Cheese, Butter, Bread,  Coffee, Sugar,  Flour},

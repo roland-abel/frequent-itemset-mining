@@ -32,10 +32,10 @@
 
 using namespace std;
 using namespace std::chrono;
-using namespace rules;
-using namespace rules::io;
-using namespace rules::config;
-using namespace rules::tests;
+using namespace fim;
+using namespace fim::io;
+using namespace fim::config;
+using namespace fim::tests;
 
 class WriterTests : public ::testing::Test {
 protected:
@@ -52,7 +52,7 @@ protected:
 
         for (const auto &[itemset, frequency]: itemsets_frequencies) {
             itemsets.insert(itemset);
-            frequencies[rules::hash_code(itemset)] = frequency;
+            frequencies[fim::hash_code(itemset)] = frequency;
         }
         return {itemsets, frequencies};
     }
@@ -110,7 +110,7 @@ TEST_F(WriterTests, WriterEmptyTest) {
 
 //    std::cout << to_json(result) << std::endl;
 
-//    rules::io::write(
+//    fim::io::write(
 //            std::cout,
 //            itemsets,
 //            frequencies,

@@ -30,7 +30,7 @@
 #include <ranges>
 #include "apriori.h"
 
-namespace rules::apriori_2 {
+namespace fim::apriori_2 {
 
 
 }

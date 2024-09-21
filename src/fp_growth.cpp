@@ -33,9 +33,9 @@
 #include "fp_tree.h"
 #include "fp_growth.h"
 
-namespace rules::fp_growth {
+namespace fim::fp_growth {
 
-    using namespace rules::fp_tree;
+    using namespace fim::fp_tree;
     using std::views::filter;
     using std::views::transform;
 

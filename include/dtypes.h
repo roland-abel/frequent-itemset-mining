@@ -32,7 +32,7 @@
 #include <unordered_map>
 #include <chrono>
 
-namespace rules {
+namespace fim {
 
     // The item type.
     using item_t = unsigned long;
@@ -50,7 +50,7 @@ namespace rules {
     // and a conclusion (premise -> conclusion).
     using rule_t = std::tuple<itemset_t, itemset_t>;
 
-    // Collection of rules.
+    // Collection of fim.
     using rules_t = std::set<rule_t>;
 
     // Hash code type

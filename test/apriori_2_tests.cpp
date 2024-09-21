@@ -31,7 +31,7 @@
 #include "apriori_2.h"
 //#include "test_data.h"
 
-using namespace rules::apriori_2;
+using namespace fim::apriori_2;
 
 class Apriori2Tests : public ::testing::Test {
 protected:
@@ -47,7 +47,7 @@ protected:
         Cream
     };
 
-    rules::apriori_2::database_t get_database() {
+    fim::apriori_2::database_t get_database() {
         itemsets_t database = {
                 {Milk,   Cheese, Butter, Bread,  Sugar,  Flour, Cream},
                 {Cheese, Butter, Bread,  Coffee, Sugar,  Flour},
@@ -141,7 +141,7 @@ TEST_F(Apriori2Tests, Apriori2AlgorithmTest) {
     const auto min_support = 4;
     const auto &db = get_database();
 
-    const auto &frequent_itemsets = rules::apriori_2::apriori(db, min_support);
+    const auto &frequent_itemsets = fim::apriori_2::apriori(db, min_support);
     ASSERT_EQ(frequent_itemsets.size(), 35);
 
     auto contains = [&](const itemset_t &x) {
