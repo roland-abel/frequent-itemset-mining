@@ -29,9 +29,9 @@
 #include <gtest/gtest.h>
 #include <ranges>
 #include "apriori_2.h"
-//#include "test_data.h"
 
-using namespace fim::apriori_2;
+using namespace fim::itemset;
+using namespace fim::algorithms::apriori;
 
 class Apriori2Tests : public ::testing::Test {
 protected:
@@ -47,7 +47,7 @@ protected:
         Cream
     };
 
-    fim::apriori_2::database_t get_database() {
+    static database_t get_database() {
         itemsets_t database = {
                 {Milk,   Cheese, Butter, Bread,  Sugar,  Flour, Cream},
                 {Cheese, Butter, Bread,  Coffee, Sugar,  Flour},
@@ -71,18 +71,6 @@ protected:
                | std::ranges::to<itemsets_t>();
     }
 };
-
-TEST_F(Apriori2Tests, IsSubsetTest) {
-    EXPECT_TRUE(is_subset({}, {}));
-    EXPECT_TRUE(is_subset({Sugar, Flour}, {Butter, Sugar, Flour}));
-    EXPECT_TRUE(is_subset({Sugar, Flour}, {Sugar, Coffee, Flour, Butter}));
-
-    EXPECT_FALSE(is_subset({Milk, Butter}, {}));
-    EXPECT_FALSE(is_subset({Flour, Sugar}, {Sugar, Flour}));
-    EXPECT_FALSE(is_subset({Milk, Flour}, {}));
-    EXPECT_FALSE(is_subset({Flour, Milk}, {Butter, Sugar, Flour}));
-    EXPECT_FALSE(is_subset({Flour, Milk}, {Milk, Coffee, Sugar}));
-}
 
 TEST_F(Apriori2Tests, AllFrequentOneItemsetsTest) {
     const auto min_support = 4;
@@ -141,7 +129,7 @@ TEST_F(Apriori2Tests, Apriori2AlgorithmTest) {
     const auto min_support = 4;
     const auto &db = get_database();
 
-    const auto &frequent_itemsets = fim::apriori_2::apriori(db, min_support);
+    const auto &frequent_itemsets = apriori_algorithm(db, min_support);
     ASSERT_EQ(frequent_itemsets.size(), 35);
 
     auto contains = [&](const itemset_t &x) {
