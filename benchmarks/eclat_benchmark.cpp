@@ -36,10 +36,10 @@ using namespace fim;
 static void eclat_benchmark(benchmark::State &state) {
     const std::string_view filename = "data/mushroom.dat";
     const auto db = fim::io::read_csv(filename).value();
-    const float min_support = 0.8;
+    const size_t min_support = 0.8 * db.size();
 
     for (auto _: state) {
-        fim::eclat::eclat_algorithm(db, min_support * db.size());
+        fim::eclat::eclat_algorithm(db, min_support);
     }
 }
 

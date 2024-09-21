@@ -164,7 +164,7 @@ namespace fim::apriori {
             const frequencies_t &frequencies,
             float min_confidence) -> rules_t {
 
-        // Gets the confidence of the rule of the form "x -> y" with and x=z\y.
+        // Gets the confidence of the rule "x → y" with and x=z\y.
         auto confidence = [&](const auto &x, const auto &y) -> float {
             return static_cast<float>(frequencies.at(hash_code(set_union(z, y)))) / static_cast<float>(frequencies.at(hash_code(x)));
         };

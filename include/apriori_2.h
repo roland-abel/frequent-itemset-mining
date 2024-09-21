@@ -61,5 +61,5 @@ namespace fim::algorithms::apriori {
     /// @param db
     /// @param min_support
     /// @return
-    itemsets_t apriori(const database_t &db, size_t min_support);
+    itemsets_t apriori_algorithm(const database_t &db, size_t min_support);
 }
