@@ -30,6 +30,7 @@ set(INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include)
 find_package(nlohmann_json CONFIG REQUIRED)
 
 add_library(${FIM_LIB_NAME}
+        itemset.cpp
         dtypes.cpp
         hash_tree.cpp
         reader.cpp

@@ -30,13 +30,14 @@ set(UNIT_TEST_NAME unit-tests)
 find_package(GTest CONFIG REQUIRED)
 enable_testing()
 
-file(GLOB TESTS "**_tests.cpp")
+file(GLOB UNIT_TESTS "**_tests.cpp")
+
 add_executable(${UNIT_TEST_NAME}
-        ${TESTS}
+        ${UNIT_TESTS}
         test_data.cpp
         test_main.cpp)
 
-target_include_directories(${UNIT_TEST_NAME} PUBLIC ${CMAKE_SOURCE_DIR}/include)
+target_include_directories(${UNIT_TEST_NAME} PUBLIC ${INCLUDE_DIR})
 target_link_libraries(${UNIT_TEST_NAME}
         ${FIM_LIB_NAME}
         GTest::gtest

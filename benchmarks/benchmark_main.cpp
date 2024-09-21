@@ -26,15 +26,12 @@
 /// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 /// THE SOFTWARE.
 
-#include "benchmark/benchmark.h"
+#include <benchmark/benchmark.h>
 #include <vector>
+#include <ranges>
 #include <algorithm>
 #include <random>
-#include "reader.h"
-#include "apriori.h"
-#include "fp_growth.h"
-#include "eclat.h"
-#include "relim.h"
+#include "dtypes.h"
 
 using namespace std;
 using namespace fim;
@@ -59,62 +56,5 @@ namespace {
                | std::ranges::to<database_t>();
     }
 }
-
-class BenchmarkFixture : public benchmark::Fixture {
-public:
-    void SetUp(const ::benchmark::State &state) override {
-        const std::string_view filename = "data/mushroom.dat";
-        database_ = fim::io::read_csv(filename).value();
-        min_support_ = 0.95;
-    }
-
-    const database_t &get_database() const {
-        return database_;
-    };
-
-    const size_t get_min_support() const {
-        return static_cast<size_t>(min_support_ * database_.size());
-    };
-
-private:
-    database_t database_{};
-    float min_support_{};
-};
-
-BENCHMARK_DEFINE_F(BenchmarkFixture, AprioriBenchmark)(benchmark::State &state) {
-    for (auto _: state) {
-        fim::apriori::apriori_algorithm(get_database(), get_min_support());
-    }
-}
-
-BENCHMARK_DEFINE_F(BenchmarkFixture, FPGrowthBenchmark)(benchmark::State &state) {
-    for (auto _: state) {
-        fim::fp_growth::fp_growth_algorithm(get_database(), get_min_support());
-    }
-}
-
-BENCHMARK_DEFINE_F(BenchmarkFixture, EclatBenchmark)(benchmark::State &state) {
-    for (auto _: state) {
-        fim::eclat::eclat_algorithm(get_database(), get_min_support());
-    }
-}
-
-BENCHMARK_DEFINE_F(BenchmarkFixture, RelimBenchmark)(benchmark::State &state) {
-    for (auto _: state) {
-        fim::relim::relim_algorithm(get_database(), get_min_support());
-    }
-}
-
-BENCHMARK_REGISTER_F(BenchmarkFixture, AprioriBenchmark)
-->Unit(benchmark::kMillisecond);
-
-BENCHMARK_REGISTER_F(BenchmarkFixture, FPGrowthBenchmark)
-->Unit(benchmark::kMillisecond);
-
-//BENCHMARK_REGISTER_F(BenchmarkFixture, EclatBenchmark)
-//        ->Unit(benchmark::kMillisecond);
-//
-//BENCHMARK_REGISTER_F(BenchmarkFixture, RelimBenchmark)
-//        ->Unit(benchmark::kMillisecond);
 
 BENCHMARK_MAIN();

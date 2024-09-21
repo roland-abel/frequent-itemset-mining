@@ -30,23 +30,20 @@ set(DATA_DIR ${BENCHMARK_DIR}/data)
 set(DATA_OUT_DIR ${CMAKE_BINARY_DIR}/benchmarks/data)
 
 file(GLOB DATA_FILES "${DATA_DIR}/**.dat")
+file(GLOB BENCHMARK_TESTS "**_benchmark.cpp")
 
-add_executable(
-        ${BENCHMARK_NAME}
-        benchmark.cpp
-        ${SRC_DIR}/reader.cpp
-        ${SRC_DIR}/dtypes.cpp
-        ${SRC_DIR}/fp_tree.cpp
-        ${SRC_DIR}/apriori.cpp
-        ${SRC_DIR}/fp_growth.cpp
-        ${SRC_DIR}/eclat.cpp
-        ${SRC_DIR}/relim.cpp
+add_executable(${BENCHMARK_NAME}
+        ${BENCHMARK_TESTS}
+        benchmark_main.cpp
 )
 
 find_package(benchmark CONFIG REQUIRED)
 
-target_link_libraries(${BENCHMARK_NAME} PRIVATE benchmark::benchmark benchmark::benchmark_main)
 target_include_directories(${BENCHMARK_NAME} PRIVATE ${INCLUDE_DIR})
+target_link_libraries(${BENCHMARK_NAME}
+        PRIVATE benchmark::benchmark benchmark::benchmark_main
+        ${FIM_LIB_NAME}
+)
 
 add_custom_command(
         TARGET ${BENCHMARK_NAME} POST_BUILD
