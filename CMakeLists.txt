@@ -58,5 +58,5 @@ target_link_libraries(${CLI_EXE_NAME} PRIVATE CLI11::CLI11)
 target_include_directories(${CLI_EXE_NAME} PRIVATE ${INCLUDE_DIR})
 
 add_subdirectory(src)
-add_subdirectory(test)
+add_subdirectory(tests)
 add_subdirectory(benchmarks)
