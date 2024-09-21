@@ -29,7 +29,7 @@ set(INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include)
 
 find_package(nlohmann_json CONFIG REQUIRED)
 
-add_library(${RULES_LIB}
+add_library(${FIM_LIB}
         dtypes.cpp
         hash_tree.cpp
         reader.cpp
@@ -43,9 +43,9 @@ add_library(${RULES_LIB}
         relim.cpp
 )
 
-target_link_libraries(${RULES_LIB} PRIVATE nlohmann_json::nlohmann_json)
+target_link_libraries(${FIM_LIB} PRIVATE nlohmann_json::nlohmann_json)
 set(INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include)
 
-target_include_directories(${RULES_LIB} PUBLIC
+target_include_directories(${FIM_LIB} PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}
         ${INCLUDE_DIR})

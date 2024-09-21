@@ -38,7 +38,7 @@ add_executable(${UNIT_TEST_NAME}
 
 target_include_directories(${UNIT_TEST_NAME} PUBLIC ${CMAKE_SOURCE_DIR}/include)
 target_link_libraries(${UNIT_TEST_NAME}
-        ${RULES_LIB}
+        ${FIM_LIB}
         GTest::gtest
         GTest::gtest_main
         GTest::gmock

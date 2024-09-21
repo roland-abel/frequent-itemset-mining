@@ -35,17 +35,17 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS ON)
 
-set(EXECUTABLE_NAME rule)
+set(FIM_LIB fimlib)
+set(CLI_EXE_NAME fim)
 set(BENCHMARK_NAME benchmark-tests)
-set(PROJECT_NAME association-rules)
-set(RULES_LIB rules)
+set(PROJECT_NAME frequent-itemset-mining)
 set(INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include)
 set(OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
 
 file(GLOB DATA_FILES "${CMAKE_SOURCE_DIR}/data/**.dat")
 
 add_executable(
-        ${EXECUTABLE_NAME}
+        ${CLI_EXE_NAME}
         main.cpp
         src/dtypes.cpp
         src/fp_tree.cpp
@@ -70,10 +70,10 @@ find_package(CLI11 CONFIG REQUIRED)
 find_package(benchmark CONFIG REQUIRED)
 
 target_link_libraries(${BENCHMARK_NAME} PRIVATE benchmark::benchmark benchmark::benchmark_main)
-target_link_libraries(${EXECUTABLE_NAME} PRIVATE CLI11::CLI11)
+target_link_libraries(${CLI_EXE_NAME} PRIVATE CLI11::CLI11)
 
 target_include_directories(${BENCHMARK_NAME} PRIVATE ${INCLUDE_DIR})
-target_include_directories(${EXECUTABLE_NAME} PRIVATE ${INCLUDE_DIR})
+target_include_directories(${CLI_EXE_NAME} PRIVATE ${INCLUDE_DIR})
 
 add_custom_command(
         TARGET ${BENCHMARK_NAME} POST_BUILD
