@@ -55,13 +55,13 @@ namespace {
 void add_options(CLI::App &app, configuration_t &config) {
 
     app.add_option("-i, --input", config.input_path)
-            ->description("Path to the input file containing the transaction data set")
+            ->description("Path to the input file containing the database")
             ->required()
             ->option_text("(existing file)")
             ->check(CLI::ExistingFile);
 
     app.add_option("-o, --output", config.output_path)
-            ->description("Path to the output file where discovered patterns or association fim will be saved")
+            ->description("Path to the output file where the frequent itemsets will be saved")
             ->required()
             ->option_text("(none existing file)")
             ->check(CLI::NonexistentPath);
@@ -72,12 +72,12 @@ void add_options(CLI::App &app, configuration_t &config) {
             ->option_text("(between 0 and 1)");
 
     app.add_option("-c, --min-confidence", config.min_confidence)
-            ->description("Minimum confidence threshold.")
+            ->description("Minimum confidence threshold")
             ->check(CLI::Range(0.0f, 1.f))
             ->option_text("(between 0 and 1)");
 
     app.add_option("-a, --algorithm", config.algorithm)
-            ->description("Specifies which algorithm to use. Accepted values are 'apriori' and 'fp-growth'")
+            ->description("Specifies which algorithm to use.")
             ->default_val(algorithm_t::APRIORI)
             ->transform(CLI::CheckedTransformer(map_string_to_algorithm, CLI::ignore_case))
             ->option_text("('apriori' or 'fp-growth')");
@@ -87,11 +87,11 @@ void add_options(CLI::App &app, configuration_t &config) {
             ->option_text(" ");
 
     app.add_flag("-v, --verbose", config.is_verbose)
-            ->description("Enables verbose mode, displaying additional information and progress messages");
+            ->description("Enables verbose mode");
 }
 
 auto main(int argc, char **argv) -> int {
-    CLI::App app{"Association Rules"};
+    CLI::App app{"Frequent Itemset Mining"};
     app.get_formatter()->column_width(50);
 
     configuration_t config{};

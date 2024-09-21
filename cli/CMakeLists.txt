@@ -1,7 +1,7 @@
 # @file CMakefile
 #
 # @author Roland Abel
-# @date July 02, 2024
+# @date September 21, 2024
 #
 # Copyright (c) 2024 Roland Abel
 #
@@ -25,22 +25,17 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-set(UNIT_TEST_NAME unit-tests)
-
-find_package(GTest CONFIG REQUIRED)
-enable_testing()
-
-file(GLOB TESTS "**_tests.cpp")
-add_executable(${UNIT_TEST_NAME}
-        ${TESTS}
-        test_data.cpp
-        test_main.cpp)
-
-target_include_directories(${UNIT_TEST_NAME} PUBLIC ${CMAKE_SOURCE_DIR}/include)
-target_link_libraries(${UNIT_TEST_NAME}
-        ${FIM_LIB_NAME}
-        GTest::gtest
-        GTest::gtest_main
-        GTest::gmock
-        GTest::gmock_main
+add_executable(
+        ${CLI_EXE_NAME}
+        main.cpp
+        ${SRC_DIR}/dtypes.cpp
+        ${SRC_DIR}/fp_tree.cpp
+        ${SRC_DIR}/apriori.cpp
+        ${SRC_DIR}/fp_growth.cpp
+        ${SRC_DIR}/reader.cpp
 )
+
+find_package(CLI11 CONFIG REQUIRED)
+
+target_link_libraries(${CLI_EXE_NAME} PRIVATE CLI11::CLI11)
+target_include_directories(${CLI_EXE_NAME} PRIVATE ${INCLUDE_DIR})
