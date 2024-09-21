@@ -1,4 +1,4 @@
-# Apriori Algorithm
+# Frequent Itemset Mining
 
 
 ## Author
