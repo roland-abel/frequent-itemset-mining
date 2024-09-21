@@ -45,7 +45,7 @@ namespace rules {
 
     // The transaction database type.
     using database_t = std::vector<itemset_t>;
-
+    
     // The associate rule type which contains a premise
     // and a conclusion (premise -> conclusion).
     using rule_t = std::tuple<itemset_t, itemset_t>;
@@ -60,7 +60,7 @@ namespace rules {
     using frequencies_t = std::unordered_map<code_t, size_t>;
 
     // Type for counting frequents of an item.
-    using item_counts_t = std::unordered_map<item_t , size_t>;
+    using item_counts_t = std::unordered_map<item_t, size_t>;
 
     // Date time type
     using datetime_t = std::chrono::sys_time<std::chrono::seconds>;

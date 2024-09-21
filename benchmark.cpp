@@ -106,19 +106,15 @@ BENCHMARK_DEFINE_F(BenchmarkFixture, RelimBenchmark)(benchmark::State &state) {
 }
 
 BENCHMARK_REGISTER_F(BenchmarkFixture, AprioriBenchmark)
-        ->Unit(benchmark::kMillisecond)
-        ->MinTime(1.0);
+->Unit(benchmark::kMillisecond);
 
 BENCHMARK_REGISTER_F(BenchmarkFixture, FPGrowthBenchmark)
-        ->Unit(benchmark::kMillisecond)
-        ->MinTime(1.0);
+->Unit(benchmark::kMillisecond);
 
-BENCHMARK_REGISTER_F(BenchmarkFixture, EclatBenchmark)
-        ->Unit(benchmark::kMillisecond)
-        ->MinTime(1.0);
-
-BENCHMARK_REGISTER_F(BenchmarkFixture, RelimBenchmark)
-        ->Unit(benchmark::kMillisecond)
-        ->MinTime(1.0);
+//BENCHMARK_REGISTER_F(BenchmarkFixture, EclatBenchmark)
+//        ->Unit(benchmark::kMillisecond);
+//
+//BENCHMARK_REGISTER_F(BenchmarkFixture, RelimBenchmark)
+//        ->Unit(benchmark::kMillisecond);
 
 BENCHMARK_MAIN();

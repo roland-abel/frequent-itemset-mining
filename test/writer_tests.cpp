@@ -71,8 +71,7 @@ TEST_F(WriterTests, WriterEmptyTest) {
             creation_data,
             algorithm_t::APRIORI
     };
-
-
+    
     std::stringstream ss;
     ss << output;
 

@@ -74,8 +74,8 @@ TEST_F(AprioriTests, AprioriGenTest) {
 TEST_F(AprioriTests, AprioriAlgorithmTest) {
     const auto min_support = 4;
 
-    const auto &transactions = get_database();
-    const auto [itemsets, frequencies] = apriori_algorithm(transactions, min_support);
+    const auto &database = get_database();
+    const auto [itemsets, frequencies] = apriori_algorithm(database, min_support);
 
     EXPECT_EQ(itemsets.size(), 35);
     EXPECT_EQ(itemsets.size(), frequencies.size());
@@ -127,8 +127,8 @@ TEST_F(AprioriTests, AprioriAlgorithmTest) {
 TEST_F(AprioriTests, ConfidenceTest) {
     const auto min_support = 4;
 
-    const auto &transactions = get_database();
-    const auto [itemsets, frequencies] = apriori_algorithm(transactions, min_support);
+    const auto &database = get_database();
+    const auto [itemsets, frequencies] = apriori_algorithm(database, min_support);
 
     EXPECT_NEAR(get_confidence(frequencies, itemset_t({Bread, Flour, Sugar}), itemset_t({Cheese})), 1.0, eps);
     EXPECT_NEAR(get_confidence(frequencies, itemset_t({Sugar, Flour}), itemset_t({Milk})), 0.8, eps);
@@ -140,8 +140,8 @@ TEST_F(AprioriTests, GenerateRulesForOneItemsetTest) {
     const auto min_support = 4;
     const auto min_confidence = 0.9f;
 
-    const auto &transactions = get_database();
-    const auto [itemsets, frequencies] = apriori_algorithm(transactions, min_support);
+    const auto &database = get_database();
+    const auto [itemsets, frequencies] = apriori_algorithm(database, min_support);
 
     const itemset_t z = {Cheese, Bread, Sugar, Flour};
     const auto rules = generate_rules(z, frequencies, min_confidence);
@@ -170,8 +170,8 @@ TEST_F(AprioriTests, GenerateRulesTest) {
     const auto min_support = 4;
     const auto min_confidence = 0.75f;
 
-    const auto &transactions = get_database();
-    const auto [itemsets, frequencies] = apriori_algorithm(transactions, min_support);
+    const auto &database = get_database();
+    const auto [itemsets, frequencies] = apriori_algorithm(database, min_support);
     const auto rules = generate_rules(itemsets, frequencies, min_confidence);
 
     auto check_rule = [&](const itemset_t &premise, const itemset_t &conclusion, float conf) -> bool {

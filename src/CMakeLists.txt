@@ -31,9 +31,12 @@ find_package(nlohmann_json CONFIG REQUIRED)
 
 add_library(${RULES_LIB}
         dtypes.cpp
+        hash_tree.cpp
         reader.cpp
         writer.cpp
         apriori.cpp
+        apriori_2.cpp
+        apriori_hash_tree.cpp
         fp_tree.cpp
         fp_growth.cpp
         eclat.cpp

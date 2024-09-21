@@ -42,7 +42,7 @@ set(RULES_LIB rules)
 set(INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include)
 set(OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
 
-file(GLOB DATA_FILES "${CMAKE_SOURCE_DIR}/data/*")
+file(GLOB DATA_FILES "${CMAKE_SOURCE_DIR}/data/**.dat")
 
 add_executable(
         ${EXECUTABLE_NAME}

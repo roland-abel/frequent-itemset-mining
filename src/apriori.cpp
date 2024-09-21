@@ -91,7 +91,7 @@ namespace rules::apriori {
 
         auto candidates = itemsets_t{};
 
-        // find all pairs of itemsets where the first k − 1 items are identical (self-join).
+        // find all pairs of itemsets where the (k−1) prefix is identical (self-join).
         for (auto x = itemsets.begin(); x != itemsets.end(); x++) {
             for (auto y = std::next(x); y != itemsets.end(); y++) {
                 auto [match, z] = first_items_match(*x, *y);
