@@ -26,9 +26,9 @@
 # THE SOFTWARE.
 
 cmake_minimum_required(VERSION 3.22.1)
-project(association-rules
+project(frequent-itemset-mining
         VERSION 1.0.0
-        DESCRIPTION "Implementation of the Apriori and FP-Growth algorithms"
+        DESCRIPTION "Implementation of the frequent itemset mining algorithms"
         LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 23)
