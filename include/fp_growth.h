@@ -28,7 +28,7 @@
 
 #pragma once
 
-#include "dtypes.h"
+#include "utils.h"
 #include "fp_tree.h"
 
 namespace fim::fp_growth {

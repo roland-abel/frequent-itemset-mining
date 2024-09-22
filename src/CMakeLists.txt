@@ -31,7 +31,7 @@ find_package(nlohmann_json CONFIG REQUIRED)
 
 add_library(${FIM_LIB_NAME}
         itemset.cpp
-        dtypes.cpp
+        utils.cpp
         hash_tree.cpp
         reader.cpp
         writer.cpp

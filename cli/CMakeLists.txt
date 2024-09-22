@@ -25,17 +25,9 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-add_executable(
-        ${CLI_EXE_NAME}
-        main.cpp
-        ${SRC_DIR}/dtypes.cpp
-        ${SRC_DIR}/fp_tree.cpp
-        ${SRC_DIR}/apriori.cpp
-        ${SRC_DIR}/fp_growth.cpp
-        ${SRC_DIR}/reader.cpp
-)
-
 find_package(CLI11 CONFIG REQUIRED)
 
-target_link_libraries(${CLI_EXE_NAME} PRIVATE CLI11::CLI11)
+add_executable(${CLI_EXE_NAME} main.cpp)
+target_link_libraries(${CLI_EXE_NAME} PRIVATE CLI11::CLI11 ${FIM_LIB_NAME})
+
 target_include_directories(${CLI_EXE_NAME} PRIVATE ${INCLUDE_DIR})

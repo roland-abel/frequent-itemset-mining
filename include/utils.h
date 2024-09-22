@@ -50,7 +50,7 @@ namespace fim {
     // and a conclusion (premise -> conclusion).
     using rule_t = std::tuple<itemset_t, itemset_t>;
 
-    // Collection of fim.
+    // Collection of rules.
     using rules_t = std::set<rule_t>;
 
     // Hash code type
