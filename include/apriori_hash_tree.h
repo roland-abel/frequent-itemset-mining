@@ -64,11 +64,11 @@ namespace fim::apriori_hash_tree {
 
     ///
     /// @param itemset
-    /// @param db
+    /// @param database
     /// @return
-    auto count_support(const itemset_t &itemset, const database_t &db) -> size_t {
+    auto count_support(const itemset_t &itemset, const database_t &database) -> size_t {
         int count = 0;
-        for (const auto &transaction: db) {
+        for (const auto &transaction: database) {
             if (is_subset(itemset, transaction)) {
                 ++count;
             }
@@ -124,10 +124,10 @@ namespace fim::apriori_hash_tree {
     }
 
     ///
-    /// @param db
+    /// @param database
     /// @param min_support
     /// @return
-    itemsets_t apriori_ht_algorithm(const database_t &db, size_t min_support) {
+    itemsets_t apriori_ht_algorithm(const database_t &database, size_t min_support) {
         auto hash_func = [](const item_t &item) {
             return item % 5;
         };
@@ -138,7 +138,7 @@ namespace fim::apriori_hash_tree {
 
         // Initiale Kandidaten (1-Itemsets) bestimmen.
         std::unordered_map<item_t, int> item_count;
-        for (const auto &transaction: db) {
+        for (const auto &transaction: database) {
             for (const auto &item: transaction) {
                 ++item_count[item];
             }
@@ -166,7 +166,7 @@ namespace fim::apriori_hash_tree {
             // Zähle Unterstützung für die übriggebliebenen Kandidaten.
             frequent_itemsets.clear();
             for (const auto &candidate: pruned_candidates) {
-                int support_count = count_support(candidate, db);
+                int support_count = count_support(candidate, database);
                 if (support_count >= min_support) {
                     frequent_itemsets.push_back(candidate);
                     ht.insert(candidate);

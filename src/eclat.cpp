@@ -68,7 +68,8 @@ namespace fim::eclat {
             return itemset;
         };
 
-        std::function<void(const itemset_t &, const vertical_database_t &, const tidset_t &)> eclat_ = [&](
+        using eclat_func_t = std::function<void(const itemset_t &, const vertical_database_t &, const tidset_t &)>;
+        eclat_func_t eclat_ = [&](
                 const itemset_t &prefix,
                 const vertical_database_t &vertical_trans,
                 const tidset_t &current_tidset) -> void {

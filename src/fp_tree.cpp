@@ -199,7 +199,7 @@ namespace fim::fp_tree {
         return items;
     }
 
-    auto build_fp_tree(const database_t &transactions, const items_t &frequent_items) -> node_ptr {
+    auto build_fp_tree(const database_t &database, const items_t &frequent_items) -> node_ptr {
         auto root = node_t::create_root();
         auto insert_items = [&](const items_t &items) {
             auto current = root;
@@ -214,7 +214,7 @@ namespace fim::fp_tree {
             }
         };
 
-        for (const auto &trans: transactions) {
+        for (const auto &trans: database) {
             const auto &items = filter_and_sort_items(trans, frequent_items);
             insert_items(items);
         }

@@ -40,10 +40,10 @@ namespace fim::algorithms::apriori {
     using namespace fim::itemset;
 
     ///
-    /// @param db
+    /// @param database
     /// @param min_support
     /// @return
-    auto all_frequent_1_itemsets(const database_t &db, size_t min_support) -> itemsets_t;
+    auto all_frequent_1_itemsets(const database_t &database, size_t min_support) -> itemsets_t;
 
     /// Generate a candidate frequent itemsets of size k from frequent itemsets of size k-1.
     /// @param frequent_itemsets
@@ -53,13 +53,13 @@ namespace fim::algorithms::apriori {
 
     ///
     /// @param candidates
-    /// @param db
+    /// @param database
     /// @param support_count
-    auto prune(itemsets_t &candidates, const database_t &db, size_t min_support) -> void;;
+    auto prune(itemsets_t &candidates, const database_t &database, size_t min_support) -> void;;
 
     /// The Apriori algorithm implementation.
-    /// @param db
+    /// @param database
     /// @param min_support
     /// @return
-    itemsets_t apriori_algorithm(const database_t &db, size_t min_support);
+    itemsets_t apriori_algorithm(const database_t &database, size_t min_support);
 }

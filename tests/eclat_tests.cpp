@@ -66,9 +66,9 @@ TEST_F(EclatTests, SetIntersectionOfTidsTest) {
 
 TEST_F(EclatTests, EclatAlgorithmTest) {
     const auto min_support = 4;
-    const auto &transactions = get_database();
+    const auto &database = get_database();
 
-    const auto &itemsets = eclat_algorithm(transactions, min_support);
+    const auto &itemsets = eclat_algorithm(database, min_support);
     EXPECT_EQ(itemsets.size(), 35);
 
     // 1-itemsets

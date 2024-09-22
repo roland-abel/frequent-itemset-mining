@@ -26,6 +26,7 @@
 /// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 /// THE SOFTWARE.
 
+#include <functional>
 #include <algorithm>
 #include <ranges>
 #include "apriori_2.h"
@@ -35,16 +36,12 @@ namespace fim::algorithms::apriori {
     using namespace fim::itemset;
     using namespace fim::algorithms::apriori;
 
-    auto is_subset(const itemset_t &x, const itemset_t &y) -> bool {
-        return std::ranges::includes(y, x);
-    }
-
-    auto all_frequent_1_itemsets(const database_t &db, size_t min_support) -> itemsets_t {
+    auto all_frequent_1_itemsets(const database_t &database, size_t min_support) -> itemsets_t {
         const auto is_frequent = [=](const auto &pair) -> bool { return pair.second >= min_support; };
         const auto get_item = [](const auto &pair) -> itemset_t { return itemset_t{pair.first}; };
 
         item_count_t item_count{};
-        for (const item_t &item: db | std::views::join) {
+        for (const item_t &item: database | std::views::join) {
             ++item_count[item];
         }
 
@@ -100,30 +97,21 @@ namespace fim::algorithms::apriori {
                | std::ranges::to<itemsets_t>();
     }
 
-    auto prune(itemsets_t &candidates, const database_t &db, size_t min_support) -> void {
-        support_count_t support_count{};
-
-        // Support counting for candidate itemsets
-        for (const auto &trans: db) {
-            for (const auto &candidate: candidates) {
-                if (is_subset(candidate, trans)) {
-                    ++support_count[candidate];
-                }
-            }
-        }
-
+    auto prune(itemsets_t &candidates, const database_t &database, size_t min_support) -> void {
+        const auto support_count = get_support_count(database, candidates, is_subset);
         const auto is_infrequent = [&](const itemset_t &z) -> bool { return support_count.at(z) < min_support; };
+
         std::erase_if(candidates, is_infrequent);
     }
 
-    itemsets_t apriori_algorithm(const database_t &db, size_t min_support) {
+    itemsets_t apriori_algorithm(const database_t &database, size_t min_support) {
         itemsets_t frequent_itemsets{};
         auto insert_itemset = [&](const auto &itemsets) {
             std::ranges::copy(itemsets, std::back_inserter(frequent_itemsets));
         };
 
         // Find all 1-element itemsets
-        auto itemsets = all_frequent_1_itemsets(db, min_support);
+        auto itemsets = all_frequent_1_itemsets(database, min_support);
         insert_itemset(itemsets);
 
         for (auto k = 2; !itemsets.empty(); k++) {
@@ -131,7 +119,7 @@ namespace fim::algorithms::apriori {
             itemsets = generate_candidates(itemsets, k);
 
             // Remove all itemsets with low support
-            prune(itemsets, db, min_support);
+            prune(itemsets, database, min_support);
 
             // Insert frequent candidates
             insert_itemset(itemsets);

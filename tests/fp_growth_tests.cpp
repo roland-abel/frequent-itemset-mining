@@ -42,9 +42,9 @@ protected:
 
 TEST_F(FPGrowthTests, FpGrowthAlgorithmTest) {
     const auto min_support = 4;
-    const auto &transactions = get_database();
+    const auto &db = get_database();
 
-    const auto &itemsets = fp_growth_algorithm(transactions, min_support);
+    const auto &itemsets = fp_growth_algorithm(db, min_support);
     EXPECT_EQ(itemsets.size(), 35);
 
     // 1-itemsets

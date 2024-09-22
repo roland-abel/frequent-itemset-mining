@@ -39,8 +39,8 @@ namespace fim::relim {
     auto get_item_counts(const database_t &database) -> item_counts_t;
 
     ///
-    /// @param db
+    /// @param database
     /// @param min_support
     /// @return
-    auto relim_algorithm(const database_t &db, size_t min_support) -> itemsets_t;
+    auto relim_algorithm(const database_t &database, size_t min_support) -> itemsets_t;
 }

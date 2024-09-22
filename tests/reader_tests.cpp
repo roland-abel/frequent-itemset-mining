@@ -88,16 +88,16 @@ TEST_F(ReaderTests, ReadCsvReadSimpleTransactionsTest) {
     const auto &result = read_csv(iss);
     ASSERT_TRUE(result.has_value());
 
-    const auto &transactions = result.value();
-    ASSERT_EQ(transactions.size(), 3);
+    const auto &database = result.value();
+    ASSERT_EQ(database.size(), 3);
 
-    EXPECT_EQ(transactions[0], itemset_t({1, 2, 3}));
-    EXPECT_EQ(transactions[1], itemset_t({1, 2}));
-    EXPECT_EQ(transactions[2], itemset_t({1, 2, 3, 4}));
+    EXPECT_EQ(database[0], itemset_t({1, 2, 3}));
+    EXPECT_EQ(database[1], itemset_t({1, 2}));
+    EXPECT_EQ(database[2], itemset_t({1, 2, 3, 4}));
 }
 
 TEST_F(ReaderTests, ReadCsvTransactionsTest) {
-    std::string csv = "Sample transactions (CSV)\n"
+    std::string csv = "Sample database (CSV)\n"
                       "1,2,3,4,6,7,8\n"
                       "2,3,4,5,6,7\n"
                       "1,4,5,6,7\n"
@@ -115,17 +115,17 @@ TEST_F(ReaderTests, ReadCsvTransactionsTest) {
     const auto &result = read_csv(iss, csv_config_t{1, ','});
     ASSERT_TRUE(result.has_value());
 
-    const auto &transactions = result.value();
-    ASSERT_EQ(transactions.size(), 10);
+    const auto &database = result.value();
+    ASSERT_EQ(database.size(), 10);
 
-    EXPECT_EQ(transactions[0], itemset_t({Milk, Cheese, Butter, Bread, Sugar, Flour, Cream}));
-    EXPECT_EQ(transactions[1], itemset_t({Cheese, Butter, Bread, Coffee, Sugar, Flour}));
-    EXPECT_EQ(transactions[2], itemset_t({Milk, Butter, Coffee, Sugar, Flour}));
-    EXPECT_EQ(transactions[3], itemset_t({Milk, Butter}));
-    EXPECT_EQ(transactions[4], itemset_t({Milk, Butter, Coffee}));
-    EXPECT_EQ(transactions[5], itemset_t({Milk, Flour}));
-    EXPECT_EQ(transactions[6], itemset_t({Milk, Cheese, Butter, Bread, Coffee, Sugar, Flour}));
-    EXPECT_EQ(transactions[7], itemset_t({Cream}));
-    EXPECT_EQ(transactions[8], itemset_t({Milk, Cheese, Butter, Sugar}));
-    EXPECT_EQ(transactions[9], itemset_t({Milk, Cheese, Bread, Coffee, Sugar, Flour}));
+    EXPECT_EQ(database[0], itemset_t({Milk, Cheese, Butter, Bread, Sugar, Flour, Cream}));
+    EXPECT_EQ(database[1], itemset_t({Cheese, Butter, Bread, Coffee, Sugar, Flour}));
+    EXPECT_EQ(database[2], itemset_t({Milk, Butter, Coffee, Sugar, Flour}));
+    EXPECT_EQ(database[3], itemset_t({Milk, Butter}));
+    EXPECT_EQ(database[4], itemset_t({Milk, Butter, Coffee}));
+    EXPECT_EQ(database[5], itemset_t({Milk, Flour}));
+    EXPECT_EQ(database[6], itemset_t({Milk, Cheese, Butter, Bread, Coffee, Sugar, Flour}));
+    EXPECT_EQ(database[7], itemset_t({Cream}));
+    EXPECT_EQ(database[8], itemset_t({Milk, Cheese, Butter, Sugar}));
+    EXPECT_EQ(database[9], itemset_t({Milk, Cheese, Bread, Coffee, Sugar, Flour}));
 }

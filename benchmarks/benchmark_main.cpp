@@ -37,6 +37,7 @@ using namespace std;
 using namespace fim;
 
 namespace {
+
     static auto generate_test_database(size_t num_transactions, size_t max_items) -> database_t {
         std::random_device rd;
         std::mt19937 gen(rd());

@@ -27,7 +27,6 @@
 /// THE SOFTWARE.
 
 #include <gtest/gtest.h>
-#include "fp_growth.h"
 #include "hash_tree.h"
 
 using namespace fim::hash;

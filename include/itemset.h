@@ -55,4 +55,23 @@ namespace fim::itemset {
 
     // Item counting
     using item_count_t = std::unordered_map<item_t, size_t>;
+
+    ///
+    using is_subset_t = std::function<bool(const itemset_t &x, const itemset_t &y)>;
+
+    ///
+    /// @param x A sorted item set.
+    /// @param y A sorted item set.
+    /// @return
+    auto is_subset(const itemset_t &x, const itemset_t &y) -> bool;
+
+    ///
+    /// @param db
+    /// @param itemsets
+    /// @param is_subset
+    /// @return
+    auto get_support_count(
+            const database_t &db,
+            const itemsets_t &itemsets,
+            const is_subset_t &is_subset = fim::itemset::is_subset) -> support_count_t;
 }

@@ -33,6 +33,9 @@
 
 namespace fim::relim {
 
+    using std::views::filter;
+    using std::views::transform;
+
     auto get_item_counts(const database_t &database) -> item_counts_t {
         item_counts_t item_counts{};
 
@@ -56,10 +59,11 @@ namespace fim::relim {
             return itemset;
         };
 
-        std::function<void(const database_t &, const itemset_t &)> relim_ = [&](const database_t &db, const itemset_t &prefix) -> void {
+        using relim_func_t = std::function<void(const database_t &, const itemset_t &)>;
+        relim_func_t relim_ = [&](const database_t &db, const itemset_t &prefix) -> void {
             const auto &frequent_items = get_item_counts(db)
-                                         | std::views::filter(is_frequent)
-                                         | std::views::transform(get_item)
+                                         | filter(is_frequent)
+                                         | transform(get_item)
                                          | std::ranges::to<std::vector>();
 
             for (const auto &item: frequent_items) {

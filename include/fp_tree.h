@@ -131,8 +131,8 @@ namespace fim::fp_tree {
     auto build_fp_tree(const database_t &database, size_t min_support) -> node_ptr;
 
     ///
-    /// @param transactions
+    /// @param database
     /// @param frequent_items
     /// @return
-    auto build_fp_tree(const database_t &transactions, const items_t &frequent_items) -> node_ptr;
+    auto build_fp_tree(const database_t &database, const items_t &frequent_items) -> node_ptr;
 }

@@ -57,9 +57,9 @@ TEST_F(RelimTests, GetItemCountsTest) {
 
 TEST_F(RelimTests, RelimAlgorithmTest) {
     const auto min_support = 4;
-    const auto &transactions = get_database();
+    const auto &database = get_database();
 
-    const auto &itemsets = relim_algorithm(transactions, min_support);
+    const auto &itemsets = relim_algorithm(database, min_support);
     EXPECT_EQ(itemsets.size(), 35);
 
     // 1-itemsets

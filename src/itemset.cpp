@@ -26,6 +26,8 @@
 /// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 /// THE SOFTWARE.
 
+#include <functional>
+#include <algorithm>
 #include "itemset.h"
 
 namespace fim::itemset {
@@ -36,5 +38,25 @@ namespace fim::itemset {
             seed ^= std::hash<item_t>{}(item) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
         }
         return seed;
+    }
+
+    auto is_subset(const itemset_t &x, const itemset_t &y) -> bool {
+        return std::ranges::includes(y, x);
+    }
+
+    auto get_support_count(
+            const database_t &db,
+            const itemsets_t &itemsets,
+            const is_subset_t &is_subset) -> support_count_t {
+        support_count_t support_count{};
+
+        for (const auto &trans: db) {
+            for (const auto &x: itemsets) {
+                if (is_subset(x, trans)) {
+                    ++support_count[x];
+                }
+            }
+        }
+        return support_count;
     }
 }
