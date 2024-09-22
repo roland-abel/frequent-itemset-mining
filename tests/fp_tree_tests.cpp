@@ -29,15 +29,43 @@
 #include <gtest/gtest.h>
 #include <ranges>
 #include "fp_growth.h"
-#include "test_data.h"
 
 using namespace fim;
-using namespace fim::apriori;
 using namespace fim::fp_growth;
-using namespace fim::tests;
+
+using std::views::transform;
 
 class FPTreeTests : public ::testing::Test {
 protected:
+    enum Items {
+        Milk = 1,
+        Bread,
+        Cheese,
+        Butter,
+        Coffee,
+        Sugar,
+        Flour,
+        Cream
+    };
+
+    static database_t get_database() {
+        itemsets_t database = {
+                {Milk,   Cheese, Butter, Bread,  Sugar,  Flour, Cream},
+                {Cheese, Butter, Bread,  Coffee, Sugar,  Flour},
+                {Milk,   Butter, Coffee, Sugar,  Flour},
+                {Milk,   Butter},
+                {Milk,   Butter, Coffee},
+                {Milk,   Flour},
+                {Milk,   Cheese, Butter, Bread,  Coffee, Sugar, Flour},
+                {Cream},
+                {Milk,   Cheese, Butter, Sugar},
+                {Milk,   Cheese, Bread,  Coffee, Sugar,  Flour}
+        };
+
+        return database
+               | transform([](itemset_t &x) { return x.sort_itemset(); })
+               | std::ranges::to<database_t>();
+    }
 };
 
 
@@ -152,7 +180,7 @@ TEST_F(FPTreeTests, PowerSetExcludeEmptySetTest) {
     const auto &p = power_set(items, true);
 
     EXPECT_EQ(p.size(), 8);
-    EXPECT_TRUE(p.contains({}));
+    EXPECT_TRUE(p.contains(itemset_t{}));
     EXPECT_TRUE(p.contains({Milk}));
     EXPECT_TRUE(p.contains({Butter}));
     EXPECT_TRUE(p.contains({Coffee}));
@@ -168,20 +196,20 @@ TEST_F(FPTreeTests, InsertIntoAllItemsetsTest) {
 
     EXPECT_EQ(result.size(), 8);
     EXPECT_TRUE(result.contains({Sugar}));
-    EXPECT_TRUE(result.contains({Sugar, Milk}));
-    EXPECT_TRUE(result.contains({Sugar, Butter}));
-    EXPECT_TRUE(result.contains({Sugar, Coffee}));
-    EXPECT_TRUE(result.contains({Sugar, Milk, Butter}));
-    EXPECT_TRUE(result.contains({Sugar, Milk, Coffee}));
-    EXPECT_TRUE(result.contains({Sugar, Butter, Coffee}));
-    EXPECT_TRUE(result.contains({Sugar, Milk, Butter, Coffee}));
+    EXPECT_TRUE(result.contains({Milk, Sugar}));
+    EXPECT_TRUE(result.contains({Butter, Sugar}));
+    EXPECT_TRUE(result.contains({Coffee, Sugar}));
+    EXPECT_TRUE(result.contains({Milk, Butter, Sugar}));
+    EXPECT_TRUE(result.contains({Milk, Coffee, Sugar}));
+    EXPECT_TRUE(result.contains({Butter, Coffee, Sugar}));
+    EXPECT_TRUE(result.contains({Milk, Butter, Coffee, Sugar}));
 }
 
 TEST_F(FPTreeTests, GetFrequentItemsTest) {
     const auto min_support = 4;
 
-    const auto &item_counts = get_item_counts(get_database());
-    const auto &[items, frequencies] = get_frequent_items(item_counts, min_support);
+    const auto &item_counts = get_item_count(get_database());
+    const auto &[items, frequencies] = get_ordered_frequent_items(item_counts, min_support);
 
     ASSERT_EQ(items.size(), 7);
     EXPECT_EQ(items[0], Milk);
@@ -206,8 +234,8 @@ TEST_F(FPTreeTests, GetFrequentItemsTest) {
 TEST_F(FPTreeTests, SortAndFilterItems1Test) {
     const auto min_support = 4;
 
-    const auto &item_counts = get_item_counts(get_database());
-    const auto &[frequent_items, _] = get_frequent_items(item_counts, min_support);
+    const auto &item_counts = get_item_count(get_database());
+    const auto &[frequent_items, _] = get_ordered_frequent_items(item_counts, min_support);
     const itemset_t &itemset = {Milk, Bread, Cheese, Butter, Coffee, Sugar, Flour, Cream};
 
     const auto &items = filter_and_sort_items(itemset, frequent_items);
@@ -271,7 +299,7 @@ TEST_F(FPTreeTests, ConditionalTransactions1Test) {
     EXPECT_EQ(trans[2], (itemset_t{Milk, Butter, Sugar}));
     EXPECT_EQ(trans[3], itemset_t{Milk});
     EXPECT_EQ(trans[4], (itemset_t{{Milk, Sugar}}));
-    EXPECT_EQ(trans[5], (itemset_t{{Sugar, Butter}}));
+    EXPECT_EQ(trans[5], (itemset_t{{Butter, Sugar}}));
 }
 
 TEST_F(FPTreeTests, ConditionalTransactions2Test) {
@@ -280,8 +308,8 @@ TEST_F(FPTreeTests, ConditionalTransactions2Test) {
     const auto &trans = conditional_transactions(root, Bread);
 
     ASSERT_EQ(trans.size(), 4);
-    EXPECT_EQ(trans[0], (itemset_t{Milk, Butter, Sugar, Flour, Cheese}));
-    EXPECT_EQ(trans[1], (itemset_t{Milk, Butter, Sugar, Flour, Coffee, Cheese}));
-    EXPECT_EQ(trans[2], (itemset_t{Milk, Sugar, Flour, Coffee, Cheese}));
-    EXPECT_EQ(trans[3], (itemset_t{Butter, Sugar, Flour, Coffee, Cheese}));
+    EXPECT_EQ(trans[0], (itemset_t{Milk, Cheese, Butter, Sugar, Flour}));
+    EXPECT_EQ(trans[1], (itemset_t{Milk, Cheese, Butter, Coffee, Sugar, Flour}));
+    EXPECT_EQ(trans[2], (itemset_t{Milk, Cheese, Coffee, Sugar, Flour}));
+    EXPECT_EQ(trans[3], (itemset_t{Cheese, Butter, Coffee, Sugar, Flour}));
 }

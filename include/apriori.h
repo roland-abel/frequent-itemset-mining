@@ -1,9 +1,8 @@
 /// @file apriori.h
 /// @brief
-/// @see: https://www.macs.hw.ac.uk/~dwcorne/Teaching/agrawal94fast.pdf
 ///
 /// @author Roland Abel
-/// @date July 07, 2024
+/// @date September 20, 2024
 ///
 /// Copyright (c) 2024 Roland Abel
 ///
@@ -29,70 +28,35 @@
 
 #pragma once
 
-#include "utils.h"
+#include <ranges>
+#include <algorithm>
+#include "itemset.h"
 
-namespace fim::apriori {
+namespace fim::algorithms::apriori {
 
-    /// Overloads the output stream operator to output an itemset to an ostream.
-    /// @param os The output stream to write to.
-    /// @param x The itemset to output.
-    /// @return The output stream after writing the itemset.
-    std::ostream &operator<<(std::ostream &os, const itemset_t &x);
+    using namespace fim::itemset;
 
-    /// Overloads the output stream operator to output an rule to an ostream.
-    /// @param os The output stream to write to.
-    /// @param r The rule to output.
-    /// @return The output stream after writing the rule.
-    std::ostream &operator<<(std::ostream &os, const rule_t &r);
+    ///
+    /// @param database
+    /// @param min_support
+    /// @return
+    auto all_frequent_1_itemsets(const database_t &database, size_t min_support) -> itemsets_t;
 
-    /// Computes the union of two itemsets.
-    /// @param x The first itemset.
-    /// @param y The second itemset.
-    /// @return The union of the two itemsets.
-    itemset_t set_union(const itemset_t &x, const itemset_t &y);
+    /// Generate a candidate frequent itemsets of size k from frequent itemsets of size k-1.
+    /// @param frequent_itemsets
+    /// @param k
+    /// @return
+    auto generate_candidates(const itemsets_t &frequent_itemsets, size_t k) -> itemsets_t;
 
-    /// Computes the difference of two itemsets (elements in x but not in y).
-    /// @param x The first itemset.
-    /// @param y The second itemset.
-    /// @return The difference of the two sets.
-    itemset_t set_difference(const itemset_t &x, const itemset_t &y);
+    ///
+    /// @param candidates
+    /// @param database
+    /// @param support_count
+    auto prune(itemsets_t &candidates, const database_t &database, size_t min_support) -> void;;
 
-    /// Computes the confidence level of rule x -> y given a set of frequencies.
-    /// @param frequencies The frequencies of itemsets.
-    /// @param x The premise of the rule.
-    /// @param y The conclusion of the rule.
-    /// @return The confidence level of the rule x -> y.
-    float get_confidence(const frequencies_t &frequencies, const itemset_t &x, const itemset_t &y);
-
-    /// @brief Creates itemsets of the length k from the given itemsets of length k-1 by self-joining.
-    /// @param k The size of the returned itemsets.
-    /// @return The k-element frequent itemsets.
-    auto apriori_gen(const itemsets_t &itemsets, size_t k) -> itemsets_t;
-
-    /// @brief Creates the collection of all frequent database by apply the Apriori principle:
-    /// If an itemset is frequent, then all of its subsets must also be frequent.
-    /// @param database The database database.
-    /// @param min_support The minimum support threshold for frequent database.
-    /// @return Pair of the frequent database with regard to min_support and their frequents.
-    auto apriori_algorithm(const database_t &database, size_t min_support) -> std::pair<itemsets_t, frequencies_t>;
-
-    /// @brief Creates association fim based on one frequent itemset.
-    /// @param z The frequent itemset for which the fim are generated.
-    /// @param frequencies The frequencies of the frequent itemsets.
-    /// @param min_confidence The minimum confidence threshold for the fim.
-    /// @return rules_t The association fim.
-    auto generate_rules(
-            const itemset_t &z,
-            const frequencies_t &frequencies,
-            float min_confidence) -> rules_t;
-
-    /// @brief Creates association fim based on the collection of frequent itemsets.
-    /// @param itemsets The collection of frequent itemsets.
-    /// @param frequencies The frequencies of the frequent itemsets.
-    /// @param min_confidence The minimum confidence threshold for the fim.
-    /// @return rules_t The association fim.
-    auto generate_rules(
-            const itemsets_t &itemsets,
-            const frequencies_t &frequencies,
-            float min_confidence) -> rules_t;
+    /// The Apriori algorithm implementation.
+    /// @param database
+    /// @param min_support
+    /// @return
+    itemsets_t apriori_algorithm(const database_t &database, size_t min_support);
 }

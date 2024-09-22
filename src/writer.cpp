@@ -27,13 +27,13 @@
 /// THE SOFTWARE.
 
 #include <nlohmann/json.hpp>
-#include "apriori.h"
+#include "rules.h"
 #include "writer.h"
 
 using namespace nlohmann;
-using namespace fim::config;
+using namespace fim::itemset;
 
-namespace fim::io {
+namespace fim::data {
 
 //    namespace {
 //        constexpr std::string_view APRIORI = "Apriori";
@@ -72,7 +72,7 @@ namespace fim::io {
         };
 
         for (const auto &itemset: result.itemsets) {
-            const auto frequency = result.frequencies.at(hash_code(itemset));
+            const auto frequency = result.frequencies.at(itemset);
             document_json["frequent_itemsets"].push_back(json{
                     {"itemset",   itemset},
                     {"frequency", frequency},
@@ -94,20 +94,23 @@ namespace fim::io {
         result.algorithm = to_algorithm(j["metadata"]["algorithm"]);
 
         auto frequent_itemsets = j["frequent_itemsets"];
-        for (const auto x: frequent_itemsets) {
-            const auto itemset = x["itemset"].template get<itemset_t>();
-            const auto frequency = x["frequency"].template get<size_t>();
-            const auto hash = hash_code(itemset);
 
-            result.frequencies[hash] = frequency;
-            result.itemsets.insert(itemset);
-        }
+        // TODO
+
+//        for (const auto x: frequent_itemsets) {
+//            const auto itemset = x["itemset"].template get<itemset_t>();
+//            const auto frequency = x["frequency"].template get<size_t>();
+//            const auto hash = hash_code(itemset);
+//
+//            result.frequencies[hash] = frequency;
+//            result.itemsets.insert(itemset);
+//        }
         return is;
     }
 
     auto to_json(const frequency_output_t &output) -> std::string {
         auto get_support = [&](const itemset_t &x) {
-            return static_cast<float>(output.frequencies.at(hash_code(x)) / output.num_transactions);
+            return static_cast<float>(output.frequencies.at(x) / output.num_transactions);
         };
 
         json document_json{};

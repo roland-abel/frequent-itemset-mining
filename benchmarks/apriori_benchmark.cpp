@@ -31,7 +31,7 @@
 #include "apriori.h"
 
 using namespace std;
-using namespace fim::apriori;
+using namespace fim::algorithms::apriori;
 
 static void apriori_benchmark(benchmark::State &state) {
     const std::string_view filename = "data/mushroom.dat";

@@ -35,8 +35,8 @@ add_library(${FIM_LIB_NAME}
         hash_tree.cpp
         reader.cpp
         writer.cpp
+        rules.cpp
         apriori.cpp
-        apriori_2.cpp
         apriori_hash_tree.cpp
         fp_tree.cpp
         fp_growth.cpp

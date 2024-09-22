@@ -27,56 +27,63 @@
 /// THE SOFTWARE.
 
 #include "reader.h"
+#include "itemset.h"
 
-auto fim::io::read_csv(std::istream &input, const csv_config_t &config) -> fim::io::read_result_t {
-    database_t database{};
-    std::string line;
+using namespace fim;
+using namespace fim::itemset;
 
-    if ((input.bad() || input.fail())) {
-        return std::unexpected(io_error_t::UNKNOWN_ERROR);
-    }
+namespace fim::data {
 
-    for (auto i = 0; i < config.skip_rows; ++i) {
-        std::getline(input, line);
-    }
+    auto read_csv(std::istream &input, const csv_config_t &config) -> read_result_t {
+        database_t database{};
+        std::string line;
 
-    while (std::getline(input, line)) {
-        itemset_t itemset{};
+        if ((input.bad() || input.fail())) {
+            return std::unexpected(io_error_t::UNKNOWN_ERROR);
+        }
 
-        std::stringstream line_stream(line);
-        std::string number;
+        for (auto i = 0; i < config.skip_rows; ++i) {
+            std::getline(input, line);
+        }
 
-        try {
-            while (std::getline(line_stream, number, config.separator)) {
-                size_t value = std::stoull(number);
-                itemset.insert(value);
+        while (std::getline(input, line)) {
+            itemset_t itemset{};
+
+            std::stringstream line_stream(line);
+            std::string number;
+
+            try {
+                while (std::getline(line_stream, number, config.separator)) {
+                    size_t value = std::stoull(number);
+                    itemset.push_back(value);
+                }
+            } catch (const std::invalid_argument &) {
+                return std::unexpected(io_error_t::INVALID_FORMAT);
             }
-        } catch (const std::invalid_argument &) {
-            return std::unexpected(io_error_t::INVALID_FORMAT);
-        }
-        catch (const std::out_of_range &) {
-            return std::unexpected(io_error_t::VALUE_OUT_OF_RANGE);
+            catch (const std::out_of_range &) {
+                return std::unexpected(io_error_t::VALUE_OUT_OF_RANGE);
+            }
+
+            if (line_stream.fail() && !line_stream.eof()) {
+                return std::unexpected(io_error_t::INVALID_FORMAT);
+            }
+
+            database.push_back(std::move(itemset));
         }
 
-        if (line_stream.fail() && !line_stream.eof()) {
-            return std::unexpected(io_error_t::INVALID_FORMAT);
+        if (database.empty()) {
+            return std::unexpected(io_error_t::EMPTY_ERROR);
         }
 
-        database.push_back(std::move(itemset));
+        return database;
     }
 
-    if (database.empty()) {
-        return std::unexpected(io_error_t::EMPTY_ERROR);
+    auto read_csv(const std::string_view &filename, const csv_config_t &config) -> read_result_t {
+        std::ifstream file(filename.data());
+        if (!file.is_open()) {
+            return std::unexpected(io_error_t::FILE_NOT_FOUND);
+        }
+
+        return read_csv(file, config);
     }
-
-    return database;
-}
-
-auto fim::io::read_csv(const std::string_view &filename, const csv_config_t &config) -> fim::io::read_result_t {
-    std::ifstream file(filename.data());
-    if (!file.is_open()) {
-        return std::unexpected(io_error_t::FILE_NOT_FOUND);
-    }
-
-    return read_csv(file, config);
 }

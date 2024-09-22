@@ -35,6 +35,8 @@ namespace fim::fp_tree {
 
     using std::views::filter;
     using std::views::transform;
+    using std::ranges::find;
+    using std::ranges::to;
 
     node_t::node_t(item_t item, size_t frequency, const std::shared_ptr<node_t> &parent)
             : item(item), frequency(frequency), parent(parent), children({}) {
@@ -118,7 +120,7 @@ namespace fim::fp_tree {
                 return std::nullopt;
             }
 
-            items_along_path.insert(current->item);
+            items_along_path.emplace_back(current->item);
             if (num_children == 0) {
                 return items_along_path;
             }
@@ -132,68 +134,66 @@ namespace fim::fp_tree {
         const auto num_subsets = static_cast<size_t>(std::pow(2, items.size()));
 
         for (size_t i = 0; i < num_subsets; ++i) {
-            itemset_t subset;
+            itemset_t subset{};
             size_t bit_position = 0;
 
             for (const auto &item: items) {
                 if (i & (1 << bit_position)) {
-                    subset.insert(item);
+                    subset.emplace_back(item);
                 }
                 ++bit_position;
             }
 
             if (include_empty_set || !subset.empty()) {
-                result.insert(std::move(subset));
+                result.emplace_back(std::move(subset));
             }
         }
         return result;
     }
 
     auto insert_into_each_itemsets(const itemsets_t &itemsets, item_t item) -> itemsets_t {
-        const auto copy_and_insert = [item](const auto &subset) -> itemset_t {
-            auto result = subset; // call copy-constructor
-            result.insert(item);
+        const auto copy_and_insert = [item](const itemset_t &subset) -> itemset_t {
+            itemset_t result = subset; // call copy-constructor
+            result.add(item);
             return result;
         };
 
         return itemsets
-               | std::views::transform(copy_and_insert)
-               | std::ranges::to<itemsets_t>();
+               | transform(copy_and_insert)
+               | to<itemsets_t>();
     }
 
-    auto get_item_counts(const database_t &database) -> item_counts_t {
-        auto item_counts = item_counts_t{};
+    auto get_item_count(const database_t &database) -> item_count_t {
+        auto count = item_count_t{};
         for (const auto &item: database | std::views::join) {
-            ++item_counts[item];
+            ++count[item];
         }
-        return item_counts;
+        return count;
     }
 
-    auto get_frequent_items(const item_counts_t &item_counts, size_t min_support) -> std::pair<items_t, item_counts_t> {
+    auto get_ordered_frequent_items(const item_count_t &count, size_t min_support) -> std::pair<items_t, item_count_t> {
         auto is_frequent = [=](const auto &kv) { return kv.second >= min_support; };
 
-        auto item_compare = [&](const item_t &x, const item_t &y) {
-            return item_counts.at(x) > item_counts.at(y);
-        };
-
-        auto items = item_counts
+        auto items = count
                      | filter(is_frequent)
                      | std::views::keys
-                     | std::ranges::to<std::vector>();
+                     | to<std::vector>();
 
-        std::ranges::sort(items, item_compare);
-        return {items, item_counts};
+        std::ranges::sort(items, [&](const item_t &x, const item_t &y) {
+            return count.at(x) > count.at(y);
+        });
+        return {items, count};
     }
 
     auto filter_and_sort_items(const itemset_t &itemset, const items_t &frequent_items) -> items_t {
-        auto is_frequent = [&](const auto &item) { return itemset.contains(item); };
+        auto is_frequent = [&](const auto &item) { return find(itemset, item) != itemset.end(); };
 
         auto items = frequent_items
-                     | std::views::filter(is_frequent)
-                     | std::ranges::to<std::vector>();
+                     | filter(is_frequent)
+                     | to<std::vector>();
 
-        std::sort(std::execution::par_unseq, items.begin(), items.end(), [&](const item_t &x, const item_t &y) {
-            return std::ranges::find(frequent_items, x) < std::ranges::find(frequent_items, y);
+        std::sort(items.begin(), items.end(), [&](const item_t &x, const item_t &y) {
+            return find(frequent_items, x) < find(frequent_items, y);
         });
 
         return items;
@@ -222,8 +222,8 @@ namespace fim::fp_tree {
     }
 
     auto build_fp_tree(const database_t &database, size_t min_support) -> node_ptr {
-        const auto &item_counts = get_item_counts(database);
-        const auto &[frequent_items, _] = get_frequent_items(item_counts, min_support);
+        const auto &item_counts = get_item_count(database);
+        const auto &[frequent_items, _] = get_ordered_frequent_items(item_counts, min_support);
 
         return build_fp_tree(database, frequent_items);
     }

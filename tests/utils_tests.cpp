@@ -1,8 +1,8 @@
-/// @file dtypes_tests.cpp
-/// @brief
+/// @file apriori_tests.cpp
+/// @brief Unit test for the Apriori algorithm.
 ///
 /// @author Roland Abel
-/// @date September 6, 2024
+/// @date December 8, 2023
 ///
 /// Copyright (c) 2023 Roland Abel
 ///
@@ -28,36 +28,27 @@
 
 #include <gtest/gtest.h>
 #include "utils.h"
-#include "test_data.h"
 
-using namespace std::chrono;
 using namespace fim;
-using namespace fim::tests;
+using namespace std::chrono;
 
-TEST(DTypesTests, AlgorithmToStringTest) {
+class UtilsTests : public ::testing::Test {
+};
+
+TEST(UtilsTests, AlgorithmToStringTest) {
     EXPECT_EQ(to_string(algorithm_t::APRIORI), "apriori");
     EXPECT_EQ(to_string(algorithm_t::FP_GROWTH), "fp-growth");
     EXPECT_EQ(to_string(algorithm_t::UNKNOWN), "unknown");
 }
 
-TEST(DTypesTests, AlgorithmToEnumTest) {
+TEST(UtilsTests, AlgorithmToEnumTest) {
     EXPECT_EQ(to_algorithm("apriori"), algorithm_t::APRIORI);
     EXPECT_EQ(to_algorithm("fp-growth"), algorithm_t::FP_GROWTH);
     EXPECT_EQ(to_algorithm("X"), algorithm_t::UNKNOWN);
 }
 
-TEST(DTypesTests, Iso8601DatetimeTest) {
+TEST(UtilsTests, Iso8601DatetimeTest) {
     const auto dt = to_datetime(year{2024}, month{9}, day{1}, hours{14}, minutes{30}, seconds{5});
     EXPECT_EQ(iso8601_datetime(dt), "2024-09-01T14:30:05Z");
 }
 
-TEST(DTypesTests, HashCodeTest) {
-    const auto code1 = hash_code(itemset_t{Coffee, Milk, Bread});
-    const auto code2 = hash_code(itemset_t{Milk, Coffee, Bread});
-
-    const auto code3 = hash_code(itemset_t{Coffee, Milk, Bread});
-    const auto code4 = hash_code(itemset_t{Coffee, Milk, Sugar});
-
-    EXPECT_EQ(code1, code2);
-    EXPECT_NE(code3, code4);
-}

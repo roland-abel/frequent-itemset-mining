@@ -62,14 +62,14 @@ namespace fim::eclat {
 
         auto create_frequent_itemset = [&](const item_t &item, const itemset_t &prefix) -> itemset_t {
             itemset_t itemset = prefix;
-            itemset.insert(item);
-            frequent_itemsets.insert(itemset);
+            itemset.add(item);
+            frequent_itemsets.add(itemset);
 
             return itemset;
         };
 
-        using eclat_func_t = std::function<void(const itemset_t &, const vertical_database_t &, const tidset_t &)>;
-        eclat_func_t eclat_ = [&](
+        using func_t = std::function<void(const itemset_t &, const vertical_database_t &, const tidset_t &)>;
+        func_t eclat_ = [&](
                 const itemset_t &prefix,
                 const vertical_database_t &vertical_trans,
                 const tidset_t &current_tidset) -> void {

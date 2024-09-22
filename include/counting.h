@@ -1,4 +1,4 @@
-/// @file apriori.h
+/// @file counting.h
 /// @brief
 ///
 /// @author Roland Abel
@@ -32,34 +32,6 @@
 #include <algorithm>
 #include "itemset.h"
 
-namespace fim::algorithms::apriori {
+namespace fim {
 
-    using std::views::transform;
-    using std::views::filter;
-
-    using namespace fim::itemset;
-
-    ///
-    /// @param database
-    /// @param min_support
-    /// @return
-    auto all_frequent_1_itemsets(const database_t &database, size_t min_support) -> itemsets_t;
-
-    /// Generate a candidate frequent itemsets of size k from frequent itemsets of size k-1.
-    /// @param frequent_itemsets
-    /// @param k
-    /// @return
-    auto generate_candidates(const itemsets_t &frequent_itemsets, size_t k) -> itemsets_t;
-
-    ///
-    /// @param candidates
-    /// @param database
-    /// @param support_count
-    auto prune(itemsets_t &candidates, const database_t &database, size_t min_support) -> void;;
-
-    /// The Apriori algorithm implementation.
-    /// @param database
-    /// @param min_support
-    /// @return
-    itemsets_t apriori_algorithm(const database_t &database, size_t min_support);
 }

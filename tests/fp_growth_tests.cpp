@@ -29,22 +29,46 @@
 #include <gtest/gtest.h>
 #include <ranges>
 #include "fp_growth.h"
-#include "test_data.h"
 
 using namespace fim;
-using namespace fim::apriori;
 using namespace fim::fp_growth;
-using namespace fim::tests;
+
+using std::views::transform;
 
 class FPGrowthTests : public ::testing::Test {
 protected:
+    enum Items {
+        Milk = 1,
+        Bread,
+        Cheese,
+        Butter,
+        Coffee,
+        Sugar,
+        Flour,
+        Cream
+    };
+
+    static database_t get_database() {
+        return database_t{
+                {Milk,   Cheese, Butter, Bread,  Sugar,  Flour, Cream},
+                {Cheese, Butter, Bread,  Coffee, Sugar,  Flour},
+                {Milk,   Butter, Coffee, Sugar,  Flour},
+                {Milk,   Butter},
+                {Milk,   Butter, Coffee},
+                {Milk,   Flour},
+                {Milk,   Cheese, Butter, Bread,  Coffee, Sugar, Flour},
+                {Cream},
+                {Milk,   Cheese, Butter, Sugar},
+                {Milk,   Cheese, Bread,  Coffee, Sugar,  Flour}
+        }.sort_database();
+    }
 };
 
 TEST_F(FPGrowthTests, FpGrowthAlgorithmTest) {
     const auto min_support = 4;
     const auto &db = get_database();
 
-    const auto &itemsets = fp_growth_algorithm(db, min_support);
+    const auto &itemsets = fp_growth_algorithm(db, min_support).sort_each_itemset();
     EXPECT_EQ(itemsets.size(), 35);
 
     // 1-itemsets

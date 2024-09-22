@@ -36,55 +36,33 @@ namespace fim::relim {
     using std::views::filter;
     using std::views::transform;
 
-    auto get_item_counts(const database_t &database) -> item_counts_t {
-        item_counts_t item_counts{};
+    auto preprocessing(database_t &database, size_t min_support) -> item_count_t {
+        const auto &item_count = item_count_t::get_item_count(database);
 
-        for (const auto &item: database | std::views::join) {
-            ++item_counts[item];
+        auto is_infrequent_item = [&](const item_t &item) -> bool { return item_count.at(item) < min_support; };
+        auto is_empty_itemset = [](const itemset_t &x) -> bool { return x.empty(); };
+
+        for (itemset_t &trans: database) {
+            trans.erase(std::remove_if(trans.begin(), trans.end(), is_infrequent_item), trans.end());
+            std::ranges::sort(trans, item_count.get_item_comparer());
         }
-        return item_counts;
+
+        const auto it = std::remove_if(database.begin(), database.end(), is_empty_itemset);
+        database.erase(it, database.end());
+
+        return item_count;
+    }
+
+    auto create_initial_database(database_t &database) -> conditional_database_t {
+        conditional_database_t conditional_db{};
+        for (const itemset_t &itemset: database) {
+            conditional_db.insert(itemset);
+        }
+        return std::move(conditional_db);
     }
 
     auto relim_algorithm(const database_t &database, size_t min_support) -> itemsets_t {
-        auto is_frequent = [=](const auto &kv) { return kv.second >= min_support; };
-        auto get_item = [](const auto &kv) { return kv.first; };
-
         itemsets_t frequent_itemsets{};
-
-        auto create_frequent_itemset = [&](const item_t &item, const itemset_t &prefix) -> itemset_t {
-            itemset_t itemset = prefix;
-            itemset.insert(item);
-            frequent_itemsets.insert(itemset);
-
-            return itemset;
-        };
-
-        using relim_func_t = std::function<void(const database_t &, const itemset_t &)>;
-        relim_func_t relim_ = [&](const database_t &db, const itemset_t &prefix) -> void {
-            const auto &frequent_items = get_item_counts(db)
-                                         | filter(is_frequent)
-                                         | transform(get_item)
-                                         | std::ranges::to<std::vector>();
-
-            for (const auto &item: frequent_items) {
-                const auto &new_itemset = create_frequent_itemset(item, prefix);
-
-                database_t new_transactions{};
-                for (const auto &trans: db) {
-                    if (trans.contains(item)) {
-                        itemset_t reduced_transaction = trans;
-                        reduced_transaction.erase(item);
-
-                        if (!reduced_transaction.empty()) {
-                            new_transactions.emplace_back(reduced_transaction);
-                        }
-                    }
-                    relim_(new_transactions, new_itemset);
-                }
-            }
-        };
-
-        relim_(database, {});
         return frequent_itemsets;
     }
 }
