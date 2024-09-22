@@ -31,13 +31,11 @@
 
 #include <functional>
 #include <utility>
-#include "utils.h"
+#include "itemset.h"
 
 namespace fim::hash {
 
-    using item_t = fim::item_t;
-    using itemset_t = std::vector<item_t>;
-    using itemsets_t = std::vector<itemset_t>;
+    using namespace itemset;
 
     using hash_function_t = std::function<size_t(const item_t &)>;
 
@@ -90,7 +88,7 @@ namespace fim::hash {
         itemsets_t &itemsets() { return itemsets_; }
 
     private:
-        std::vector<itemset_t> itemsets_;
+        itemsets_t itemsets_{};
     };
 
     /// Hash tree type.

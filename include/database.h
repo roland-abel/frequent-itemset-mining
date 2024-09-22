@@ -1,8 +1,8 @@
-/// @file fp_growth.h
+/// @file database.h
 /// @brief
 ///
 /// @author Roland Abel
-/// @date August 10, 2024
+/// @date September 21, 2024
 ///
 /// Copyright (c) 2024 Roland Abel
 ///
@@ -28,24 +28,15 @@
 
 #pragma once
 
-#include "utils.h"
-#include "fp_tree.h"
+#include <ostream>
+#include <algorithm>
+#include <ranges>
+#include <vector>
+#include <functional>
+#include <unordered_map>
 
-namespace fim::fp_growth {
+namespace fim {
 
-    using namespace fim::itemset;
-    using namespace fim::fp_tree;
 
-    /// Generates the conditional transaction from the given FP-Tree.
-    /// @param node The current node in the FP-Tree being processed.
-    /// @param item  The item for which conditional database_ are being generated.
-    /// @return The database_ that will be populated with the conditional database_.
-    auto conditional_transactions(const node_ptr &node, item_t item) -> database_t;
 
-    /// Applies the FP-Growth algorithm to find frequent itemsets from the given database_.
-    /// @param database A collection of transactions, where each transaction is a set of items.
-    /// @param min_support The minimum support threshold for an itemset to be considered frequent.
-    /// @return A set of frequent itemsets, where each itemset is a collection of items that meet
-    /// the minimum support threshold.
-    auto fp_growth_algorithm(const database_t &database, size_t min_support) -> itemsets_t;
 }

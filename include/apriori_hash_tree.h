@@ -35,32 +35,33 @@
 #include <set>
 #include <algorithm>
 
-//#include "dtypes.h"
 #include "hash_tree.h"
 
 using namespace fim::hash;
 
 namespace fim::apriori_hash_tree {
 
-    // The item type.
-    using item_t = unsigned long;
+    using namespace fim::itemset;
 
-    // The itemset type.
-    using itemset_t = std::vector<item_t>;
+//    // The item type.
+//    using item_t = unsigned long;
+//
+//    // The itemset type.
+//    using itemset_t = std::vector<item_t>;
+//
+//    // Collection of itemsets.
+//    using itemsets_t = std::vector<itemset_t>;
+//
+//    // The transaction database type.
+//    using database_t = std::vector<itemset_t>;
 
-    // Collection of itemsets.
-    using itemsets_t = std::vector<itemset_t>;
-
-    // The transaction database type.
-    using database_t = std::vector<itemset_t>;
-
-    ///
-    /// @param subset
-    /// @param superset
-    /// @return
-    bool is_subset(const itemset_t &subset, const itemset_t &superset) {
-        return std::includes(superset.begin(), superset.end(), subset.begin(), subset.end());
-    }
+//    ///
+//    /// @param subset
+//    /// @param superset
+//    /// @return
+//    bool is_subset(const itemset_t &subset, const itemset_t &superset) {
+//        return std::includes(superset.begin(), superset.end(), subset.begin(), subset.end());
+//    }
 
     ///
     /// @param itemset
@@ -82,7 +83,7 @@ namespace fim::apriori_hash_tree {
 
         for (size_t i = 0; i < n; ++i) {
             for (size_t j = i + 1; j < n; ++j) {
-                itemset_t candidate;
+                itemset_t candidate{};
                 // Versuche, zwei Itemsets zu mergen, wenn die ersten k-1 Items identisch sind.
 
 

@@ -27,17 +27,27 @@
 /// THE SOFTWARE.
 
 #include <gtest/gtest.h>
-#include "test_data.h"
+#include "itemset.h"
+#include "utils.h"
 #include "reader.h"
 
 using namespace std;
-using namespace fim::io;
-using namespace fim::tests;
-
-using itemset_t = fim::itemset_t;
+using namespace fim;
+using namespace fim::data;
+using namespace fim::itemset;
 
 class ReaderTests : public ::testing::Test {
 protected:
+    enum Items {
+        Milk = 1,
+        Bread,
+        Cheese,
+        Butter,
+        Coffee,
+        Sugar,
+        Flour,
+        Cream
+    };
 };
 
 TEST_F(ReaderTests, ReadCsvEmptyTest) {

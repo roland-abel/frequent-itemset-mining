@@ -28,11 +28,11 @@
 
 #pragma once
 
-#include "apriori.h"
+#include "itemset.h"
 
 namespace fim::tests {
 
-    using database_t = fim::database_t;
+    using namespace fim::itemset;
 
     enum Items {
         Milk = 1,

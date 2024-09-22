@@ -1,8 +1,8 @@
-/// @file hash_tree_tests.cpp
+/// @file igm_generator_tests.cpp
 /// @brief
 ///
 /// @author Roland Abel
-/// @date September 16, 2024
+/// @date September 21, 2024
 ///
 /// Copyright (c) 2023 Roland Abel
 ///
@@ -27,29 +27,34 @@
 /// THE SOFTWARE.
 
 #include <gtest/gtest.h>
-#include "hash_tree.h"
+#include <ranges>
+#include "itemset.h"
+#include "apriori.h"
+#include "igm_generator.h"
 
-using namespace fim::hash;
+using namespace fim::itemset;
+using namespace fim::generators::igm;
 
-enum Items {
-    Milk = 1,
-    Bread,
-    Cheese,
-    Butter,
-    Coffee,
-    Sugar,
-    Flour,
-    Cream
-};
-
-class HashTreeTests : public ::testing::Test {
+class IgmGeneratorTests : public ::testing::Test {
 protected:
-    static auto hash_func(const item_t &item) {
-        return item % 5;
-    }
 
-    static auto get_itemsets() -> itemsets_t {
-        return {
+    enum Items {
+        Milk = 1,
+        Bread,
+        Cheese,
+        Butter,
+        Coffee,
+        Sugar,
+        Flour,
+        Cream
+    };
+
+    static fim_algorithm_t get_algorithm() {
+        return fim::algorithms::apriori::apriori_algorithm;
+    };
+
+    static database_t get_database() {
+        itemsets_t database = {
                 {Milk,   Cheese, Butter, Bread,  Sugar,  Flour, Cream},
                 {Cheese, Butter, Bread,  Coffee, Sugar,  Flour},
                 {Milk,   Butter, Coffee, Sugar,  Flour},
@@ -61,17 +66,25 @@ protected:
                 {Milk,   Cheese, Butter, Sugar},
                 {Milk,   Cheese, Bread,  Coffee, Sugar,  Flour}
         };
+
+        auto sort_itemset = [](itemset_t &x) -> itemset_t {
+            std::ranges::sort(x);
+            return x;
+        };
+
+        return database
+               | std::views::transform(sort_itemset)
+               | std::ranges::to<database_t>();
     }
 };
 
-TEST_F(HashTreeTests, InsertSearchTest) {
-    const itemset_t itemset =  {Milk, Cheese, Butter, Bread, Sugar, Flour, Cream};
-    hash_tree tree(5, hash_func);
+TEST_F(IgmGeneratorTests, DummyTest) {
+    const size_t min_support = 4;
 
-    tree.insert(itemset);
-    const auto opt = tree.search(itemset);
+    const auto &algorithm = get_algorithm();
+    const auto &db = get_database();
 
-    ASSERT_TRUE(opt.has_value());
-    EXPECT_EQ(opt.value(), itemset);
+    const auto synthetic_db = generate_database(db, min_support, algorithm);
+
+
 }
-

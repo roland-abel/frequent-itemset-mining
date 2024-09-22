@@ -29,14 +29,39 @@
 #include <gtest/gtest.h>
 #include <ranges>
 #include "eclat.h"
-#include "test_data.h"
 
 using namespace fim;
 using namespace fim::eclat;
-using namespace fim::tests;
+
+using std::views::transform;
 
 class EclatTests : public ::testing::Test {
 protected:
+    enum Items {
+        Milk = 1,
+        Bread,
+        Cheese,
+        Butter,
+        Coffee,
+        Sugar,
+        Flour,
+        Cream
+    };
+
+    static database_t get_database() {
+        return database_t{
+                {Milk,   Cheese, Butter, Bread,  Sugar,  Flour, Cream},
+                {Cheese, Butter, Bread,  Coffee, Sugar,  Flour},
+                {Milk,   Butter, Coffee, Sugar,  Flour},
+                {Milk,   Butter},
+                {Milk,   Butter, Coffee},
+                {Milk,   Flour},
+                {Milk,   Cheese, Butter, Bread,  Coffee, Sugar, Flour},
+                {Cream},
+                {Milk,   Cheese, Butter, Sugar},
+                {Milk,   Cheese, Bread,  Coffee, Sugar,  Flour}
+        } | transform([](itemset_t &x) { return x.sort(); }) | std::ranges::to<database_t>();
+    }
 };
 
 TEST_F(EclatTests, ToVerticalTransactionsTest) {
@@ -68,7 +93,8 @@ TEST_F(EclatTests, EclatAlgorithmTest) {
     const auto min_support = 4;
     const auto &database = get_database();
 
-    const auto &itemsets = eclat_algorithm(database, min_support);
+    const auto &itemsets = eclat_algorithm(database, min_support) | transform([](itemset_t &x) { return x.sort(); })
+                           | std::ranges::to<itemsets_t>();
     EXPECT_EQ(itemsets.size(), 35);
 
     // 1-itemsets

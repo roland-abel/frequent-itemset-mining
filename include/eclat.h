@@ -28,10 +28,13 @@
 
 #pragma once
 
-#include "utils.h"
+#include <set>
+#include "itemset.h"
 
 namespace fim::eclat {
 
+    using namespace itemset;
+    
     // Transaction id
     using tid_t = size_t;
 

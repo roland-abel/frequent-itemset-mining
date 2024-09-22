@@ -38,7 +38,7 @@ namespace fim::fp_growth {
     using namespace fim::fp_tree;
     using std::views::filter;
     using std::views::transform;
-    
+
     auto conditional_transactions(const node_ptr &root, item_t item) -> database_t {
         database_t transactions{};
 
@@ -49,10 +49,10 @@ namespace fim::fp_growth {
 
                 node_ptr current = node->parent.lock();
                 while (!current->is_root()) {
-                    path.insert(current->item);
+                    path.add(current->item);
                     current = current->parent.lock();
                 }
-                return path;
+                return path.sort();
             };
 
             if (node->item == item) {
@@ -75,12 +75,12 @@ namespace fim::fp_growth {
         itemsets_t frequent_itemsets{};
 
         const auto update_frequent_itemsets = [&](const item_t &item, const itemsets_t &itemsets) {
-            frequent_itemsets.insert(itemset_t{item});
-            std::ranges::merge(frequent_itemsets, itemsets, std::inserter(frequent_itemsets, frequent_itemsets.end()));
+            frequent_itemsets.add(itemset_t{item});
+            frequent_itemsets.add(itemsets);
         };
 
-        const auto &item_counts = get_item_counts(database);
-        const auto &[frequent_items, _] = get_frequent_items(item_counts, min_support);
+        const auto &count = get_item_count(database);
+        const auto &[frequent_items, _] = get_ordered_frequent_items(count, min_support);
         const auto &root = build_fp_tree(database, frequent_items);
         const auto &items_along_path = tree_has_single_path(root);
 

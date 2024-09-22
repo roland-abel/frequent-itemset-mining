@@ -33,9 +33,9 @@
 namespace fim::fp_tree {
     struct node_t;
 
-    using item_t = fim::item_t;
-
+    using namespace fim::itemset;
     using items_t = std::vector<item_t>;
+
     using node_ptr = std::shared_ptr<node_t>;
     using children_t = std::vector<node_ptr>;
 
@@ -98,13 +98,13 @@ namespace fim::fp_tree {
     ///
     /// @param database
     /// @return
-    auto get_item_counts(const database_t &database) -> item_counts_t;
+    auto get_item_count(const database_t &database) -> item_count_t;
 
     /// Gets a sorted list of frequent items from the given transactions.
-    /// @param item_counts
+    /// @param count
     /// @param min_support The minimum support threshold for items to be considered frequent.
     /// @return A list of items that exceed the minimum support threshold, sorted in order of frequency.
-    auto get_frequent_items(const item_counts_t &item_counts, size_t min_support) -> std::pair<items_t, item_counts_t>;
+    auto get_ordered_frequent_items(const item_count_t &count, size_t min_support) -> std::pair<items_t, item_count_t>;
 
     /// Creates the power set of the given set of items.
     /// @param items The input itemset for which the power set is to created.

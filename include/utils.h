@@ -1,4 +1,4 @@
-/// @file dtypes.h
+/// @file utils.h
 /// @brief
 ///
 /// @author Roland Abel
@@ -31,44 +31,12 @@
 #include <set>
 #include <unordered_map>
 #include <chrono>
+#include "itemset.h"
 
 namespace fim {
 
-    // The item type.
-    using item_t = unsigned long;
-
-    // The itemset type.
-    using itemset_t = std::set<item_t>;
-
-    // Collection of itemsets.
-    using itemsets_t = std::set<itemset_t>;
-
-    // The transaction database type.
-    using database_t = std::vector<itemset_t>;
-    
-    // The associate rule type which contains a premise
-    // and a conclusion (premise -> conclusion).
-    using rule_t = std::tuple<itemset_t, itemset_t>;
-
-    // Collection of rules.
-    using rules_t = std::set<rule_t>;
-
-    // Hash code type
-    using code_t = unsigned long;
-
-    // Type for counting frequents of itemsets. The key is the hash code of an item set.
-    using frequencies_t = std::unordered_map<code_t, size_t>;
-
-    // Type for counting frequents of an item.
-    using item_counts_t = std::unordered_map<item_t, size_t>;
-
     // Date time type
     using datetime_t = std::chrono::sys_time<std::chrono::seconds>;
-
-    /// Hash function for an itemset.
-    /// @param itemset The given itemset.
-    /// @return The hash code for the given x.
-    code_t hash_code(const itemset_t &itemset);
 
     ///
     /// @param year
@@ -112,48 +80,42 @@ namespace fim {
     /// @return
     auto to_algorithm(std::string_view str) -> algorithm_t;
 
-    namespace config {
+    ///
+    enum class input_format_t {
+        CVS,
+        JSON
+    };
 
-        ///
-        enum class input_format_t {
-            CVS,
-            JSON
-        };
+    ///
+    struct configuration_t {
+        std::string input_path;
+        std::string output_path;
+        float min_support;
+        float min_confidence;
+        algorithm_t algorithm;
+        uint8_t max_length;
+        bool is_verbose;
+        // min_lift=3,
+        // min_length=2,
+    };
 
-        ///
-        struct configuration_t {
-            std::string input_path;
-            std::string output_path;
-            float min_support;
-            float min_confidence;
-            algorithm_t algorithm;
-            uint8_t max_length;
-            bool is_verbose;
-            // min_lift=3,
-            // min_length=2,
-        };
-    }
+    // Reader/writer error codes
+    enum class io_error_t {
+        FILE_NOT_FOUND,
+        INVALID_FORMAT,
+        VALUE_OUT_OF_RANGE,
+        UNKNOWN_ERROR,
+        EMPTY_ERROR
+    };
 
-    namespace io {
-
-        // Reader/writer error codes
-        enum class io_error_t {
-            FILE_NOT_FOUND,
-            INVALID_FORMAT,
-            VALUE_OUT_OF_RANGE,
-            UNKNOWN_ERROR,
-            EMPTY_ERROR
-        };
-
-        ///
-        struct frequency_output_t {
-            itemsets_t itemsets{};
-            frequencies_t frequencies{};
-            float min_support{};
-            size_t num_items{};
-            size_t num_transactions{};
-            datetime_t creation_datetime{current_datetime()};
-            algorithm_t algorithm{algorithm_t::UNKNOWN};
-        };
-    }
+    ///
+    struct frequency_output_t {
+        itemset::itemsets_t itemsets{};
+        itemset::itemset_count_t frequencies{};
+        float min_support{};
+        size_t num_items{};
+        size_t num_transactions{};
+        datetime_t creation_datetime{current_datetime()};
+        algorithm_t algorithm{algorithm_t::UNKNOWN};
+    };
 }

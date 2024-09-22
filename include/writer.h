@@ -30,7 +30,7 @@
 
 #include "utils.h"
 
-namespace fim::io {
+namespace fim::data {
 
     ///
     /// @param os
