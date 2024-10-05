@@ -34,153 +34,168 @@
 
 namespace fim::relim {
 
+    using std::views::transform;
+    using std::ranges::to;
+    using std::views::drop;
+    using std::views::take;
+
     using namespace itemset;
 
+    /// Suffix type with number of occurrences.
+    struct suffix_t {
+        size_t count{};
+        itemset_t itemset{};
+    };
+
+    /// List of suffixes.
+    using suffixes_t = std::list<suffix_t>;
+
+    /// Head element
+    struct header_element_t {
+        size_t count{};
+        item_t prefix{};
+        suffixes_t suffixes{};
+
+        ///
+        /// @param suffix
+        /// @param comp
+        /// @param quantity
+        auto add_suffix(
+                const itemset_t &suffix,
+                const item_compare_t &comp,
+                const size_t quantity = 1) -> void {
+
+            auto it = suffixes.begin();
+
+            // search for insert position
+            while (it != suffixes.end() && lexicographical_compare(it->itemset, suffix, comp)) {
+                ++it;
+            }
+
+            // check, whether the itemset already exists
+            if (it != suffixes.begin() && (std::prev(it)->itemset == suffix)) {
+                // itemset found, increasing counter
+                std::prev(it)->count += quantity;
+            } else if (it != suffixes.end() && it->itemset == suffix) {
+                // itemset found, increasing counter
+                it->count += quantity;
+            } else {
+                // itemset haven't been found, insert a new suffix_t element
+                suffixes.insert(it, suffix_t{quantity, suffix});
+            }
+        }
+    };
+
+    /// Header type
+    using header_t = std::vector<header_element_t>;
 
     /// @brief
-    struct conditional_database2_t {
-        using head_t = std::vector<size_t>;
-
-        head_t head{};
-        itemsets_t itemsets{};
-        itemset_t frequent_items{};
+    struct conditional_database_t {
+        header_t header{};
+        item_compare_t item_comparer = default_item_comparer;
 
         /// @brief
-        /// @param frequent_items
-        explicit conditional_database2_t(itemset_t frequent_items)
-                : frequent_items(std::move(frequent_items)),
-                  head(frequent_items.size(), 0),
-                  itemsets(frequent_items.size(), itemset_t{}) {
+        /// @param freq_items
+        explicit conditional_database_t(const itemset_t &freq_items, item_compare_t comp)
+                : item_comparer(std::move(comp)) {
+            auto to_header_element = [](const item_t &item) {
+                return header_element_t{0, item, suffixes_t{}};
+            };
+            header = freq_items | transform(to_header_element) | to<header_t>();
         }
 
-        /// @brief
+        ///
         /// @param database
-        /// @param count
-        /// @param min_support
+        /// @param freq_items
+        /// @param item_comparer
         /// @return
-        static auto create(
+        static auto create_initial_database(
                 const database_t &database,
-                const item_count_t &count,
-                size_t min_support) -> conditional_database2_t {
+                const itemset_t &freq_items,
+                const item_compare_t &comp) -> conditional_database_t {
 
-            using std::views::drop;
-            using std::ranges::to;
-
-            const auto frequent_items = count.get_frequent_items(min_support);
-            conditional_database2_t contaitional_db(frequent_items);
-
-            auto it_head = contaitional_db.head.rbegin();
-            auto it_item = frequent_items.rbegin();
+            conditional_database_t conditional_db(freq_items, comp);
+            auto it = conditional_db.header.rbegin();
 
             for (const itemset_t &trans: database) {
                 const auto &prefix = trans.front();
                 const auto &suffix = trans | drop(1) | to<itemset_t>();
 
-                if (prefix != *it_item) {
-                    it_head++;
-                    it_item++;
+                if (prefix != it->prefix) {
+                    it++;
                 }
 
-
-
-
-
+                it->count++;
+                if (not suffix.empty()) {
+                    it->add_suffix(suffix, comp);
+                }
             }
-            return contaitional_db;
+            return conditional_db;
         }
 
-        auto insert(const itemset_t &itemset) -> void {
-            auto split_itemset = [&]() -> std::pair<item_t, itemset_t> {
-                itemset_t suffix{};
-                std::copy(std::next(itemset.begin()), itemset.end(), std::back_inserter(suffix));
+        ///
+        /// @return
+        auto get_prefix_database() const -> conditional_database_t {
+            const auto items = header
+                               | take(header.size() - 1)
+                               | transform([](const auto &x) { return x.prefix; })
+                               | to<itemset_t>();
 
-                return std::make_pair(itemset.front(), suffix);
-            };
+            conditional_database_t conditional_db(items, item_comparer);
+            auto it = conditional_db.header.rbegin();
 
-            const auto [prefix, suffix] = split_itemset();
+            for (const auto &[count, itemset]: header.back().suffixes) {
+                const auto &prefix = itemset.front();
+                const auto &suffix = itemset | drop(1) | to<itemset_t>();
 
+                if (prefix != it->prefix) {
+                    it++;
+                }
 
+                it->count++;
+                if (not suffix.empty()) {
+                    it->add_suffix(suffix, item_comparer, count);
+                }
+            }
+            return conditional_db;
+        }
+
+        ///
+        /// @param prefix_db
+        /// @return
+        auto eliminate(const conditional_database_t &prefix_db) -> item_t {
+            const item_t eliminated_prefix = header.back().prefix;
+            header.pop_back();
+
+            auto it = header.rbegin();
+            auto it_prefix = prefix_db.header.rbegin();
+
+            while (it != header.rend() && it_prefix != prefix_db.header.rend()) {
+                it->count += it_prefix->count;
+
+                for (const auto &[count, itemset]: it_prefix->suffixes) {
+                    it->add_suffix(itemset, item_comparer, count);
+                }
+
+                it++;
+                it_prefix++;
+            }
+            return eliminated_prefix;
         }
     };
 
-
-    /// @brief
-    class conditional_database_t {
-    public:
-        struct data_t {
-            size_t count{};
-            itemset_t itemset{};
-        };
-
-        using data_list_t = std::list<data_t>;
-        using map_t = std::unordered_map<item_t, std::pair<size_t, data_list_t>>;
-
-        auto get(const item_t &item) -> std::pair<size_t, data_list_t> {
-            return map_.at(item);
-        }
-
-//        auto data_list(const item_t &item) -> data_list_t {
-//            return map_.at(item).second;
-//        }
-
-        auto insert(const itemset_t &itemset) -> void {
-            auto split_itemset = [&]() -> std::pair<item_t, itemset_t> {
-                itemset_t suffix{};
-                std::copy(std::next(itemset.begin()), itemset.end(), std::back_inserter(suffix));
-
-                return std::make_pair(itemset.front(), suffix);
-            };
-
-            const auto [prefix, suffix] = split_itemset();
-            const auto [it, inserted] = map_.try_emplace(prefix, std::pair{0, data_list_t{}});
-
-            if (inserted) {
-                if (suffix.empty()) {
-                    it->second.first++;
-                } else {
-                    it->second.first++;
-                }
-            } else {
-                if (suffix.empty()) {
-                    it->second.first++;
-                } else {
-                    it->second.second.emplace_back(data_t{0, suffix});
-                    it->second.first++;
-                }
-            }
-
-//            if (suffix.empty()) {
-//                if (!inserted) {
-//                    it->second.first++;
-//                }
-//            } else {
-//                it->second.second.emplace_back(data_t{0, suffix});
-//            }
-//            it->second.first++;
-        }
-
-    private:
-        map_t map_{};
-
-
-    };
-
-    // Removes all infrequent items from the database and sorts all item sets.
+    // Removes all infrequent items from the database and sorts all prefix sets.
     /// @param database
     /// @param min_support
     /// @return
     auto preprocessing(database_t &database, size_t min_support) -> item_count_t;
 
-    /// @brief
-    /// @param database
-    /// @param count
-    /// @param min_support
-    /// @return
-    auto create_initial_database(database_t &database) -> conditional_database_t;
-
     ///
     /// @param database
     /// @param min_support
     /// @return
-    auto relim_algorithm(const database_t &database, size_t min_support) -> itemsets_t;
+    auto relim_algorithm(
+            const database_t &database,
+            const itemset_t &frequent_items,
+            size_t min_support) -> itemsets_t;
 }

@@ -185,21 +185,21 @@ namespace fim::fp_tree {
         return {items, count};
     }
 
-    auto filter_and_sort_items(const itemset_t &itemset, const items_t &frequent_items) -> items_t {
+    auto filter_and_sort_items(const itemset_t &itemset, const items_t &freq_items) -> items_t {
         auto is_frequent = [&](const auto &item) { return find(itemset, item) != itemset.end(); };
 
-        auto items = frequent_items
+        auto items = freq_items
                      | filter(is_frequent)
                      | to<std::vector>();
 
         std::sort(items.begin(), items.end(), [&](const item_t &x, const item_t &y) {
-            return find(frequent_items, x) < find(frequent_items, y);
+            return find(freq_items, x) < find(freq_items, y);
         });
 
         return items;
     }
 
-    auto build_fp_tree(const database_t &database, const items_t &frequent_items) -> node_ptr {
+    auto build_fp_tree(const database_t &database, const items_t &freq_items) -> node_ptr {
         auto root = node_t::create_root();
         auto insert_items = [&](const items_t &items) {
             auto current = root;
@@ -215,7 +215,7 @@ namespace fim::fp_tree {
         };
 
         for (const auto &trans: database) {
-            const auto &items = filter_and_sort_items(trans, frequent_items);
+            const auto &items = filter_and_sort_items(trans, freq_items);
             insert_items(items);
         }
         return root;

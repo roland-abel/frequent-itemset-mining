@@ -41,7 +41,7 @@ namespace fim::generators::igm {
         std::mt19937 gen(rd());
     }
 
-    // Signature of a frequent itemset mining algorithm, like the Apriori algorithm
+    // Signature of a frequent suffix mining algorithm, like the Apriori algorithm
     using fim_algorithm_t = std::function<itemsets_t(const database_t &database, size_t min_support)>;
 
     ///
@@ -71,8 +71,8 @@ namespace fim::generators::igm {
 
     ///
     /// @param original_db The original database.
-    /// @param min_support The minimal support of frequent itemsets.
-    /// @param algorithm A frequent itemset mining algorithm, like the Apriori algorithm.
+    /// @param min_support The minimal support of frequent suffix.
+    /// @param algorithm A frequent suffix mining algorithm, like the Apriori algorithm.
     /// @return A synthetic generated database.
     auto generate_database(const database_t &original_db, size_t min_support, const fim_algorithm_t &algorithm) -> database_t {
         using std::views::filter;

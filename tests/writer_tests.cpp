@@ -54,8 +54,8 @@ protected:
         frequencies_t frequencies{};
 
         for (const auto &[itemset, frequency]: itemsets_frequencies) {
-//            itemsets.insert(itemset);
-//            frequencies[fim::hash_code(itemset)] = frequency;
+//            suffix.insert(suffix);
+//            frequencies[fim::hash_code(suffix)] = frequency;
         }
         return {itemsets, frequencies};
     }
@@ -89,9 +89,9 @@ TEST_F(WriterTests, WriterEmptyTest) {
     EXPECT_EQ(output.itemsets, deserialized.itemsets);
     EXPECT_EQ(output.frequencies, deserialized.frequencies);
 
-//    EXPECT_TRUE(deserialized.itemsets.contains({Milk, Bread, Butter}));   // TODO
-//    EXPECT_TRUE(deserialized.itemsets.contains({Coffee, Milk, Cheese}));
-//    EXPECT_TRUE(deserialized.itemsets.contains({Coffee, Milk, Bread}));
+//    EXPECT_TRUE(deserialized.suffix.contains({Milk, Bread, Butter}));   // TODO
+//    EXPECT_TRUE(deserialized.suffix.contains({Coffee, Milk, Cheese}));
+//    EXPECT_TRUE(deserialized.suffix.contains({Coffee, Milk, Bread}));
 //
 //    const auto get_frequency = [&](const itemset_t x) {
 //        return deserialized.frequencies[hash_code(x)];
@@ -115,10 +115,10 @@ TEST_F(WriterTests, WriterEmptyTest) {
 
 //    fim::io::write(
 //            std::cout,
-//            itemsets,
+//            suffix,
 //            frequencies,
 //            0.75,
-//            itemsets.size(),
+//            suffix.size(),
 //            3,
 //            creation_data,
 //            algorithm_t::APRIORI)

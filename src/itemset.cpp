@@ -1,4 +1,4 @@
-/// @file itemset.cpp
+/// @file suffix.cpp
 /// @brief
 ///
 /// @author Roland Abel
@@ -127,6 +127,20 @@ namespace fim::itemset {
             }
         }
         return std::move(count);
+    }
+
+    auto lexicographical_compare(const itemset_t &x, const itemset_t &y, const item_compare_t &comp) -> bool {
+        auto it_x = x.begin();
+        auto it_y = y.begin();
+
+        for (; it_x != x.end() && it_y != y.end(); ++it_x, ++it_y) {
+            if (comp(*it_x, *it_y))
+                return true;
+
+            if (comp(*it_y, *it_x))
+                return false;
+        }
+        return std::distance(it_x, x.end()) > std::distance(it_y, y.end());
     }
 
     ///

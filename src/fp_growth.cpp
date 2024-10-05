@@ -72,23 +72,23 @@ namespace fim::fp_growth {
     }
 
     auto fp_growth_algorithm(const database_t &database, size_t min_support) -> itemsets_t {
-        itemsets_t frequent_itemsets{};
+        itemsets_t freq_items{};
 
         const auto update_frequent_itemsets = [&](const item_t &item, const itemsets_t &itemsets) {
-            frequent_itemsets.add(itemset_t{item});
-            frequent_itemsets.add(itemsets);
+            freq_items.add(itemset_t{item});
+            freq_items.add(itemsets);
         };
 
         const auto &count = get_item_count(database);
-        const auto &[frequent_items, _] = get_ordered_frequent_items(count, min_support);
-        const auto &root = build_fp_tree(database, frequent_items);
+        const auto &[items, _] = get_ordered_frequent_items(count, min_support);
+        const auto &root = build_fp_tree(database, items);
         const auto &items_along_path = tree_has_single_path(root);
 
         if (items_along_path.has_value()) {
             return power_set(items_along_path.value(), false);
         } else {
             // traverses all frequent items in the reversed order
-            for (auto &item: std::ranges::reverse_view(frequent_items)) {
+            for (auto &item: std::ranges::reverse_view(items)) {
                 const auto &cond_trans = conditional_transactions(root, item);
                 const auto &cond_itemsets = fp_growth_algorithm(cond_trans, min_support);
                 const auto &itemsets = insert_into_each_itemsets(cond_itemsets, item);
@@ -96,6 +96,6 @@ namespace fim::fp_growth {
                 update_frequent_itemsets(item, itemsets);
             }
         }
-        return frequent_itemsets;
+        return freq_items;
     }
 }

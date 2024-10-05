@@ -1,4 +1,4 @@
-/// @file itemset.h
+/// @file suffix.h
 /// @brief
 ///
 /// @author Roland Abel
@@ -37,13 +37,13 @@
 
 namespace fim::itemset {
 
-    // The item type.
+    // The prefix type.
     using item_t = unsigned long;
     using item_compare_t = std::function<bool(const item_t &, const item_t &)>;
 
     auto default_item_comparer(const item_t &i, const item_t &j) -> bool;
 
-    // The itemset type.
+    // The suffix type.
     struct itemset_t : public std::vector<item_t> {
         using std::vector<item_t>::vector;
 
@@ -62,15 +62,15 @@ namespace fim::itemset {
         /// @return
         [[nodiscard]] auto is_subset(const itemset_t &superset) const -> bool;
 
-        /// Gets the union of two itemsets.
-        /// @param x The first itemset.
-        /// @param y The second itemset.
-        /// @return The union of the two itemsets.
+        /// Gets the union of two suffix.
+        /// @param x The first suffix.
+        /// @param y The second suffix.
+        /// @return The union of the two suffix.
         [[nodiscard]] auto set_union(const itemset_t &y) const -> itemset_t;
 
-        /// Gets the difference of two itemsets (elements in x but not in y).
-        /// @param x The first itemset.
-        /// @param y The second itemset.
+        /// Gets the difference of two suffix (elements in x but not in y).
+        /// @param x The first suffix.
+        /// @param y The second suffix.
         /// @return The difference of the two sets.
         [[nodiscard]] auto set_difference(const itemset_t &y) const -> itemset_t;
 
@@ -88,7 +88,17 @@ namespace fim::itemset {
         [[nodiscard]] auto remove_item(const item_t &to_remove) const -> itemset_t;
     };
 
-    // Collection of item sets.
+    ///
+    /// @param x
+    /// @param y
+    /// @param comp
+    /// @return
+    auto lexicographical_compare(
+            const itemset_t &x,
+            const itemset_t &y,
+            const item_compare_t &comp = default_item_comparer) -> bool;
+
+    // Collection of prefix sets.
     struct itemsets_t : public std::vector<itemset_t> {
         using std::vector<itemset_t>::vector;
 
@@ -122,23 +132,13 @@ namespace fim::itemset {
     struct database_t : public std::vector<itemset_t> {
         using std::vector<itemset_t>::vector;
 
+        database_t(itemsets_t itemsets)
+                : std::vector<itemset_t>(std::move(itemsets)) {
+        }
+
         auto sort_lexicographically(const item_compare_t &comp = default_item_comparer) -> database_t {
-            const auto lexicographical_compare = [&](const itemset_t &x, const itemset_t &y) -> bool {
-                auto it_x = x.begin();
-                auto it_y = y.begin();
-
-                for (; it_x != x.end() && it_y != y.end(); ++it_x, ++it_y) {
-                    if (comp(*it_x, *it_y))
-                        return true;
-
-                    if (comp(*it_y, *it_x))
-                        return false;
-                }
-                return std::distance(it_x, x.end()) > std::distance(it_y, y.end());
-            };
-
             std::ranges::sort(*this, [&](const itemset_t &x, const itemset_t &y) {
-                return lexicographical_compare(x, y);
+                return lexicographical_compare(x, y, comp);
             });
             return *this;
         };
@@ -157,7 +157,7 @@ namespace fim::itemset {
     // Hash code type
     using code_t = unsigned long;
 
-    // Hash function for an itemset
+    // Hash function for an suffix
     struct itemset_hash {
         auto operator()(const itemset_t &itemset) const -> std::size_t;
     };
@@ -189,27 +189,27 @@ namespace fim::itemset {
         }
     };
 
-    /// Overloads the output stream operator to output an itemset to an ostream.
+    /// Overloads the output stream operator to output an suffix to an ostream.
     /// @param os The output stream to write to.
-    /// @param x The itemset to output.
-    /// @return The output stream after writing the itemset.
+    /// @param x The suffix to output.
+    /// @return The output stream after writing the suffix.
     std::ostream &operator<<(std::ostream &os, const itemset_t &x);
 
-    /// Computes the union of two itemsets.
-    /// @param x The first itemset.
-    /// @param y The second itemset.
-    /// @return The union of the two itemsets.
+    /// Computes the union of two suffix.
+    /// @param x The first suffix.
+    /// @param y The second suffix.
+    /// @return The union of the two suffix.
     auto set_union(const itemset_t &x, const itemset_t &y) -> itemset_t;
 
-    /// Computes the difference of two itemsets (elements in x but not in y).
-    /// @param x The first itemset.
-    /// @param y The second itemset.
+    /// Computes the difference of two suffix (elements in x but not in y).
+    /// @param x The first suffix.
+    /// @param y The second suffix.
     /// @return The difference of the two sets.
     auto set_difference(const itemset_t &x, const itemset_t &y) -> itemset_t;
 
     ///
-    /// @param x A sorted item set.
-    /// @param y A sorted item set.
+    /// @param x A sorted prefix set.
+    /// @param y A sorted prefix set.
     /// @return
     auto is_subset(const itemset_t &x, const itemset_t &y) -> bool;
 

@@ -64,7 +64,7 @@ namespace fim::data {
     auto operator<<(std::ostream &os, const frequency_output_t &result) -> std::ostream & {
         json document_json{};
         document_json["metadata"] = {
-                {"min_support",      result.min_support},
+                {"get_min_support",      result.min_support},
                 {"num_transactions", result.num_transactions},
                 {"num_items",        result.num_items},
                 {"algorithm",        to_string(result.algorithm)},
@@ -74,7 +74,7 @@ namespace fim::data {
         for (const auto &itemset: result.itemsets) {
             const auto frequency = result.frequencies.at(itemset);
             document_json["frequent_itemsets"].push_back(json{
-                    {"itemset",   itemset},
+                    {"suffix",   itemset},
                     {"frequency", frequency},
             });
         }
@@ -88,7 +88,7 @@ namespace fim::data {
         result.frequencies = {};
         result.itemsets = {};
 
-        result.min_support = j["metadata"]["min_support"];
+        result.min_support = j["metadata"]["get_min_support"];
         result.num_transactions = j["metadata"]["num_transactions"];
         result.num_items = j["metadata"]["num_items"];
         result.algorithm = to_algorithm(j["metadata"]["algorithm"]);
@@ -98,12 +98,12 @@ namespace fim::data {
         // TODO
 
 //        for (const auto x: frequent_itemsets) {
-//            const auto itemset = x["itemset"].template get<itemset_t>();
+//            const auto suffix = x["suffix"].template get<itemset_t>();
 //            const auto frequency = x["frequency"].template get<size_t>();
-//            const auto hash = hash_code(itemset);
+//            const auto hash = hash_code(suffix);
 //
 //            result.frequencies[hash] = frequency;
-//            result.itemsets.insert(itemset);
+//            result.suffix.insert(suffix);
 //        }
         return is;
     }
@@ -115,7 +115,7 @@ namespace fim::data {
 
         json document_json{};
         document_json["metadata"] = {
-                {"min_support",      std::format("{:.2f}", output.min_support)},
+                {"get_min_support",      std::format("{:.2f}", output.min_support)},
                 {"num_transactions", output.num_transactions},
                 {"num_items",        output.num_items},
                 {"algorithm",        to_string(output.algorithm)},
@@ -125,7 +125,7 @@ namespace fim::data {
         for (const auto &itemset: output.itemsets) {
             const auto support = get_support(itemset);
             document_json["frequent_itemsets"].push_back(nlohmann::json{
-                    {"itemset", itemset},
+                    {"suffix", itemset},
                     {"support", std::format("{:.2f}", support)},
             });
         }

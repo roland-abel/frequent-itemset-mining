@@ -71,7 +71,7 @@ TEST_F(FPGrowthTests, FpGrowthAlgorithmTest) {
     const auto &itemsets = fp_growth_algorithm(db, min_support).sort_each_itemset();
     EXPECT_EQ(itemsets.size(), 35);
 
-    // 1-itemsets
+    // 1-suffix
     EXPECT_TRUE(itemsets.contains({Milk}));
     EXPECT_TRUE(itemsets.contains({Bread}));
     EXPECT_TRUE(itemsets.contains({Cheese}));
@@ -80,7 +80,7 @@ TEST_F(FPGrowthTests, FpGrowthAlgorithmTest) {
     EXPECT_TRUE(itemsets.contains({Sugar}));
     EXPECT_TRUE(itemsets.contains({Flour}));
 
-    // 2-itemsets
+    // 2-suffix
     EXPECT_TRUE(itemsets.contains({Milk, Cheese}));
     EXPECT_TRUE(itemsets.contains({Milk, Butter}));
     EXPECT_TRUE(itemsets.contains({Milk, Coffee}));
@@ -99,7 +99,7 @@ TEST_F(FPGrowthTests, FpGrowthAlgorithmTest) {
     EXPECT_TRUE(itemsets.contains({Coffee, Flour}));
     EXPECT_TRUE(itemsets.contains({Sugar, Flour}));
 
-    // 3-itemsets
+    // 3-suffix
     EXPECT_TRUE(itemsets.contains({Milk, Cheese, Sugar}));
     EXPECT_TRUE(itemsets.contains({Milk, Butter, Sugar}));
     EXPECT_TRUE(itemsets.contains({Milk, Sugar, Flour}));
@@ -111,7 +111,7 @@ TEST_F(FPGrowthTests, FpGrowthAlgorithmTest) {
     EXPECT_TRUE(itemsets.contains({Butter, Sugar, Flour}));
     EXPECT_TRUE(itemsets.contains({Coffee, Sugar, Flour}));
 
-    // 4-itemsets
+    // 4-suffix
     EXPECT_TRUE(itemsets.contains({Bread, Cheese, Sugar, Flour}));
 
     EXPECT_FALSE(itemsets.contains({Milk, Cheese, Sugar, Flour}));

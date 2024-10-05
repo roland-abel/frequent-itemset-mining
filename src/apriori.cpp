@@ -113,15 +113,15 @@ namespace fim::algorithms::apriori {
             std::ranges::copy(itemsets, std::back_inserter(frequent_itemsets));
         };
 
-        // Find all 1-element itemsets
+        // Find all 1-element suffix
         auto itemsets = all_frequent_1_itemsets(database, min_support);
         insert_itemset(itemsets);
 
         for (auto k = 2; !itemsets.empty(); k++) {
-            // Create k-itemsets from the previous (k-1)-itemsets
+            // Create k-suffix from the previous (k-1)-suffix
             itemsets = generate_candidates(itemsets, k);
 
-            // Remove all itemsets with low support
+            // Remove all suffix with low support
             prune(itemsets, database, min_support);
 
             // Insert frequent candidates

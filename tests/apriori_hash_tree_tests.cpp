@@ -78,14 +78,14 @@ TEST_F(AprioriHashTreeTests, DummyTest) {
 //}
 //
 //TEST_F(AprioriTests, AprioriGenTest) {
-//    const itemsets_t itemsets = {
+//    const itemsets_t suffix = {
 //            {Milk,   Bread,  Cheese, Coffee},
 //            {Milk,   Bread,  Cheese, Flour},
 //            {Butter, Coffee, Sugar,  Flour},
 //            {Butter, Coffee, Sugar,  Cream}
 //    };
 //
-//    auto candidates = apriori_gen(itemsets, 5);
+//    auto candidates = apriori_gen(suffix, 5);
 //
 //    ASSERT_EQ(candidates.size(), 2);
 //    EXPECT_TRUE(candidates.contains({Milk, Bread, Cheese, Coffee, Flour}));
@@ -102,61 +102,61 @@ TEST_F(AprioriHashTreeTests, AprioriHtAlgorithmTest) {
         std::sort(transaction.begin(), transaction.end());
     }
 
-//    const auto itemsets = apriori_ht_algorithm(sorted_db, min_support);
-//    EXPECT_EQ(itemsets.size(), 35);
+//    const auto suffix = apriori_ht_algorithm(sorted_db, get_min_support);
+//    EXPECT_EQ(suffix.size(), 35);
 
 
-    // EXPECT_EQ(itemsets.size(), frequencies.size());
+    // EXPECT_EQ(suffix.size(), frequencies.size());
 
-//    // 1-itemsets
-//    EXPECT_TRUE(itemsets.contains({Milk}));
-//    EXPECT_TRUE(itemsets.contains({Bread}));
-//    EXPECT_TRUE(itemsets.contains({Cheese}));
-//    EXPECT_TRUE(itemsets.contains({Butter}));
-//    EXPECT_TRUE(itemsets.contains({Coffee}));
-//    EXPECT_TRUE(itemsets.contains({Sugar}));
-//    EXPECT_TRUE(itemsets.contains({Flour}));
+//    // 1-suffix
+//    EXPECT_TRUE(suffix.contains({Milk}));
+//    EXPECT_TRUE(suffix.contains({Bread}));
+//    EXPECT_TRUE(suffix.contains({Cheese}));
+//    EXPECT_TRUE(suffix.contains({Butter}));
+//    EXPECT_TRUE(suffix.contains({Coffee}));
+//    EXPECT_TRUE(suffix.contains({Sugar}));
+//    EXPECT_TRUE(suffix.contains({Flour}));
 //
-//    // 2-itemsets
-//    EXPECT_TRUE(itemsets.contains({Milk, Cheese}));
-//    EXPECT_TRUE(itemsets.contains({Milk, Butter}));
-//    EXPECT_TRUE(itemsets.contains({Milk, Coffee}));
-//    EXPECT_TRUE(itemsets.contains({Milk, Sugar}));
-//    EXPECT_TRUE(itemsets.contains({Milk, Flour}));
-//    EXPECT_TRUE(itemsets.contains({Bread, Cheese}));
-//    EXPECT_TRUE(itemsets.contains({Bread, Sugar}));
-//    EXPECT_TRUE(itemsets.contains({Bread, Flour}));
-//    EXPECT_TRUE(itemsets.contains({Cheese, Butter}));
-//    EXPECT_TRUE(itemsets.contains({Cheese, Sugar}));
-//    EXPECT_TRUE(itemsets.contains({Cheese, Flour}));
-//    EXPECT_TRUE(itemsets.contains({Butter, Coffee}));
-//    EXPECT_TRUE(itemsets.contains({Butter, Sugar}));
-//    EXPECT_TRUE(itemsets.contains({Butter, Flour}));
-//    EXPECT_TRUE(itemsets.contains({Coffee, Sugar}));
-//    EXPECT_TRUE(itemsets.contains({Coffee, Flour}));
-//    EXPECT_TRUE(itemsets.contains({Sugar, Flour}));
+//    // 2-suffix
+//    EXPECT_TRUE(suffix.contains({Milk, Cheese}));
+//    EXPECT_TRUE(suffix.contains({Milk, Butter}));
+//    EXPECT_TRUE(suffix.contains({Milk, Coffee}));
+//    EXPECT_TRUE(suffix.contains({Milk, Sugar}));
+//    EXPECT_TRUE(suffix.contains({Milk, Flour}));
+//    EXPECT_TRUE(suffix.contains({Bread, Cheese}));
+//    EXPECT_TRUE(suffix.contains({Bread, Sugar}));
+//    EXPECT_TRUE(suffix.contains({Bread, Flour}));
+//    EXPECT_TRUE(suffix.contains({Cheese, Butter}));
+//    EXPECT_TRUE(suffix.contains({Cheese, Sugar}));
+//    EXPECT_TRUE(suffix.contains({Cheese, Flour}));
+//    EXPECT_TRUE(suffix.contains({Butter, Coffee}));
+//    EXPECT_TRUE(suffix.contains({Butter, Sugar}));
+//    EXPECT_TRUE(suffix.contains({Butter, Flour}));
+//    EXPECT_TRUE(suffix.contains({Coffee, Sugar}));
+//    EXPECT_TRUE(suffix.contains({Coffee, Flour}));
+//    EXPECT_TRUE(suffix.contains({Sugar, Flour}));
 //
-//    // 3-itemsets
-//    EXPECT_TRUE(itemsets.contains({Milk, Cheese, Sugar}));
-//    EXPECT_TRUE(itemsets.contains({Milk, Butter, Sugar}));
-//    EXPECT_TRUE(itemsets.contains({Milk, Sugar, Flour}));
-//    EXPECT_TRUE(itemsets.contains({Bread, Cheese, Sugar}));
-//    EXPECT_TRUE(itemsets.contains({Bread, Cheese, Flour}));
-//    EXPECT_TRUE(itemsets.contains({Bread, Sugar, Flour}));
-//    EXPECT_TRUE(itemsets.contains({Cheese, Butter, Sugar}));
-//    EXPECT_TRUE(itemsets.contains({Cheese, Sugar, Flour}));
-//    EXPECT_TRUE(itemsets.contains({Butter, Sugar, Flour}));
-//    EXPECT_TRUE(itemsets.contains({Coffee, Sugar, Flour}));
+//    // 3-suffix
+//    EXPECT_TRUE(suffix.contains({Milk, Cheese, Sugar}));
+//    EXPECT_TRUE(suffix.contains({Milk, Butter, Sugar}));
+//    EXPECT_TRUE(suffix.contains({Milk, Sugar, Flour}));
+//    EXPECT_TRUE(suffix.contains({Bread, Cheese, Sugar}));
+//    EXPECT_TRUE(suffix.contains({Bread, Cheese, Flour}));
+//    EXPECT_TRUE(suffix.contains({Bread, Sugar, Flour}));
+//    EXPECT_TRUE(suffix.contains({Cheese, Butter, Sugar}));
+//    EXPECT_TRUE(suffix.contains({Cheese, Sugar, Flour}));
+//    EXPECT_TRUE(suffix.contains({Butter, Sugar, Flour}));
+//    EXPECT_TRUE(suffix.contains({Coffee, Sugar, Flour}));
 //
-//    // 4-itemsets
-//    EXPECT_TRUE(itemsets.contains({Bread, Cheese, Sugar, Flour}));
+//    // 4-suffix
+//    EXPECT_TRUE(suffix.contains({Bread, Cheese, Sugar, Flour}));
 }
 //
 //TEST_F(AprioriTests, ConfidenceTest) {
-//    const auto min_support = 4;
+//    const auto get_min_support = 4;
 //
 //    const auto &database = get_database();
-//    const auto [itemsets, frequencies] = apriori_algorithm(database, min_support);
+//    const auto [suffix, frequencies] = apriori_algorithm(database, get_min_support);
 //
 //    EXPECT_NEAR(get_confidence(frequencies, itemset_t({Bread, Flour, Sugar}), itemset_t({Cheese})), 1.0, eps);
 //    EXPECT_NEAR(get_confidence(frequencies, itemset_t({Sugar, Flour}), itemset_t({Milk})), 0.8, eps);
@@ -165,11 +165,11 @@ TEST_F(AprioriHashTreeTests, AprioriHtAlgorithmTest) {
 //}
 //
 //TEST_F(AprioriTests, GenerateRulesForOneItemsetTest) {
-//    const auto min_support = 4;
+//    const auto get_min_support = 4;
 //    const auto min_confidence = 0.9f;
 //
 //    const auto &database = get_database();
-//    const auto [itemsets, frequencies] = apriori_algorithm(database, min_support);
+//    const auto [suffix, frequencies] = apriori_algorithm(database, get_min_support);
 //
 //    const itemset_t z = {Cheese, Bread, Sugar, Flour};
 //    const auto fim = generate_rules(z, frequencies, min_confidence);
@@ -195,12 +195,12 @@ TEST_F(AprioriHashTreeTests, AprioriHtAlgorithmTest) {
 //}
 //
 //TEST_F(AprioriTests, GenerateRulesTest) {
-//    const auto min_support = 4;
+//    const auto get_min_support = 4;
 //    const auto min_confidence = 0.75f;
 //
 //    const auto &database = get_database();
-//    const auto [itemsets, frequencies] = apriori_algorithm(database, min_support);
-//    const auto fim = generate_rules(itemsets, frequencies, min_confidence);
+//    const auto [suffix, frequencies] = apriori_algorithm(database, get_min_support);
+//    const auto fim = generate_rules(suffix, frequencies, min_confidence);
 //
 //    auto check_rule = [&](const itemset_t &premise, const itemset_t &conclusion, float conf) -> bool {
 //        return fim.contains({premise, conclusion})

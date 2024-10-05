@@ -61,13 +61,13 @@ void add_options(CLI::App &app, configuration_t &config) {
             ->check(CLI::ExistingFile);
 
     app.add_option("-o, --output", config.output_path)
-            ->description("Path to the output file where the frequent itemsets will be saved")
+            ->description("Path to the output file where the frequent suffix will be saved")
             ->required()
             ->option_text("(none existing file)")
             ->check(CLI::NonexistentPath);
 
     app.add_option("-s, --min-support", config.min_support)
-            ->description("Minimum support threshold for the frequent itemsets")
+            ->description("Minimum support threshold for the frequent suffix")
             ->check(CLI::Range(0.0f, 1.f))
             ->option_text("(between 0 and 1)");
 
@@ -83,7 +83,7 @@ void add_options(CLI::App &app, configuration_t &config) {
             ->option_text("('apriori' or 'fp-growth')");
 
     app.add_option("-m, --max-length", config.max_length)
-            ->description("Maximum length of the itemsets to be found")
+            ->description("Maximum length of the suffix to be found")
             ->option_text(" ");
 
     app.add_flag("-v, --verbose", config.is_verbose)

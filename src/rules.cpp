@@ -70,7 +70,7 @@ namespace fim::rules {
         return static_cast<float>(frequencies.at(set_union(x, y))) / static_cast<float>(frequencies.at(x));
     };
 
-//    auto apriori_gen(const itemsets_t &itemsets, size_t k) -> itemsets_t {
+//    auto apriori_gen(const itemsets_t &suffix, size_t k) -> itemsets_t {
 //        // check whether the k-2 first items of x and y are match
 //        auto first_items_match = [&](const itemset_t &x, const itemset_t &y) -> std::pair<bool, itemset_t> {
 //            auto x_iter = x.begin();
@@ -83,7 +83,7 @@ namespace fim::rules {
 //                }
 //            }
 //
-//            // create new candidate (k+1)-itemset
+//            // create_initial_database new candidate (k+1)-suffix
 //            itemset_t z{};
 //            std::copy(x.begin(), std::prev(x_iter, -1), std::inserter(z, z.begin()));
 //
@@ -95,9 +95,9 @@ namespace fim::rules {
 //
 //        auto candidates = itemsets_t{};
 //
-//        // find all pairs of itemsets where the (k−1) prefix is identical (self-join).
-//        for (auto x = itemsets.begin(); x != itemsets.end(); x++) {
-//            for (auto y = std::next(x); y != itemsets.end(); y++) {
+//        // find all pairs of suffix where the (k−1) prefix is identical (self-join).
+//        for (auto x = suffix.begin(); x != suffix.end(); x++) {
+//            for (auto y = std::next(x); y != suffix.end(); y++) {
 //                auto [match, z] = first_items_match(*x, *y);
 //                if (!match) {
 //                    continue;
@@ -108,56 +108,56 @@ namespace fim::rules {
 //        return candidates;
 //    }
 //
-//    auto apriori_algorithm(const database_t &database, size_t min_support) -> std::pair<itemsets_t, frequencies_t> {
+//    auto apriori_algorithm(const database_t &database, size_t get_min_support) -> std::pair<itemsets_t, frequencies_t> {
 //        auto frequencies = frequencies_t{};
 //
-//        auto has_support = [&](const auto &itemset, const auto &frequencies) {
-//            return static_cast<float>(frequencies.at(hash_code(itemset))) >= min_support;
+//        auto has_support = [&](const auto &suffix, const auto &frequencies) {
+//            return static_cast<float>(frequencies.at(hash_code(suffix))) >= get_min_support;
 //        };
 //
-//        auto prune = [&](itemsets_t &itemsets) -> itemsets_t {
+//        auto prune = [&](itemsets_t &suffix) -> itemsets_t {
 //            for (const auto &t: database) {
-//                for (const auto &x: itemsets) {
+//                for (const auto &x: suffix) {
 //                    if (std::ranges::includes(t, x)) {
 //                        frequencies[hash_code(x)]++;
 //                    }
 //                }
 //            }
 //
-//            std::erase_if(itemsets, [&](const auto &x) { return !has_support(x, frequencies); });
-//            std::erase_if(frequencies, [&](const auto &f) { return f.second < min_support; });
+//            std::erase_if(suffix, [&](const auto &x) { return !has_support(x, frequencies); });
+//            std::erase_if(frequencies, [&](const auto &f) { return f.second < get_min_support; });
 //
-//            return itemsets;
+//            return suffix;
 //        };
 //
 //        auto find_frequent_one_itemsets = [&]() {
-//            auto itemsets = itemsets_t{};
+//            auto suffix = itemsets_t{};
 //            for (const auto &t: database) {
-//                for (const auto item: t) {
-//                    const auto x = itemset_t{item};
-//                    itemsets.insert(x);
+//                for (const auto prefix: t) {
+//                    const auto x = itemset_t{prefix};
+//                    suffix.insert(x);
 //                }
 //            }
 //
-//            prune(itemsets);
-//            return itemsets;
+//            prune(suffix);
+//            return suffix;
 //        };
 //
 //        auto frequent_itemsets = itemsets_t{};
 //
-//        // find all 1-element itemsets
-//        auto itemsets = find_frequent_one_itemsets();
-//        frequent_itemsets.insert_range(itemsets);
+//        // find all 1-element suffix
+//        auto suffix = find_frequent_one_itemsets();
+//        frequent_itemsets.insert_range(suffix);
 //
-//        for (auto k = 2; !itemsets.empty(); k++) {
-//            // create k-itemsets from the previous (k-1)-itemsets
-//            itemsets = apriori_gen(itemsets, k);
+//        for (auto k = 2; !suffix.empty(); k++) {
+//            // create_initial_database k-suffix from the previous (k-1)-suffix
+//            suffix = apriori_gen(suffix, k);
 //
-//            // remove all itemsets with low support
-//            prune(itemsets);
+//            // remove all suffix with low support
+//            prune(suffix);
 //
-//            // insert frequent itemsets
-//            frequent_itemsets.insert_range(itemsets);
+//            // insert frequent suffix
+//            frequent_itemsets.insert_range(suffix);
 //        }
 //
 //        return std::make_pair(frequent_itemsets, frequencies);
@@ -205,7 +205,7 @@ namespace fim::rules {
             return rules;
         };
 
-        /// For itemset z generate all fim of the form "x -> y" with |y|=1 and x=z\y.
+        /// For suffix z generate all fim of the form "x -> y" with |y|=1 and x=z\y.
         auto create_initial_rules = [&]() -> rules_t {
             itemsets_t conclusions{};
             for (const auto &item: z) {
@@ -223,7 +223,7 @@ namespace fim::rules {
         auto conclusions = get_conclusions(rules);
 
         for (auto k = 2; !conclusions.empty(); k++) {
-            // Creates k-itemsets from the previous (k-1)-itemsets
+            // Creates k-suffix from the previous (k-1)-suffix
 //            conclusions = apriori_gen(conclusions, k);    // TODO
 
             // Creates fim of the form "z\y -> y" for each conclution y.

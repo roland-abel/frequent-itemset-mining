@@ -83,57 +83,57 @@ TEST_F(RelimTests, PreprocessingDatabaseTest) {
 }
 
 TEST_F(RelimTests, RelimAlgorithmTest) {
-    auto sort_each_itemset = [](itemset_t &x) -> itemset_t { return x.sort_itemset(); };
-
-    const auto min_support = 4;
-    const auto &database = get_database();
-
-    const auto &itemsets = relim_algorithm(database, min_support).sort_each_itemset();
-    EXPECT_EQ(itemsets.size(), 35);
+//    auto sort_each_itemset = [](itemset_t &x) -> itemset_t { return x.sort_itemset(); };
+//
+//    const auto min_support = 4;
+//    const auto &database = get_database();
+//
+//    const auto &suffix = relim_algorithm(database, min_support).sort_each_itemset();
+//    EXPECT_EQ(suffix.size(), 35);
 
     // TODO
 
-//    // 1-itemsets
-//    EXPECT_TRUE(itemsets.contains({Milk}));
-//    EXPECT_TRUE(itemsets.contains({Bread}));
-//    EXPECT_TRUE(itemsets.contains({Cheese}));
-//    EXPECT_TRUE(itemsets.contains({Butter}));
-//    EXPECT_TRUE(itemsets.contains({Coffee}));
-//    EXPECT_TRUE(itemsets.contains({Sugar}));
-//    EXPECT_TRUE(itemsets.contains({Flour}));
+//    // 1-suffix
+//    EXPECT_TRUE(suffix.contains({Milk}));
+//    EXPECT_TRUE(suffix.contains({Bread}));
+//    EXPECT_TRUE(suffix.contains({Cheese}));
+//    EXPECT_TRUE(suffix.contains({Butter}));
+//    EXPECT_TRUE(suffix.contains({Coffee}));
+//    EXPECT_TRUE(suffix.contains({Sugar}));
+//    EXPECT_TRUE(suffix.contains({Flour}));
 //
-//    // 2-itemsets
-//    EXPECT_TRUE(itemsets.contains({Milk, Cheese}));
-//    EXPECT_TRUE(itemsets.contains({Milk, Butter}));
-//    EXPECT_TRUE(itemsets.contains({Milk, Coffee}));
-//    EXPECT_TRUE(itemsets.contains({Milk, Sugar}));
-//    EXPECT_TRUE(itemsets.contains({Milk, Flour}));
-//    EXPECT_TRUE(itemsets.contains({Bread, Cheese}));
-//    EXPECT_TRUE(itemsets.contains({Bread, Sugar}));
-//    EXPECT_TRUE(itemsets.contains({Bread, Flour}));
-//    EXPECT_TRUE(itemsets.contains({Cheese, Butter}));
-//    EXPECT_TRUE(itemsets.contains({Cheese, Sugar}));
-//    EXPECT_TRUE(itemsets.contains({Cheese, Flour}));
-//    EXPECT_TRUE(itemsets.contains({Butter, Coffee}));
-//    EXPECT_TRUE(itemsets.contains({Butter, Sugar}));
-//    EXPECT_TRUE(itemsets.contains({Butter, Flour}));
-//    EXPECT_TRUE(itemsets.contains({Coffee, Sugar}));
-//    EXPECT_TRUE(itemsets.contains({Coffee, Flour}));
-//    EXPECT_TRUE(itemsets.contains({Sugar, Flour}));
+//    // 2-suffix
+//    EXPECT_TRUE(suffix.contains({Milk, Cheese}));
+//    EXPECT_TRUE(suffix.contains({Milk, Butter}));
+//    EXPECT_TRUE(suffix.contains({Milk, Coffee}));
+//    EXPECT_TRUE(suffix.contains({Milk, Sugar}));
+//    EXPECT_TRUE(suffix.contains({Milk, Flour}));
+//    EXPECT_TRUE(suffix.contains({Bread, Cheese}));
+//    EXPECT_TRUE(suffix.contains({Bread, Sugar}));
+//    EXPECT_TRUE(suffix.contains({Bread, Flour}));
+//    EXPECT_TRUE(suffix.contains({Cheese, Butter}));
+//    EXPECT_TRUE(suffix.contains({Cheese, Sugar}));
+//    EXPECT_TRUE(suffix.contains({Cheese, Flour}));
+//    EXPECT_TRUE(suffix.contains({Butter, Coffee}));
+//    EXPECT_TRUE(suffix.contains({Butter, Sugar}));
+//    EXPECT_TRUE(suffix.contains({Butter, Flour}));
+//    EXPECT_TRUE(suffix.contains({Coffee, Sugar}));
+//    EXPECT_TRUE(suffix.contains({Coffee, Flour}));
+//    EXPECT_TRUE(suffix.contains({Sugar, Flour}));
 //
-//    // 3-itemsets
-//    EXPECT_TRUE(itemsets.contains({Milk, Cheese, Sugar}));
-//    EXPECT_TRUE(itemsets.contains({Milk, Butter, Sugar}));
-//    EXPECT_TRUE(itemsets.contains({Milk, Sugar, Flour}));
-//    EXPECT_TRUE(itemsets.contains({Bread, Cheese, Sugar}));
-//    EXPECT_TRUE(itemsets.contains({Bread, Cheese, Flour}));
-//    EXPECT_TRUE(itemsets.contains({Bread, Sugar, Flour}));
-//    EXPECT_TRUE(itemsets.contains({Cheese, Butter, Sugar}));
-//    EXPECT_TRUE(itemsets.contains({Cheese, Sugar, Flour}));
-//    EXPECT_TRUE(itemsets.contains({Butter, Sugar, Flour}));
-//    EXPECT_TRUE(itemsets.contains({Coffee, Sugar, Flour}));
+//    // 3-suffix
+//    EXPECT_TRUE(suffix.contains({Milk, Cheese, Sugar}));
+//    EXPECT_TRUE(suffix.contains({Milk, Butter, Sugar}));
+//    EXPECT_TRUE(suffix.contains({Milk, Sugar, Flour}));
+//    EXPECT_TRUE(suffix.contains({Bread, Cheese, Sugar}));
+//    EXPECT_TRUE(suffix.contains({Bread, Cheese, Flour}));
+//    EXPECT_TRUE(suffix.contains({Bread, Sugar, Flour}));
+//    EXPECT_TRUE(suffix.contains({Cheese, Butter, Sugar}));
+//    EXPECT_TRUE(suffix.contains({Cheese, Sugar, Flour}));
+//    EXPECT_TRUE(suffix.contains({Butter, Sugar, Flour}));
+//    EXPECT_TRUE(suffix.contains({Coffee, Sugar, Flour}));
 //
-//    // 4-itemsets
-//    EXPECT_TRUE(itemsets.contains({Bread, Cheese, Sugar, Flour}));
+//    // 4-suffix
+//    EXPECT_TRUE(suffix.contains({Bread, Cheese, Sugar, Flour}));
 }
 

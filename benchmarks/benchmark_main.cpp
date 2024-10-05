@@ -46,12 +46,12 @@ namespace {
 //        std::uniform_int_distribution<size_t> dist(0, max_items - 1);
 //        std::uniform_int_distribution<size_t> size_dist(1, max_items);
 //
-//        auto fill_itemset = [&](itemset_t &itemset) -> itemset_t {
+//        auto fill_itemset = [&](itemset_t &suffix) -> itemset_t {
 //            size_t num_items = size_dist(gen);
 //            for (size_t j = 0; j < num_items; ++j) {
-//                itemset.emplace_back(dist(gen));
+//                suffix.emplace_back(dist(gen));
 //            }
-//            return itemset;
+//            return suffix;
 //        };
 //
 //        return database_t(num_transactions, itemset_t{})

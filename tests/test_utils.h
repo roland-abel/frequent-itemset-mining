@@ -1,8 +1,8 @@
-/// @file eclat.h
-/// @brief
+/// @file test_utilities.h
+/// @brief Helper functions for testing.
 ///
 /// @author Roland Abel
-/// @date September 08, 2024
+/// @date October 03, 2024
 ///
 /// Copyright (c) 2024 Roland Abel
 ///
@@ -26,38 +26,23 @@
 /// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 /// THE SOFTWARE.
 
-#pragma once
+#ifndef _TEST_UTILITIES_H
+#define _TEST_UTILITIES_H
 
-#include <set>
-#include "itemset.h"
+#include <vector>
+#include <algorithm>
 
-namespace fim::eclat {
+#define EXPECT_LIST_EQ(list1, list2) \
+    do { \
+        auto it1 = (list1).begin(); \
+        auto it2 = (list2).begin(); \
+        while (it1 != (list1).end() && it2 != (list2).end()) { \
+            EXPECT_EQ(*it1, *it2) << "Element mismatch at index " << std::distance((list1).begin(), it1); \
+            ++it1; \
+            ++it2; \
+        } \
+        EXPECT_EQ(it1, (list1).end()) << "First list has more elements."; \
+        EXPECT_EQ(it2, (list2).end()) << "Second list has more elements."; \
+    } while (0)
 
-    using namespace itemset;
-    
-    // Transaction id
-    using tid_t = size_t;
-
-    // Transactions identification set
-    using tidset_t = std::set<tid_t>;
-
-    // The vertical transaction database type.
-    using vertical_database_t = std::unordered_map<item_t, tidset_t>;
-
-    /// Computes the intersection of two tidsets.
-    /// @param x The first suffix.
-    /// @param y The second suffix.
-    /// @return The union of the two suffix.
-    auto set_intersection(const tidset_t &x, const tidset_t &y) -> tidset_t;
-
-    /// Converts the given transaction data to a vertical representation of the data.
-    /// @param database The transaction data
-    /// @return The vertical representation of the transaction data.
-    auto to_vertical_database(const database_t &database) -> vertical_database_t;
-
-    ///
-    /// @param database
-    /// @param min_support
-    /// @return
-    auto eclat_algorithm(const database_t &database, size_t min_support) -> itemsets_t;
-}
+#endif // _TEST_UTILITIES_H

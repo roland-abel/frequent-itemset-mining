@@ -44,10 +44,10 @@ protected:
 // TODO ...
 
 //TEST_F(RulesTests, ConfidenceTest) {
-//    const auto min_support = 4;
+//    const auto get_min_support = 4;
 //
 //    const auto &database = get_database();
-//    const auto [itemsets, frequencies] = apriori_algorithm(database, min_support);
+//    const auto [suffix, frequencies] = apriori_algorithm(database, get_min_support);
 //
 //    EXPECT_NEAR(get_confidence(frequencies, itemset_t({Bread, Flour, Sugar}), itemset_t({Cheese})), 1.0, eps);
 //    EXPECT_NEAR(get_confidence(frequencies, itemset_t({Sugar, Flour}), itemset_t({Milk})), 0.8, eps);
@@ -56,11 +56,11 @@ protected:
 //}
 //
 //TEST_F(RulesTests, GenerateRulesForOneItemsetTest) {
-//    const auto min_support = 4;
+//    const auto get_min_support = 4;
 //    const auto min_confidence = 0.9f;
 //
 //    const auto &database = get_database();
-//    const auto [itemsets, frequencies] = apriori_algorithm(database, min_support);
+//    const auto [suffix, frequencies] = apriori_algorithm(database, get_min_support);
 //
 //    const itemset_t z = {Cheese, Bread, Sugar, Flour};
 //    const auto rules = generate_rules(z, frequencies, min_confidence);
@@ -86,12 +86,12 @@ protected:
 //}
 //
 //TEST_F(RulesTests, GenerateRulesTest) {
-//    const auto min_support = 4;
+//    const auto get_min_support = 4;
 //    const auto min_confidence = 0.75f;
 //
 //    const auto &database = get_database();
-//    const auto [itemsets, frequencies] = apriori_algorithm(database, min_support);
-//    const auto rules = generate_rules(itemsets, frequencies, min_confidence);
+//    const auto [suffix, frequencies] = apriori_algorithm(database, get_min_support);
+//    const auto rules = generate_rules(suffix, frequencies, min_confidence);
 //
 //    auto check_rule = [&](const itemset_t &premise, const itemset_t &conclusion, float conf) -> bool {
 //        return rules.contains({premise, conclusion})

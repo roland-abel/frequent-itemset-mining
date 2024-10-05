@@ -42,7 +42,7 @@ namespace fim::algorithms::apriori {
     /// @return
     auto all_frequent_1_itemsets(const database_t &database, size_t min_support) -> itemsets_t;
 
-    /// Generate a candidate frequent itemsets of size k from frequent itemsets of size k-1.
+    /// Generate a candidate frequent suffix of size k from frequent suffix of size k-1.
     /// @param frequent_itemsets
     /// @param k
     /// @return

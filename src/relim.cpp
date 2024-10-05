@@ -39,11 +39,11 @@ namespace fim::relim {
     auto preprocessing(database_t &database, size_t min_support) -> item_count_t {
         const auto &item_count = item_count_t::get_item_count(database);
 
-        auto is_infrequent_item = [&](const item_t &item) -> bool { return item_count.at(item) < min_support; };
+        auto is_infreq_item = [&](const item_t &item) -> bool { return item_count.at(item) < min_support; };
         auto is_empty_itemset = [](const itemset_t &x) -> bool { return x.empty(); };
 
         for (itemset_t &trans: database) {
-            trans.erase(std::remove_if(trans.begin(), trans.end(), is_infrequent_item), trans.end());
+            trans.erase(std::remove_if(trans.begin(), trans.end(), is_infreq_item), trans.end());
             std::ranges::sort(trans, item_count.get_item_comparer());
         }
 
@@ -53,16 +53,14 @@ namespace fim::relim {
         return item_count;
     }
 
-    auto create_initial_database(database_t &database) -> conditional_database_t {
-        conditional_database_t conditional_db{};
-        for (const itemset_t &itemset: database) {
-            conditional_db.insert(itemset);
-        }
-        return std::move(conditional_db);
-    }
-
-    auto relim_algorithm(const database_t &database, size_t min_support) -> itemsets_t {
-        itemsets_t frequent_itemsets{};
-        return frequent_itemsets;
-    }
+//    auto relim_algorithm(const database_t &database, const itemset_t &frequent_items, size_t min_support) -> itemsets_t {
+////        auto conditional_db = conditional_database_t::create_initial_database(database, frequent_items);
+////
+////        while (conditional_db.header.size() > 1) {
+////            conditional_db.eliminate_next_item();
+////        }
+////
+////        itemsets_t frequent_itemsets{};
+////        return frequent_itemsets;
+//    }
 }

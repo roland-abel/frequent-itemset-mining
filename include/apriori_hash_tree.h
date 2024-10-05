@@ -43,13 +43,13 @@ namespace fim::apriori_hash_tree {
 
     using namespace fim::itemset;
 
-//    // The item type.
+//    // The prefix type.
 //    using item_t = unsigned long;
 //
-//    // The itemset type.
+//    // The suffix type.
 //    using itemset_t = std::vector<item_t>;
 //
-//    // Collection of itemsets.
+//    // Collection of suffix.
 //    using itemsets_t = std::vector<itemset_t>;
 //
 //    // The transaction database type.

@@ -1,6 +1,7 @@
 /// @file relim2_tests.cpp
 /// @brief Unit test for the RElim algorithm.
-/// @ee https://borgelt.net/papers/simple.pdf
+/// @see https://borgelt.net/papers/simple.pdf
+/// @see https://borgelt.net/papers/relim.pdf
 ///
 /// @author Roland Abel
 /// @date September 29, 2024
@@ -38,7 +39,7 @@ using std::views::transform;
 
 class Relim2Tests : public ::testing::Test {
 protected:
-    static size_t min_support() { return 2; }
+    static size_t get_min_support() { return 2; }
 
     static auto get_database() -> database_t {
         return database_t{
@@ -58,7 +59,7 @@ protected:
 
 TEST_F(Relim2Tests, PreprocessingDatabaseTest) {
     database_t db = get_database();
-    const auto item_count = preprocessing(db, min_support());
+    const auto item_count = preprocessing(db, get_min_support());
 
     EXPECT_EQ(item_count.at('e'), 3);
     EXPECT_EQ(item_count.at('a'), 4);
@@ -82,8 +83,10 @@ TEST_F(Relim2Tests, PreprocessingDatabaseTest) {
 }
 
 TEST_F(Relim2Tests, SortLexicographicallyTest) {
+    const auto min_support = get_min_support();
     database_t db = get_database();
-    const auto count = preprocessing(db, min_support());
+
+    const auto count = preprocessing(db, min_support);
 
     db.sort_lexicographically(count.get_item_comparer());
     ASSERT_EQ(db.size(), 10);
@@ -100,31 +103,198 @@ TEST_F(Relim2Tests, SortLexicographicallyTest) {
     EXPECT_EQ(db[9], itemset_t({'b', 'd'}));
 }
 
-TEST_F(Relim2Tests, CreateInitialDatabase) {
+TEST_F(Relim2Tests, CreateInitialDatabaseTest) {
+    const auto min_support = get_min_support();
     database_t db = get_database();
-    const auto item_count = preprocessing(db, min_support());
-    db.sort_lexicographically(item_count.get_item_comparer());
 
-    auto initial_db = create_initial_database(db);
+    const auto item_count = preprocessing(db, min_support);
+    const auto comp = item_count.get_item_comparer();
 
-    auto [count_a, list] = initial_db.get('a');
-    EXPECT_EQ(count_a, 3);
-    EXPECT_EQ(list.size(), 2);
+    db.sort_lexicographically(comp);
 
-    auto it = list.begin();
-    EXPECT_EQ(it->count, 2);
-    EXPECT_EQ(it->itemset, itemset_t({'b', 'd'}));
+    const auto freq_items = item_count.get_frequent_items(min_support);
+    auto conditional_db = conditional_database_t::create_initial_database(db, freq_items, comp);
 
-    it++;
+    const auto header = conditional_db.header;
+    ASSERT_EQ(header.size(), 5);
+
+    EXPECT_EQ(header[0].count, 0);
+    EXPECT_EQ(header[0].prefix, 'd');
+    EXPECT_EQ(header[0].suffixes.size(), 0);
+
+    EXPECT_EQ(header[1].count, 1);
+    EXPECT_EQ(header[1].prefix, 'b');
+    EXPECT_EQ(header[1].suffixes.size(), 1);
+
+    EXPECT_EQ(header[2].count, 3);
+    EXPECT_EQ(header[2].prefix, 'c');
+    EXPECT_EQ(header[2].suffixes.size(), 2);
+
+    EXPECT_EQ(header[3].count, 3);
+    EXPECT_EQ(header[3].prefix, 'a');
+    EXPECT_EQ(header[3].suffixes.size(), 2);
+
+    EXPECT_EQ(header[4].count, 3);
+    EXPECT_EQ(header[4].prefix, 'e');
+    EXPECT_EQ(header[4].suffixes.size(), 3);
+
+    auto it = header[1].suffixes.begin();
     EXPECT_EQ(it->count, 1);
     EXPECT_EQ(it->itemset, itemset_t({'d'}));
 
+    it = header[2].suffixes.begin();
+    EXPECT_EQ(it->count, 1);
+    EXPECT_EQ(it->itemset, itemset_t({'b', 'd'}));
 
+    ++it;
+    EXPECT_EQ(it->count, 2);
+    EXPECT_EQ(it->itemset, itemset_t({'b'}));
+
+    it = header[3].suffixes.begin();
+    EXPECT_EQ(it->count, 2);
+    EXPECT_EQ(it->itemset, itemset_t({'b', 'd'}));
+
+    ++it;
+    EXPECT_EQ(it->count, 1);
+    EXPECT_EQ(it->itemset, itemset_t({'d'}));
+
+    it = header[4].suffixes.begin();
+    EXPECT_EQ(it->count, 1);
+    EXPECT_EQ(it->itemset, itemset_t({'a', 'c', 'd'}));
+
+    ++it;
+    EXPECT_EQ(it->count, 1);
+    EXPECT_EQ(it->itemset, itemset_t({'c', 'b', 'd'}));
+
+    ++it;
+    EXPECT_EQ(it->count, 1);
+    EXPECT_EQ(it->itemset, itemset_t({'b', 'd'}));
 }
 
+TEST_F(Relim2Tests, PrefixDatabaseTest) {
+    const auto min_support = get_min_support();
+    database_t db = get_database();
+
+    const auto item_count = preprocessing(db, min_support);
+    const auto comp = item_count.get_item_comparer();
+
+    db.sort_lexicographically(comp);
+
+    const auto freq_items = item_count.get_frequent_items(min_support);
+    auto conditional_db = conditional_database_t::create_initial_database(db, freq_items, comp);
+
+    const auto &prefix_db = conditional_db.get_prefix_database();
+
+    const auto header = prefix_db.header;
+    ASSERT_EQ(header.size(), 4);
+
+    EXPECT_EQ(header[0].count, 0);
+    EXPECT_EQ(header[0].prefix, 'd');
+    EXPECT_EQ(header[0].suffixes.size(), 0);
+
+    EXPECT_EQ(header[1].count, 1);
+    EXPECT_EQ(header[1].prefix, 'b');
+    EXPECT_EQ(header[1].suffixes.size(), 1);
+
+    EXPECT_EQ(header[2].count, 1);
+    EXPECT_EQ(header[2].prefix, 'c');
+    EXPECT_EQ(header[2].suffixes.size(), 1);
+
+    EXPECT_EQ(header[3].count, 1);
+    EXPECT_EQ(header[3].prefix, 'a');
+    EXPECT_EQ(header[3].suffixes.size(), 1);
+
+    auto it = header[1].suffixes.begin();
+    EXPECT_EQ(it->count, 1);
+    EXPECT_EQ(it->itemset, itemset_t({'d'}));
+
+    it = header[2].suffixes.begin();
+    EXPECT_EQ(it->count, 1);
+    EXPECT_EQ(it->itemset, itemset_t({'b', 'd'}));
+
+    it = header[3].suffixes.begin();
+    EXPECT_EQ(it->count, 1);
+    EXPECT_EQ(it->itemset, itemset_t({'c', 'd'}));
+}
+
+TEST_F(Relim2Tests, EliminateTest) {
+    const auto min_support = get_min_support();
+    database_t db = get_database();
+
+    const auto item_count = preprocessing(db, min_support);
+    const auto comp = item_count.get_item_comparer();
+
+    db.sort_lexicographically(comp);
+
+    const auto freq_items = item_count.get_frequent_items(min_support);
+    auto conditional_db = conditional_database_t::create_initial_database(db, freq_items, comp);
+
+    const auto &prefix_db = conditional_db.get_prefix_database();
+    const auto prefix = conditional_db.eliminate(prefix_db);
+
+    EXPECT_EQ(prefix, 'e');
+
+    const auto header = conditional_db.header;
+    ASSERT_EQ(header.size(), 4);
+
+    EXPECT_EQ(header[0].count, 0);
+    EXPECT_EQ(header[0].prefix, 'd');
+    EXPECT_EQ(header[0].suffixes.size(), 0);
+
+    EXPECT_EQ(header[1].count, 2);
+    EXPECT_EQ(header[1].prefix, 'b');
+    EXPECT_EQ(header[1].suffixes.size(), 1);
+
+    EXPECT_EQ(header[2].count, 4);
+    EXPECT_EQ(header[2].prefix, 'c');
+    EXPECT_EQ(header[2].suffixes.size(), 2);
+
+    EXPECT_EQ(header[3].count, 4);
+    EXPECT_EQ(header[3].prefix, 'a');
+    EXPECT_EQ(header[3].suffixes.size(), 3);
+
+    auto it = header[1].suffixes.begin();
+    EXPECT_EQ(it->count, 2);
+    EXPECT_EQ(it->itemset, itemset_t({'d'}));
+
+    it = header[2].suffixes.begin();
+    EXPECT_EQ(it->count, 2);
+    EXPECT_EQ(it->itemset, itemset_t({'b', 'd'}));
+
+    ++it;
+    EXPECT_EQ(it->count, 2);
+    EXPECT_EQ(it->itemset, itemset_t({'b'}));
+
+    it = header[3].suffixes.begin();
+    EXPECT_EQ(it->count, 1);
+    EXPECT_EQ(it->itemset, itemset_t({'c', 'd'}));
+
+    ++it;
+    EXPECT_EQ(it->count, 2);
+    EXPECT_EQ(it->itemset, itemset_t({'b', 'd'}));
+
+    ++it;
+    EXPECT_EQ(it->count, 1);
+    EXPECT_EQ(it->itemset, itemset_t({'d'}));
+}
+
+
+
+
+
+
+
+
 TEST_F(Relim2Tests, RelimAlgorithmTest) {
-    const auto &database = get_database();
-    const auto &itemsets = relim_algorithm(database, min_support()).sort_each_itemset();
+//    database_t db = get_database();
+//    const auto min_support = get_min_support();
+//
+//    const auto item_count = preprocessing(db, min_support);
+//    db.sort_lexicographically(item_count.get_item_comparer());
+//
+//    const auto frequent_items = item_count.get_frequent_items(min_support);
+//    const auto &itemsets = relim_algorithm(db, frequent_items, min_support).sort_each_itemset();
+
 
 }
 
