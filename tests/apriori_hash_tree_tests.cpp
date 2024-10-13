@@ -55,10 +55,8 @@ protected:
 };
 
 TEST_F(AprioriHashTreeTests, DummyTest) {
-    EXPECT_TRUE(false);
+//    EXPECT_TRUE(false);
 }
-
-
 
 //
 //TEST_F(AprioriHashTreeTests, SetDifferenceTest) {
@@ -102,7 +100,7 @@ TEST_F(AprioriHashTreeTests, AprioriHtAlgorithmTest) {
         std::sort(transaction.begin(), transaction.end());
     }
 
-//    const auto suffix = apriori_ht_algorithm(sorted_db, get_min_support);
+//    const auto suffix = apriori_ht_algorithm(sorted_db, min_support);
 //    EXPECT_EQ(suffix.size(), 35);
 
 
@@ -153,10 +151,10 @@ TEST_F(AprioriHashTreeTests, AprioriHtAlgorithmTest) {
 }
 //
 //TEST_F(AprioriTests, ConfidenceTest) {
-//    const auto get_min_support = 4;
+//    const auto min_support = 4;
 //
 //    const auto &database = get_database();
-//    const auto [suffix, frequencies] = apriori_algorithm(database, get_min_support);
+//    const auto [suffix, frequencies] = apriori_algorithm(database, min_support);
 //
 //    EXPECT_NEAR(get_confidence(frequencies, itemset_t({Bread, Flour, Sugar}), itemset_t({Cheese})), 1.0, eps);
 //    EXPECT_NEAR(get_confidence(frequencies, itemset_t({Sugar, Flour}), itemset_t({Milk})), 0.8, eps);
@@ -165,11 +163,11 @@ TEST_F(AprioriHashTreeTests, AprioriHtAlgorithmTest) {
 //}
 //
 //TEST_F(AprioriTests, GenerateRulesForOneItemsetTest) {
-//    const auto get_min_support = 4;
+//    const auto min_support = 4;
 //    const auto min_confidence = 0.9f;
 //
 //    const auto &database = get_database();
-//    const auto [suffix, frequencies] = apriori_algorithm(database, get_min_support);
+//    const auto [suffix, frequencies] = apriori_algorithm(database, min_support);
 //
 //    const itemset_t z = {Cheese, Bread, Sugar, Flour};
 //    const auto fim = generate_rules(z, frequencies, min_confidence);
@@ -195,11 +193,11 @@ TEST_F(AprioriHashTreeTests, AprioriHtAlgorithmTest) {
 //}
 //
 //TEST_F(AprioriTests, GenerateRulesTest) {
-//    const auto get_min_support = 4;
+//    const auto min_support = 4;
 //    const auto min_confidence = 0.75f;
 //
 //    const auto &database = get_database();
-//    const auto [suffix, frequencies] = apriori_algorithm(database, get_min_support);
+//    const auto [suffix, frequencies] = apriori_algorithm(database, min_support);
 //    const auto fim = generate_rules(suffix, frequencies, min_confidence);
 //
 //    auto check_rule = [&](const itemset_t &premise, const itemset_t &conclusion, float conf) -> bool {

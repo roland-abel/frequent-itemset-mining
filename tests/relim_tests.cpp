@@ -48,6 +48,8 @@ protected:
         Cream
     };
 
+    static size_t get_min_support() { return 4; }
+
     static auto get_database() -> database_t {
         return database_t{
                 {Milk,   Cheese, Butter, Bread,  Sugar,  Flour, Cream},
@@ -60,29 +62,54 @@ protected:
                 {Cream},
                 {Milk,   Cheese, Butter, Sugar},
                 {Milk,   Cheese, Bread,  Coffee, Sugar,  Flour}
-        }.sort_lexicographically();
+        };
     }
 };
 
 TEST_F(RelimTests, PreprocessingDatabaseTest) {
-    const auto min_support = 4;
     database_t db = get_database();
-    preprocessing(db, min_support);
+    const auto item_count = preprocessing(db, get_min_support());
+    const auto comp = item_count.get_item_comparer();
+
+    db.sort_lexicographically(comp);
 
     ASSERT_EQ(db.size(), 9);
 
-    EXPECT_EQ(db[0], itemset_t({Bread, Cheese, Sugar, Flour, Butter, Milk}));
+    EXPECT_EQ(db[0], itemset_t({Bread, Cheese, Coffee, Sugar, Flour, Butter, Milk}));
     EXPECT_EQ(db[1], itemset_t({Bread, Cheese, Coffee, Sugar, Flour, Butter}));
-    EXPECT_EQ(db[2], itemset_t({Coffee, Sugar, Flour, Butter, Milk}));
-    EXPECT_EQ(db[3], itemset_t({Butter, Milk}));
-    EXPECT_EQ(db[4], itemset_t({Coffee, Butter, Milk}));
-    EXPECT_EQ(db[5], itemset_t({Flour, Milk}));
-    EXPECT_EQ(db[6], itemset_t({Bread, Cheese, Coffee, Sugar, Flour, Butter, Milk}));
-    EXPECT_EQ(db[7], itemset_t({Cheese, Sugar, Butter, Milk}));
-    EXPECT_EQ(db[8], itemset_t({Bread, Cheese, Coffee, Sugar, Flour, Milk}));
+    EXPECT_EQ(db[2], itemset_t({Bread, Cheese, Coffee, Sugar, Flour, Milk}));
+    EXPECT_EQ(db[3], itemset_t({Bread, Cheese, Sugar, Flour, Butter, Milk}));
+    EXPECT_EQ(db[4], itemset_t({Cheese, Sugar, Butter, Milk}));
+    EXPECT_EQ(db[5], itemset_t({Coffee, Sugar, Flour, Butter, Milk}));
+    EXPECT_EQ(db[6], itemset_t({Coffee, Butter, Milk}));
+    EXPECT_EQ(db[7], itemset_t({Flour, Milk}));
+    EXPECT_EQ(db[8], itemset_t({Butter, Milk}));
 }
 
 TEST_F(RelimTests, RelimAlgorithmTest) {
+    const auto min_support = get_min_support();
+    database_t db = get_database();
+
+    const auto item_count = preprocessing(db, min_support);
+    const auto comp = item_count.get_item_comparer();
+
+    db.sort_lexicographically(comp);
+
+    const auto freq_items = item_count.get_frequent_items(min_support);
+    auto conditional_db = conditional_database_t::create_initial_database(db, freq_items, comp);
+
+    const auto header = conditional_db.header;
+    ASSERT_EQ(header.size(), 7);
+
+
+//    const auto &prefix_db = conditional_db.get_prefix_database();
+//    const auto prefix = conditional_db.eliminate(prefix_db);
+
+
+
+
+
+
 //    auto sort_each_itemset = [](itemset_t &x) -> itemset_t { return x.sort_itemset(); };
 //
 //    const auto min_support = 4;

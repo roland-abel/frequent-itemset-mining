@@ -52,6 +52,23 @@ namespace fim::algorithms::apriori {
                | to<itemsets_t>();
     }
 
+    auto get_support_count(
+            const database_t &db,
+            const itemsets_t &itemsets,
+            const is_subset_t &is_subset) -> itemset_count_t {
+
+        itemset_count_t count{};
+
+        for (const auto &trans: db) {
+            for (const auto &x: itemsets) {
+                if (is_subset(x, trans)) {
+                    ++count[x];
+                }
+            }
+        }
+        return std::move(count);
+    }
+
     auto generate_candidates(const itemsets_t &frequent_itemsets, size_t k) -> itemsets_t {
         // Check whether the k-2 first items of x and y are matched
         auto merge_itemsets_if_equal_prefix = [&](const itemset_t &x, const itemset_t &y) -> std::optional<itemset_t> {
@@ -108,9 +125,9 @@ namespace fim::algorithms::apriori {
     }
 
     auto apriori_algorithm(const database_t &database, size_t min_support) -> itemsets_t {
-        itemsets_t frequent_itemsets{};
+        itemsets_t freq_itemsets{};
         auto insert_itemset = [&](const auto &itemsets) {
-            std::ranges::copy(itemsets, std::back_inserter(frequent_itemsets));
+            std::ranges::copy(itemsets, std::back_inserter(freq_itemsets));
         };
 
         // Find all 1-element suffix
@@ -118,15 +135,15 @@ namespace fim::algorithms::apriori {
         insert_itemset(itemsets);
 
         for (auto k = 2; !itemsets.empty(); k++) {
-            // Create k-suffix from the previous (k-1)-suffix
+            // Create k-itemset from the previous (k-1)-suffix
             itemsets = generate_candidates(itemsets, k);
 
-            // Remove all suffix with low support
+            // Remove all itemset with low support
             prune(itemsets, database, min_support);
 
             // Insert frequent candidates
             insert_itemset(itemsets);
         }
-        return frequent_itemsets;
+        return freq_itemsets;
     }
 }

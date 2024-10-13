@@ -58,7 +58,7 @@ protected:
                 {Cream},
                 {Milk,   Cheese, Butter, Sugar},
                 {Milk,   Cheese, Bread,  Coffee, Sugar,  Flour}
-        } | transform([](itemset_t &x) { return x.sort_itemset(); }) | std::ranges::to<database_t>();
+        }.sort_database();
     }
 };
 

@@ -64,7 +64,7 @@ namespace fim::data {
     auto operator<<(std::ostream &os, const frequency_output_t &result) -> std::ostream & {
         json document_json{};
         document_json["metadata"] = {
-                {"get_min_support",      result.min_support},
+                {"min_support",      result.min_support},
                 {"num_transactions", result.num_transactions},
                 {"num_items",        result.num_items},
                 {"algorithm",        to_string(result.algorithm)},
@@ -88,7 +88,7 @@ namespace fim::data {
         result.frequencies = {};
         result.itemsets = {};
 
-        result.min_support = j["metadata"]["get_min_support"];
+        result.min_support = j["metadata"]["min_support"];
         result.num_transactions = j["metadata"]["num_transactions"];
         result.num_items = j["metadata"]["num_items"];
         result.algorithm = to_algorithm(j["metadata"]["algorithm"]);
@@ -115,7 +115,7 @@ namespace fim::data {
 
         json document_json{};
         document_json["metadata"] = {
-                {"get_min_support",      std::format("{:.2f}", output.min_support)},
+                {"min_support",      std::format("{:.2f}", output.min_support)},
                 {"num_transactions", output.num_transactions},
                 {"num_items",        output.num_items},
                 {"algorithm",        to_string(output.algorithm)},

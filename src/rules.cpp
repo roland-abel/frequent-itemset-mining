@@ -108,11 +108,11 @@ namespace fim::rules {
 //        return candidates;
 //    }
 //
-//    auto apriori_algorithm(const database_t &database, size_t get_min_support) -> std::pair<itemsets_t, frequencies_t> {
+//    auto apriori_algorithm(const database_t &database, size_t min_support) -> std::pair<itemsets_t, frequencies_t> {
 //        auto frequencies = frequencies_t{};
 //
 //        auto has_support = [&](const auto &suffix, const auto &frequencies) {
-//            return static_cast<float>(frequencies.at(hash_code(suffix))) >= get_min_support;
+//            return static_cast<float>(frequencies.at(hash_code(suffix))) >= min_support;
 //        };
 //
 //        auto prune = [&](itemsets_t &suffix) -> itemsets_t {
@@ -125,7 +125,7 @@ namespace fim::rules {
 //            }
 //
 //            std::erase_if(suffix, [&](const auto &x) { return !has_support(x, frequencies); });
-//            std::erase_if(frequencies, [&](const auto &f) { return f.second < get_min_support; });
+//            std::erase_if(frequencies, [&](const auto &f) { return f.second < min_support; });
 //
 //            return suffix;
 //        };

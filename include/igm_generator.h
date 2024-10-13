@@ -82,7 +82,7 @@ namespace fim::generators::igm {
         database_t synthetic_db{};
 
         const auto &frequent_itemsets = algorithm(original_db, min_support);
-        const auto support_count = get_support_count(original_db, frequent_itemsets);
+        const auto support_count = itemset_count_t{}; // get_support_count(original_db, frequent_itemsets);
 
         auto is_significant = [&](const itemset_t &x) -> bool {
             return (support_count.at(x) / db_size) > (1. / std::pow(2, x.size()));

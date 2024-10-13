@@ -33,7 +33,6 @@
 
 using namespace std;
 using namespace fim;
-using namespace fim::config;
 
 namespace {
     static const std::map<std::string, algorithm_t> map_string_to_algorithm{

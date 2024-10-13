@@ -87,9 +87,9 @@ namespace fim::rules {
 //    /// @brief Creates the collection of all frequent database by apply the Apriori principle:
 //    /// If an suffix is frequent, then all of its subsets must also be frequent.
 //    /// @param database The database database.
-//    /// @param get_min_support The minimum support threshold for frequent database.
-//    /// @return Pair of the frequent database with regard to get_min_support and their frequents.
-//    auto apriori_algorithm(const database_t &database, size_t get_min_support) -> std::pair<itemsets_t, frequencies_t>;
+//    /// @param min_support The minimum support threshold for frequent database.
+//    /// @return Pair of the frequent database with regard to min_support and their frequents.
+//    auto apriori_algorithm(const database_t &database, size_t min_support) -> std::pair<itemsets_t, frequencies_t>;
 
     /// @brief Creates association fim based on one frequent suffix.
     /// @param z The frequent suffix for which the fim are generated.

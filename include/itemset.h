@@ -1,4 +1,4 @@
-/// @file suffix.h
+/// @file itemset.h
 /// @brief
 ///
 /// @author Roland Abel
@@ -48,6 +48,10 @@ namespace fim::itemset {
         using std::vector<item_t>::vector;
 
         ///
+        /// @param item
+        itemset_t(const item_t &item);
+
+        ///
         /// @param items
         itemset_t(std::initializer_list<item_t> items);
 
@@ -81,11 +85,6 @@ namespace fim::itemset {
 
         /// Sorts the items.
         auto sort_itemset(const item_compare_t &comp = default_item_comparer) -> itemset_t &;
-
-        ///
-        /// @param to_remove
-        /// @return
-        [[nodiscard]] auto remove_item(const item_t &to_remove) const -> itemset_t;
     };
 
     ///
@@ -102,30 +101,28 @@ namespace fim::itemset {
     struct itemsets_t : public std::vector<itemset_t> {
         using std::vector<itemset_t>::vector;
 
-        auto add(const itemset_t &itemset) -> void {
-            emplace_back(itemset);
-        };
+        ///
+        /// @param itemset
+        auto add(const itemset_t &itemset) -> void;;
 
-        auto add(const itemsets_t &itemsets) -> void {
-            for (const itemset_t &x: itemsets) {
-                add(x);
-            }
-        };
+        ///
+        /// @param itemsets
+        auto add(const itemsets_t &itemsets) -> void;;
 
-        [[nodiscard]] auto contains(const item_t &item) const -> bool {
-            return std::ranges::contains(*this, itemset_t{item});
-        };
+        ///
+        /// @param item
+        /// @return
+        auto contains(const item_t &item) const -> bool;;
 
-        [[nodiscard]] auto contains(const itemset_t &itemset) const -> bool {
-            return std::ranges::contains(*this, itemset);
-        };
+        ///
+        /// @param itemset
+        /// @return
+        auto contains(const itemset_t &itemset) const -> bool;;
 
-        auto sort_each_itemset(const item_compare_t &comp = default_item_comparer) -> itemsets_t {
-            for (auto &itemset: *this) {
-                itemset.sort_itemset(comp);
-            }
-            return *this;
-        }
+        ///
+        /// @param comp
+        /// @return
+        auto sort_each_itemset(const item_compare_t &comp = default_item_comparer) -> itemsets_t;
     };
 
     // The transaction database type.
@@ -157,7 +154,7 @@ namespace fim::itemset {
     // Hash code type
     using code_t = unsigned long;
 
-    // Hash function for an suffix
+    // Hash function for a suffix
     struct itemset_hash {
         auto operator()(const itemset_t &itemset) const -> std::size_t;
     };
@@ -179,12 +176,14 @@ namespace fim::itemset {
         /// @return
         [[nodiscard]] auto get_frequent_items(size_t min_support) const -> itemset_t;
 
-
-        /// @brief
-        /// @return
+        /// @brief Returns a comparator for items based on their support.
+        /// @return Comparer function with signature `bool(const item_t &i, const item_t &j)`.
         [[nodiscard]] auto get_item_comparer() const -> item_compare_t {
             return [&](const item_t &i, const item_t &j) -> bool {
-                return at(i) < at(j);
+                const auto weight_i = at(i);
+                const auto weight_j = at(j);
+
+                return (weight_i != weight_j) ? (weight_i < weight_j) : (i < j);
             };
         }
     };
@@ -215,13 +214,4 @@ namespace fim::itemset {
 
     /// TODO: Move
     using is_subset_t = std::function<bool(const itemset_t &x, const itemset_t &y)>;
-
-    /// TODO: Move
-    /// @param db
-    /// @param itemsets
-    /// @param is_subset
-    /// @return
-    auto get_support_count(const database_t &db,
-                           const itemsets_t &itemsets,
-                           const is_subset_t &is_subset = fim::itemset::is_subset) -> itemset_count_t;
 }

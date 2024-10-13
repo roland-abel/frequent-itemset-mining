@@ -35,7 +35,7 @@ using namespace fim;
 
 static void fp_growth_benchmark(benchmark::State &state) {
     const std::string_view filename = "data/mushroom.dat";
-    const auto db = fim::io::read_csv(filename).value();
+    const auto db = fim::data::read_csv(filename).value();
     const size_t min_support = 0.8 * db.size();
 
     for (auto _: state) {

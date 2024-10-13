@@ -33,12 +33,12 @@
 #include "itemset.h"
 
 namespace fim::relim {
-
     using std::views::transform;
     using std::ranges::to;
     using std::views::drop;
     using std::views::take;
 
+    using namespace fim;
     using namespace itemset;
 
     /// Suffix type with number of occurrences.
@@ -48,42 +48,24 @@ namespace fim::relim {
     };
 
     /// List of suffixes.
-    using suffixes_t = std::list<suffix_t>;
+    struct suffixes_t : std::list<suffix_t> {
+        using std::list<suffix_t>::list;
+
+        ///
+        /// @param itemset
+        /// @param comp
+        /// @param quantity
+        auto add_itemset(
+                const itemset_t &itemset,
+                const item_compare_t &comp,
+                const size_t quantity = 1) -> void;
+    };
 
     /// Head element
     struct header_element_t {
-        size_t count{};
+        size_t count = 0;
         item_t prefix{};
         suffixes_t suffixes{};
-
-        ///
-        /// @param suffix
-        /// @param comp
-        /// @param quantity
-        auto add_suffix(
-                const itemset_t &suffix,
-                const item_compare_t &comp,
-                const size_t quantity = 1) -> void {
-
-            auto it = suffixes.begin();
-
-            // search for insert position
-            while (it != suffixes.end() && lexicographical_compare(it->itemset, suffix, comp)) {
-                ++it;
-            }
-
-            // check, whether the itemset already exists
-            if (it != suffixes.begin() && (std::prev(it)->itemset == suffix)) {
-                // itemset found, increasing counter
-                std::prev(it)->count += quantity;
-            } else if (it != suffixes.end() && it->itemset == suffix) {
-                // itemset found, increasing counter
-                it->count += quantity;
-            } else {
-                // itemset haven't been found, insert a new suffix_t element
-                suffixes.insert(it, suffix_t{quantity, suffix});
-            }
-        }
     };
 
     /// Header type
@@ -96,13 +78,7 @@ namespace fim::relim {
 
         /// @brief
         /// @param freq_items
-        explicit conditional_database_t(const itemset_t &freq_items, item_compare_t comp)
-                : item_comparer(std::move(comp)) {
-            auto to_header_element = [](const item_t &item) {
-                return header_element_t{0, item, suffixes_t{}};
-            };
-            header = freq_items | transform(to_header_element) | to<header_t>();
-        }
+        explicit conditional_database_t(const itemset_t &freq_items, item_compare_t comp);
 
         ///
         /// @param database
@@ -112,59 +88,17 @@ namespace fim::relim {
         static auto create_initial_database(
                 const database_t &database,
                 const itemset_t &freq_items,
-                const item_compare_t &comp) -> conditional_database_t {
-
-            conditional_database_t conditional_db(freq_items, comp);
-            auto it = conditional_db.header.rbegin();
-
-            for (const itemset_t &trans: database) {
-                const auto &prefix = trans.front();
-                const auto &suffix = trans | drop(1) | to<itemset_t>();
-
-                if (prefix != it->prefix) {
-                    it++;
-                }
-
-                it->count++;
-                if (not suffix.empty()) {
-                    it->add_suffix(suffix, comp);
-                }
-            }
-            return conditional_db;
-        }
+                const item_compare_t &comp) -> conditional_database_t;
 
         ///
         /// @return
-        auto get_prefix_database() const -> conditional_database_t {
-            const auto items = header
-                               | take(header.size() - 1)
-                               | transform([](const auto &x) { return x.prefix; })
-                               | to<itemset_t>();
-
-            conditional_database_t conditional_db(items, item_comparer);
-            auto it = conditional_db.header.rbegin();
-
-            for (const auto &[count, itemset]: header.back().suffixes) {
-                const auto &prefix = itemset.front();
-                const auto &suffix = itemset | drop(1) | to<itemset_t>();
-
-                if (prefix != it->prefix) {
-                    it++;
-                }
-
-                it->count++;
-                if (not suffix.empty()) {
-                    it->add_suffix(suffix, item_comparer, count);
-                }
-            }
-            return conditional_db;
-        }
+        auto get_prefix_database() const -> conditional_database_t;
 
         ///
         /// @param prefix_db
         /// @return
         auto eliminate(const conditional_database_t &prefix_db) -> item_t {
-            const item_t eliminated_prefix = header.back().prefix;
+            const auto &prefix = header.back().prefix;
             header.pop_back();
 
             auto it = header.rbegin();
@@ -174,13 +108,13 @@ namespace fim::relim {
                 it->count += it_prefix->count;
 
                 for (const auto &[count, itemset]: it_prefix->suffixes) {
-                    it->add_suffix(itemset, item_comparer, count);
+                    it->suffixes.add_itemset(itemset, item_comparer, count);
                 }
 
                 it++;
                 it_prefix++;
             }
-            return eliminated_prefix;
+            return prefix;
         }
     };
 
@@ -192,10 +126,7 @@ namespace fim::relim {
 
     ///
     /// @param database
-    /// @param min_support
+    /// @param cond_db
     /// @return
-    auto relim_algorithm(
-            const database_t &database,
-            const itemset_t &frequent_items,
-            size_t min_support) -> itemsets_t;
+    auto relim_algorithm(database_t &database, size_t cond_db) -> itemsets_t;
 }

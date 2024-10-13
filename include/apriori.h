@@ -42,6 +42,16 @@ namespace fim::algorithms::apriori {
     /// @return
     auto all_frequent_1_itemsets(const database_t &database, size_t min_support) -> itemsets_t;
 
+    ///
+    /// @param db
+    /// @param itemsets
+    /// @param is_subset
+    /// @return
+    auto get_support_count(
+            const database_t &db,
+            const itemsets_t &itemsets,
+            const is_subset_t &is_subset = fim::itemset::is_subset) -> itemset_count_t;
+
     /// Generate a candidate frequent suffix of size k from frequent suffix of size k-1.
     /// @param frequent_itemsets
     /// @param k

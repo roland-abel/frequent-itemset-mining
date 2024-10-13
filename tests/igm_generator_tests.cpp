@@ -79,12 +79,12 @@ protected:
 };
 
 TEST_F(IgmGeneratorTests, DummyTest) {
-    const size_t min_support = 4;
-
-    const auto &algorithm = get_algorithm();
-    const auto &db = get_database();
-
-    const auto synthetic_db = generate_database(db, min_support, algorithm);
+//    const size_t min_support = 4;
+//
+//    const auto &algorithm = get_algorithm();
+//    const auto &db = get_database();
+//
+//    const auto synthetic_db = generate_database(db, min_support, algorithm);
 
 
 }

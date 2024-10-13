@@ -1,4 +1,4 @@
-/// @file suffix.cpp
+/// @file itemset.cpp
 /// @brief
 ///
 /// @author Roland Abel
@@ -38,6 +38,11 @@ namespace fim::itemset {
         return i < j;
     }
 
+    itemset_t::itemset_t(const item_t &item)
+            : std::vector<item_t>() {
+        emplace_back(item);
+    }
+
     itemset_t::itemset_t(std::initializer_list<item_t> items)
             : std::vector<item_t>(items) {
     }
@@ -74,18 +79,37 @@ namespace fim::itemset {
         return *this;
     }
 
-    auto itemset_t::remove_item(const item_t &to_remove) const -> itemset_t {
-        return *this
-               | std::ranges::views::filter([&](const item_t &item) { return item != to_remove; })
-               | std::ranges::to<itemset_t>();
-    }
-
     auto itemset_hash::operator()(const itemset_t &itemset) const -> std::size_t {
         std::size_t seed = 0;
         for (const auto &item: itemset) {
             seed ^= std::hash<item_t>{}(item) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
         }
         return seed;
+    }
+
+    auto itemsets_t::add(const itemset_t &itemset) -> void {
+        emplace_back(itemset);
+    }
+
+    auto itemsets_t::add(const itemsets_t &itemsets) -> void {
+        for (const itemset_t &x: itemsets) {
+            add(x);
+        }
+    }
+
+    auto itemsets_t::contains(const item_t &item) const -> bool {
+        return std::ranges::contains(*this, itemset_t{item});
+    }
+
+    auto itemsets_t::contains(const itemset_t &itemset) const -> bool {
+        return std::ranges::contains(*this, itemset);
+    }
+
+    auto itemsets_t::sort_each_itemset(const item_compare_t &comp) -> itemsets_t {
+        for (auto &itemset: *this) {
+            itemset.sort_itemset(comp);
+        }
+        return *this;
     }
 
     auto is_subset(const itemset_t &x, const itemset_t &y) -> bool {
@@ -103,7 +127,7 @@ namespace fim::itemset {
     std::ostream &operator<<(std::ostream &os, const itemset_t &x) {
         os << "{";
         for (auto itr = x.begin(); itr != x.end(); ++itr) {
-            os << *itr;
+            os << (char) *itr;
             if (std::next(itr) != x.end()) {
                 os << ", ";
             }
@@ -112,23 +136,11 @@ namespace fim::itemset {
         return os;
     }
 
-    auto get_support_count( // TODO: Move into separated file
-            const database_t &db,
-            const itemsets_t &itemsets,
-            const is_subset_t &is_subset) -> itemset_count_t {
-
-        itemset_count_t count{};
-
-        for (const auto &trans: db) {
-            for (const auto &x: itemsets) {
-                if (is_subset(x, trans)) {
-                    ++count[x];
-                }
-            }
-        }
-        return std::move(count);
-    }
-
+    ///
+    /// @param x
+    /// @param y
+    /// @param comp
+    /// @return true if the itemset x is lexicographically less than the itemset y, otherwise false.
     auto lexicographical_compare(const itemset_t &x, const itemset_t &y, const item_compare_t &comp) -> bool {
         auto it_x = x.begin();
         auto it_y = y.begin();
