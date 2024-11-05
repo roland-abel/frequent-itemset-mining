@@ -33,14 +33,17 @@
 using namespace std;
 using namespace fim;
 
-static void relim_benchmark(benchmark::State &state) {
-    const std::string_view filename = "data/mushroom.dat";
+static void relim_benchmark(benchmark::State &state, const std::string_view &filename) {
     auto db = fim::data::read_csv(filename).value();
-    const size_t min_support = 0.8 * db.size();
+    const auto min_support = static_cast<size_t>((double) state.range(0) * 0.01 * (double) db.size());
 
-    for (auto _: state) {
-        fim::relim::relim_algorithm(db, min_support);
+    for ([[maybe_unused]] auto _: state) {
+        fim::algorithms::relim::relim_algorithm(db, min_support);
     }
 }
 
-//BENCHMARK(relim_benchmark)->Unit(benchmark::kMillisecond);
+BENCHMARK_CAPTURE(relim_benchmark, "mushroom", "data/mushroom.dat")
+        ->Arg(60)
+        ->Arg(80)
+        ->Arg(90)
+        ->Unit(benchmark::kMillisecond);

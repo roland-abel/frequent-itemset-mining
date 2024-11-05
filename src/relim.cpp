@@ -26,12 +26,11 @@
 /// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 /// THE SOFTWARE.
 
-#include <iostream>
 #include <algorithm>
 #include <ranges>
 #include "relim.h"
 
-namespace fim::relim {
+namespace fim::algorithms::relim {
 
     using std::views::filter;
     using std::views::transform;
@@ -154,8 +153,6 @@ namespace fim::relim {
         };
 
         auto report_freq_itemset = [&](const itemset_t &itemset, size_t support) -> itemset_t {
-            std::cout << itemset << " support: " << support << std::endl;
-
             freq_itemsets.emplace_back(itemset);
             return itemset;
         };
@@ -166,7 +163,7 @@ namespace fim::relim {
         func_t relim_algorithm_ = [&](const itemset_t &prefix, conditional_database_t &cond_db) -> void {
             while (not cond_db.header.empty()) {
                 auto elem = cond_db.header.back();
-                auto new_prefix = combine(prefix, elem.prefix);
+                auto new_prefix = combine(itemset_t{prefix}, itemset_t{elem.prefix});
 
                 if (elem.count >= min_support) {
                     report_freq_itemset(new_prefix, elem.count);

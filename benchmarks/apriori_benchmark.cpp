@@ -33,14 +33,23 @@
 using namespace std;
 using namespace fim::algorithms::apriori;
 
-static void apriori_benchmark(benchmark::State &state) {
-    const std::string_view filename = "data/mushroom.dat";
-    const auto db = fim::data::read_csv(filename).value();
-    const size_t min_support = 0.8 * db.size();
+static void apriori_benchmark(benchmark::State &state, const std::string_view &filename) {
+    auto db = fim::data::read_csv(filename).value();
+    const auto min_support = static_cast<size_t>((double) state.range(0) * 0.01 * (double) db.size());
 
-    for (auto _: state) {
+    for ([[maybe_unused]] auto _: state) {
         apriori_algorithm(db, min_support);
     }
 }
 
-BENCHMARK(apriori_benchmark)->Unit(benchmark::kMillisecond);
+BENCHMARK_CAPTURE(apriori_benchmark, "mushroom", "data/mushroom.dat")
+        ->Arg(60)
+        ->Arg(80)
+        ->Arg(90)
+        ->Unit(benchmark::kMillisecond);
+
+BENCHMARK_CAPTURE(apriori_benchmark, "retail", "data/retail.dat")
+        ->Arg(60)
+        ->Arg(80)
+        ->Arg(90)
+        ->Unit(benchmark::kMillisecond);

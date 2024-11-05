@@ -40,7 +40,7 @@ namespace fim::algorithms::apriori {
     /// @param database
     /// @param min_support
     /// @return
-    auto all_frequent_1_itemsets(const database_t &database, size_t min_support) -> itemsets_t;
+    auto all_frequent_one_itemsets(const database_t &database, size_t min_support) -> itemsets_t;
 
     ///
     /// @param db

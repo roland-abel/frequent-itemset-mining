@@ -31,7 +31,7 @@
 #include <set>
 #include "itemset.h"
 
-namespace fim::eclat {
+namespace fim::algorithms::eclat {
 
     using namespace itemset;
     
@@ -44,7 +44,7 @@ namespace fim::eclat {
     // The vertical transaction database type.
     using vertical_database_t = std::unordered_map<item_t, tidset_t>;
 
-    /// Computes the intersection of two tidsets.
+    /// Computes the intersection of two tid sets.
     /// @param x The first suffix.
     /// @param y The second suffix.
     /// @return The union of the two suffix.

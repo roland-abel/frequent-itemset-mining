@@ -31,7 +31,7 @@
 #include "utils.h"
 #include "fp_tree.h"
 
-namespace fim::fp_growth {
+namespace fim::algorithms::fp_growth {
 
     using namespace fim::itemset;
     using namespace fim::fp_tree;

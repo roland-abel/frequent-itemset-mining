@@ -27,37 +27,5 @@
 /// THE SOFTWARE.
 
 #include <benchmark/benchmark.h>
-#include <vector>
-#include <ranges>
-#include <algorithm>
-#include <random>
-#include "itemset.h"
-
-using namespace std;
-using namespace fim::itemset;
-
-namespace {
-
-    // TODO
-
-//    static auto generate_test_database(size_t num_transactions, size_t max_items) -> database_t {
-//        std::random_device rd;
-//        std::mt19937 gen(rd());
-//        std::uniform_int_distribution<size_t> dist(0, max_items - 1);
-//        std::uniform_int_distribution<size_t> size_dist(1, max_items);
-//
-//        auto fill_itemset = [&](itemset_t &suffix) -> itemset_t {
-//            size_t num_items = size_dist(gen);
-//            for (size_t j = 0; j < num_items; ++j) {
-//                suffix.emplace_back(dist(gen));
-//            }
-//            return suffix;
-//        };
-//
-//        return database_t(num_transactions, itemset_t{})
-//               | std::views::transform(fill_itemset)
-//               | std::ranges::to<database_t>();
-//    }
-}
 
 BENCHMARK_MAIN();

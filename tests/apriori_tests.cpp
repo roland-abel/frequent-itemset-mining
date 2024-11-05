@@ -68,7 +68,7 @@ protected:
 
 TEST_F(AprioriTests, AllFrequentOneItemsetsTest) {
     const auto &db = get_database();
-    const auto &itemsets = all_frequent_1_itemsets(db, min_support());
+    const auto &itemsets = all_frequent_one_itemsets(db, min_support());
 
     // 1-suffix
     ASSERT_EQ(itemsets.size(), 7);

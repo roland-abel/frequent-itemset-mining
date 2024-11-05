@@ -49,7 +49,7 @@ namespace fim::itemset {
 
         ///
         /// @param item
-        itemset_t(const item_t &item);
+        explicit itemset_t(const item_t &item);
 
         ///
         /// @param items
@@ -103,21 +103,21 @@ namespace fim::itemset {
 
         ///
         /// @param itemset
-        auto add(const itemset_t &itemset) -> void;;
+        auto add(const itemset_t &itemset) -> void;
 
         ///
         /// @param itemsets
-        auto add(const itemsets_t &itemsets) -> void;;
+        auto add(const itemsets_t &itemsets) -> void;
 
         ///
         /// @param item
         /// @return
-        auto contains(const item_t &item) const -> bool;;
+        [[nodiscard]] auto contains(const item_t &item) const -> bool;
 
         ///
         /// @param itemset
         /// @return
-        auto contains(const itemset_t &itemset) const -> bool;;
+        [[nodiscard]] auto contains(const itemset_t &itemset) const -> bool;
 
         ///
         /// @param comp
@@ -129,7 +129,7 @@ namespace fim::itemset {
     struct database_t : public std::vector<itemset_t> {
         using std::vector<itemset_t>::vector;
 
-        database_t(itemsets_t itemsets)
+        explicit database_t(itemsets_t itemsets)
                 : std::vector<itemset_t>(std::move(itemsets)) {
         }
 

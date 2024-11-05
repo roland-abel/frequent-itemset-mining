@@ -132,7 +132,7 @@ namespace fim::hash {
         ///
         /// @param itemset
         /// @return
-        auto search(const itemset_t &itemset) const -> std::optional<itemset_t> {
+        [[nodiscard]] auto search(const itemset_t &itemset) const -> std::optional<itemset_t> {
             using func_t = std::function<std::optional<itemset_t>(std::shared_ptr<hash_tree_node>, size_t)>;
             func_t search_ = [&](const auto &node, size_t depth) -> std::optional<itemset_t> {
                 if (node->is_leaf()) {

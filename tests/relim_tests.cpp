@@ -31,7 +31,7 @@
 #include "relim.h"
 
 using namespace fim;
-using namespace fim::relim;
+using namespace fim::algorithms::relim;
 
 using std::views::transform;
 

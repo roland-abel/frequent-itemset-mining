@@ -31,7 +31,7 @@
 #include "fp_growth.h"
 
 using namespace fim;
-using namespace fim::fp_growth;
+using namespace fim::algorithms::fp_growth;
 
 using std::views::transform;
 

@@ -37,7 +37,7 @@ namespace fim::algorithms::apriori {
     using namespace fim::itemset;
     using namespace fim::algorithms::apriori;
 
-    auto all_frequent_1_itemsets(const database_t &database, size_t min_support) -> itemsets_t {
+    auto all_frequent_one_itemsets(const database_t &database, size_t min_support) -> itemsets_t {
         const auto is_frequent = [=](const auto &pair) -> bool { return pair.second >= min_support; };
         const auto get_item = [](const auto &pair) -> itemset_t { return itemset_t{pair.first}; };
 
@@ -70,7 +70,7 @@ namespace fim::algorithms::apriori {
     }
 
     auto generate_candidates(const itemsets_t &frequent_itemsets, size_t k) -> itemsets_t {
-        // Check whether the k-2 first items of x and y are matched
+        // Check whether the (k-2) first items of x and y are matched
         auto merge_itemsets_if_equal_prefix = [&](const itemset_t &x, const itemset_t &y) -> std::optional<itemset_t> {
             if (std::ranges::equal(x | std::views::take(k - 2), y | std::views::take(k - 2))) {
                 itemset_t candidate{};
@@ -131,7 +131,7 @@ namespace fim::algorithms::apriori {
         };
 
         // Find all 1-element suffix
-        auto itemsets = all_frequent_1_itemsets(database, min_support);
+        auto itemsets = all_frequent_one_itemsets(database, min_support);
         insert_itemset(itemsets);
 
         for (auto k = 2; !itemsets.empty(); k++) {

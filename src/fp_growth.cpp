@@ -33,7 +33,7 @@
 #include "fp_tree.h"
 #include "fp_growth.h"
 
-namespace fim::fp_growth {
+namespace fim::algorithms::fp_growth {
 
     using namespace fim::fp_tree;
     using std::views::filter;

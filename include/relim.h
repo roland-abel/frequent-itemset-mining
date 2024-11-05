@@ -32,7 +32,7 @@
 #include <utility>
 #include "itemset.h"
 
-namespace fim::relim {
+namespace fim::algorithms::relim {
     using std::views::transform;
     using std::ranges::to;
     using std::views::drop;
@@ -58,7 +58,7 @@ namespace fim::relim {
         auto add_itemset(
                 const itemset_t &itemset,
                 const item_compare_t &comp,
-                const size_t quantity = 1) -> void;
+                size_t quantity = 1) -> void;
     };
 
     /// Head element
@@ -92,7 +92,7 @@ namespace fim::relim {
 
         ///
         /// @return
-        auto get_prefix_database() const -> conditional_database_t;
+        [[nodiscard]] auto get_prefix_database() const -> conditional_database_t;
 
         ///
         /// @param prefix_db

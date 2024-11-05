@@ -86,7 +86,6 @@ namespace fim::apriori_hash_tree {
                 itemset_t candidate{};
                 // Versuche, zwei Itemsets zu mergen, wenn die ersten k-1 Items identisch sind.
 
-
                 if (std::equal(frequent_itemsets[i].begin(), std::next(frequent_itemsets[i].begin(), k - 2), frequent_itemsets[j].begin())) {
                     candidate = frequent_itemsets[i];
                     candidate.push_back(frequent_itemsets[j][k - 2]);
