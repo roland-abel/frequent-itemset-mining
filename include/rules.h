@@ -34,12 +34,12 @@
 
 namespace fim::rules {
 
-    using namespace fim::itemset;
+    using namespace fim;
 
 //    using item_t = fim::suffix::item_t;
 //    using itemset_t = fim::suffix::itemset_t;
 //    using itemsets_t = fim::suffix::itemsets_t;
-    using frequencies_t = fim::itemset::itemset_count_t; // TODO
+    using frequencies_t = fim::itemset_count_t; // TODO
 
     // The associate rule type which contains a premise
     // and a conclusion (premise -> conclusion).

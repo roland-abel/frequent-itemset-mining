@@ -32,7 +32,7 @@
 #include "apriori.h"
 #include "igm_generator.h"
 
-using namespace fim::itemset;
+using namespace fim;
 using namespace fim::generators::igm;
 
 class IgmGeneratorTests : public ::testing::Test {

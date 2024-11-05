@@ -29,6 +29,7 @@
 #include <gtest/gtest.h>
 #include "hash_tree.h"
 
+using namespace fim;
 using namespace fim::hash;
 
 enum Items {

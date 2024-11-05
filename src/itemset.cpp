@@ -32,7 +32,7 @@
 #include <utility>
 #include "itemset.h"
 
-namespace fim::itemset {
+namespace fim {
 
     auto default_item_comparer(const item_t &i, const item_t &j) -> bool {
         return i < j;

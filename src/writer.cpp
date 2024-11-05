@@ -31,7 +31,7 @@
 #include "writer.h"
 
 using namespace nlohmann;
-using namespace fim::itemset;
+using namespace fim;
 
 namespace fim::data {
 

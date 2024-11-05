@@ -35,7 +35,7 @@
 #include <functional>
 #include <unordered_map>
 
-namespace fim::itemset {
+namespace fim {
 
     // The prefix type.
     using item_t = unsigned long;

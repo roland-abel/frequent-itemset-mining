@@ -34,11 +34,10 @@ using namespace std;
 using namespace std::chrono;
 
 using namespace fim;
-using namespace fim::itemset;
 using namespace fim::data;
 using namespace fim::tests;
 
-using frequencies_t = fim::itemset::itemset_count_t; // TODO
+using frequencies_t = itemset_count_t; // TODO
 
 class WriterTests : public ::testing::Test {
 protected:

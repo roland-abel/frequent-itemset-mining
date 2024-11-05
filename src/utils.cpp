@@ -32,8 +32,6 @@
 #include <map>
 #include "utils.h"
 
-using namespace fim::itemset;
-
 namespace fim {
 
     namespace {

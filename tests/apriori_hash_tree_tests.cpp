@@ -32,13 +32,13 @@
 #include "test_data.h"
 
 using namespace fim;
-using namespace fim::apriori_hash_tree;
 using namespace fim::tests;
+using namespace fim::apriori_hash_tree;
 
 class AprioriHashTreeTests : public ::testing::Test {
 protected:
 
-    fim::apriori_hash_tree::database_t get_database() {
+    database_t get_database() {
         return {
                 {Milk,   Cheese, Butter, Bread,  Sugar,  Flour, Cream},
                 {Cheese, Butter, Bread,  Coffee, Sugar,  Flour},
@@ -92,10 +92,9 @@ TEST_F(AprioriHashTreeTests, DummyTest) {
 
 TEST_F(AprioriHashTreeTests, AprioriHtAlgorithmTest) {
     const auto min_support = 4;
-
     const auto &db = get_database();
 
-    fim::apriori_hash_tree::database_t sorted_db = db;
+    database_t sorted_db = db;
     for (auto& transaction : sorted_db) {
         std::sort(transaction.begin(), transaction.end());
     }

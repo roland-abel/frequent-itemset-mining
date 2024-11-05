@@ -33,7 +33,7 @@
 namespace fim::fp_tree {
     struct node_t;
 
-    using namespace fim::itemset;
+    using namespace fim;
     using items_t = std::vector<item_t>;
 
     using node_ptr = std::shared_ptr<node_t>;

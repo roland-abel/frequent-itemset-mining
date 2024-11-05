@@ -34,7 +34,7 @@
 
 namespace fim::generators::igm {
 
-    using namespace fim::itemset;
+    using namespace fim;
 
     namespace {
         std::random_device rd;

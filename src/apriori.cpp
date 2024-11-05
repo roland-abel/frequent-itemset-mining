@@ -34,7 +34,7 @@ namespace fim::algorithms::apriori {
     using std::views::filter;
     using std::ranges::to;
 
-    using namespace fim::itemset;
+    using namespace fim;
     using namespace fim::algorithms::apriori;
 
     auto all_frequent_one_itemsets(const database_t &database, size_t min_support) -> itemsets_t {

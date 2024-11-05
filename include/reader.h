@@ -41,7 +41,7 @@ namespace fim::data {
     };
 
     /// Result type for the @refitem read_csv` function.
-    using read_result_t = std::expected<itemset::database_t, io_error_t>;
+    using read_result_t = std::expected<database_t, io_error_t>;
 
     /// Reads the transactions from the input stream as CSV.
     /// @param input The input stream to read from.

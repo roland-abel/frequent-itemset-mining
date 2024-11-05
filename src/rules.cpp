@@ -34,7 +34,7 @@
 
 namespace fim::rules {
 
-    using namespace fim::itemset;
+    using namespace fim;
 
 //    std::ostream &operator<<(std::ostream &os, const itemset_t &x) {
 //        os << "{";

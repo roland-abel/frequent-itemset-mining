@@ -30,7 +30,7 @@
 #include <ranges>
 #include "apriori.h"
 
-using namespace fim::itemset;
+using namespace fim;
 using namespace fim::algorithms::apriori;
 
 using std::views::transform;

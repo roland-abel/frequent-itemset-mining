@@ -41,8 +41,6 @@ using namespace fim::hash;
 
 namespace fim::apriori_hash_tree {
 
-    using namespace fim::itemset;
-
 //    // The prefix type.
 //    using item_t = unsigned long;
 //

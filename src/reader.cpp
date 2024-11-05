@@ -30,7 +30,6 @@
 #include "itemset.h"
 
 using namespace fim;
-using namespace fim::itemset;
 
 namespace fim::data {
 

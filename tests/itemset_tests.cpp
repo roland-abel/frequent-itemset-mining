@@ -31,7 +31,7 @@
 #include "itemset.h"
 
 using std::views::transform;
-using namespace fim::itemset;
+using namespace fim;
 
 class ItemsetTests : public ::testing::Test {
 protected:

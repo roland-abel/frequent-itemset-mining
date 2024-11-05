@@ -39,7 +39,6 @@ namespace fim::algorithms::relim {
     using std::views::take;
 
     using namespace fim;
-    using namespace itemset;
 
     /// Suffix type with number of occurrences.
     struct suffix_t {

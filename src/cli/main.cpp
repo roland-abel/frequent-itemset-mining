@@ -35,12 +35,12 @@ using namespace std;
 using namespace fim;
 
 namespace {
-    static const std::map<std::string, algorithm_t> map_string_to_algorithm{
+    const std::map<std::string, algorithm_t> map_string_to_algorithm{
             {"apriori",   algorithm_t::APRIORI},
             {"fp-growth", algorithm_t::FP_GROWTH},
     };
 
-    static const std::map<algorithm_t, std::string> map_algorithm_to_string{
+    const std::map<algorithm_t, std::string> map_algorithm_to_string{
             {algorithm_t::APRIORI,   "apriori"},
             {algorithm_t::FP_GROWTH, "fp-growth"}
     };

@@ -33,7 +33,7 @@
 
 namespace fim::algorithms::fp_growth {
 
-    using namespace fim::itemset;
+    using namespace fim;
     using namespace fim::fp_tree;
 
     /// Generates the conditional transaction from the given FP-Tree.

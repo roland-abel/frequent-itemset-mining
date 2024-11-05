@@ -34,7 +34,6 @@
 using namespace std;
 using namespace fim;
 using namespace fim::data;
-using namespace fim::itemset;
 
 class ReaderTests : public ::testing::Test {
 protected:

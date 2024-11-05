@@ -33,8 +33,6 @@
 
 namespace fim::algorithms::eclat {
 
-    using namespace itemset;
-    
     // Transaction id
     using tid_t = size_t;
 

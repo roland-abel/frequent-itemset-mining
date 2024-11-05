@@ -35,8 +35,6 @@
 
 namespace fim::hash {
 
-    using namespace itemset;
-
     using hash_function_t = std::function<size_t(const item_t &)>;
 
     /// Hash tree node type.

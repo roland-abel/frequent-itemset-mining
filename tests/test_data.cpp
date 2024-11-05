@@ -29,8 +29,7 @@
 #include "test_data.h"
 
 using namespace fim::tests;
-using namespace fim::itemset;
-
+using namespace fim;
 
 database_t fim::tests::get_database() {
     return {

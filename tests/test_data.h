@@ -32,7 +32,7 @@
 
 namespace fim::tests {
 
-    using namespace fim::itemset;
+    using namespace fim;
 
     enum Items {
         Milk = 1,
