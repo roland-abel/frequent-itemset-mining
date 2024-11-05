@@ -88,6 +88,9 @@ namespace fim::itemset {
     };
 
     ///
+    using is_subset_t = std::function<bool(const itemset_t &x, const itemset_t &y)>;
+
+    ///
     /// @param x
     /// @param y
     /// @param comp
@@ -129,26 +132,19 @@ namespace fim::itemset {
     struct database_t : public std::vector<itemset_t> {
         using std::vector<itemset_t>::vector;
 
-        explicit database_t(itemsets_t itemsets)
-                : std::vector<itemset_t>(std::move(itemsets)) {
-        }
+        ///
+        /// @param itemsets
+        explicit database_t(itemsets_t itemsets);
 
-        auto sort_lexicographically(const item_compare_t &comp = default_item_comparer) -> database_t {
-            std::ranges::sort(*this, [&](const itemset_t &x, const itemset_t &y) {
-                return lexicographical_compare(x, y, comp);
-            });
-            return *this;
-        };
+        ///
+        /// @param comp
+        /// @return
+        auto sort_lexicographically(const item_compare_t &comp = default_item_comparer) -> database_t;;
 
         /// @brief
         /// @param comp
         /// @return
-        auto sort_database(const item_compare_t &comp = default_item_comparer) -> database_t {
-            for (auto &trans: *this) {
-                trans.sort_itemset(comp);
-            }
-            return sort_lexicographically();
-        }
+        auto sort_database(const item_compare_t &comp = default_item_comparer) -> database_t;
     };
 
     // Hash code type
@@ -178,14 +174,7 @@ namespace fim::itemset {
 
         /// @brief Returns a comparator for items based on their support.
         /// @return Comparer function with signature `bool(const item_t &i, const item_t &j)`.
-        [[nodiscard]] auto get_item_comparer() const -> item_compare_t {
-            return [&](const item_t &i, const item_t &j) -> bool {
-                const auto weight_i = at(i);
-                const auto weight_j = at(j);
-
-                return (weight_i != weight_j) ? (weight_i < weight_j) : (i < j);
-            };
-        }
+        [[nodiscard]] auto get_item_comparer() const -> item_compare_t;
     };
 
     /// Overloads the output stream operator to output an suffix to an ostream.
@@ -211,7 +200,4 @@ namespace fim::itemset {
     /// @param y A sorted prefix set.
     /// @return
     auto is_subset(const itemset_t &x, const itemset_t &y) -> bool;
-
-    /// TODO: Move
-    using is_subset_t = std::function<bool(const itemset_t &x, const itemset_t &y)>;
 }

@@ -136,11 +136,6 @@ namespace fim::itemset {
         return os;
     }
 
-    ///
-    /// @param x
-    /// @param y
-    /// @param comp
-    /// @return true if the itemset x is lexicographically less than the itemset y, otherwise false.
     auto lexicographical_compare(const itemset_t &x, const itemset_t &y, const item_compare_t &comp) -> bool {
         auto it_x = x.begin();
         auto it_y = y.begin();
@@ -155,9 +150,6 @@ namespace fim::itemset {
         return std::distance(it_x, x.end()) > std::distance(it_y, y.end());
     }
 
-    ///
-    /// @param database
-    /// @return
     auto item_count_t::get_item_count(const database_t &database) -> item_count_t {
         item_count_t counts{};
         for (const auto &item: database | std::views::join) {
@@ -166,9 +158,6 @@ namespace fim::itemset {
         return std::move(counts);
     }
 
-    ///
-    /// @param min_support
-    /// @return
     auto item_count_t::get_frequent_items(size_t min_support) const -> itemset_t {
         auto is_frequent = [=](const auto &kv) { return kv.second >= min_support; };
         auto get_item = [](const auto &kv) { return kv.first; };
@@ -183,5 +172,32 @@ namespace fim::itemset {
         });
 
         return items;
+    }
+
+    auto item_count_t::get_item_comparer() const -> item_compare_t {
+        return [&](const item_t &i, const item_t &j) -> bool {
+            const auto weight_i = at(i);
+            const auto weight_j = at(j);
+
+            return (weight_i != weight_j) ? (weight_i < weight_j) : (i < j);
+        };
+    }
+
+    database_t::database_t(itemsets_t itemsets)
+            : std::vector<itemset_t>(std::move(itemsets)) {
+    }
+
+    auto database_t::sort_lexicographically(const item_compare_t &comp) -> database_t {
+        std::ranges::sort(*this, [&](const itemset_t &x, const itemset_t &y) {
+            return lexicographical_compare(x, y, comp);
+        });
+        return *this;
+    }
+
+    auto database_t::sort_database(const item_compare_t &comp) -> database_t {
+        for (auto &trans: *this) {
+            trans.sort_itemset(comp);
+        }
+        return sort_lexicographically();
     }
 }
