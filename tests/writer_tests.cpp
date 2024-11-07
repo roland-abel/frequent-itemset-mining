@@ -37,7 +37,7 @@ using namespace fim;
 using namespace fim::data;
 using namespace fim::tests;
 
-using frequencies_t = itemset_count_t; // TODO
+using frequencies_t = itemset_counts_t; // TODO
 
 class WriterTests : public ::testing::Test {
 protected:

@@ -1,4 +1,4 @@
-/// @file apriori_hash_tree.cpp
+/// @file apriori_hash.cpp
 /// @brief
 ///
 /// @author Roland Abel
@@ -28,9 +28,9 @@
 
 #include <algorithm>
 #include <ranges>
-#include "apriori_hash_tree.h"
+#include "apriori_hash.h"
 
-namespace fim::apriori_hash_tree {
+namespace fim::apriori_hash {
 
 
 

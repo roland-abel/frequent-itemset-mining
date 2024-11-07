@@ -156,16 +156,16 @@ namespace fim {
     };
 
     // Item set counting
-    using itemset_count_t = std::unordered_map<itemset_t, size_t, itemset_hash>;
+    using itemset_counts_t = std::unordered_map<itemset_t, size_t, itemset_hash>;
 
     // Item counting
-    struct item_count_t : public std::unordered_map<item_t, size_t> {
+    struct item_counts_t : public std::unordered_map<item_t, size_t> {
         using std::unordered_map<item_t, size_t>::unordered_map;
 
         ///
         /// @param database
         /// @return
-        static auto get_item_count(const database_t &database) -> item_count_t;
+        static auto get_item_counts(const database_t &database) -> item_counts_t;
 
         ///
         /// @param min_support

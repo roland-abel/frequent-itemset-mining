@@ -32,6 +32,42 @@
 
 namespace fim::data {
 
+// CSV
+//    itemset_length,itemset,support,transaction_count
+//    1,"Brot",0.60,200
+//    1,"Butter",0.50,180
+//    2,"Brot, Butter",0.45,150
+//    2,"Milch, Butter",0.40,135
+//    3,"Brot, Milch, Butter",0.30,100
+
+// JSON
+//{
+//    "frequent_itemsets": [
+//{
+//    "itemset": ["Brot", "Butter"],
+//    "support": 0.45,
+//    "transaction_count": 150
+//},
+//{
+//"itemset": ["Milch", "Butter"],
+//"support": 0.40,
+//"transaction_count": 135
+//},
+//{
+//"itemset": ["Brot", "Milch", "Butter"],
+//"support": 0.30,
+//"transaction_count": 100
+//},
+//{
+//"itemset": ["Käse", "Wurst"],
+//"support": 0.35,
+//"transaction_count": 120
+//}
+//]
+//}
+
+
+
     ///
     /// @param os
     /// @param result

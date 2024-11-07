@@ -163,26 +163,26 @@ namespace fim::fp_tree {
                | to<itemsets_t>();
     }
 
-    auto get_item_count(const database_t &database) -> item_count_t {
-        auto count = item_count_t{};
+    auto get_item_counts(const database_t &database) -> item_counts_t {
+        auto counts = item_counts_t{};
         for (const auto &item: database | std::views::join) {
-            ++count[item];
+            ++counts[item];
         }
-        return count;
+        return counts;
     }
 
-    auto get_ordered_frequent_items(const item_count_t &count, size_t min_support) -> std::pair<items_t, item_count_t> {
+    auto get_ordered_frequent_items(const item_counts_t &counts, size_t min_support) -> std::pair<items_t, item_counts_t> {
         auto is_frequent = [=](const auto &kv) { return kv.second >= min_support; };
 
-        auto items = count
+        auto items = counts
                      | filter(is_frequent)
                      | std::views::keys
                      | to<std::vector>();
 
         std::ranges::sort(items, [&](const item_t &x, const item_t &y) {
-            return count.at(x) > count.at(y);
+            return counts.at(x) > counts.at(y);
         });
-        return {items, count};
+        return {items, counts};
     }
 
     auto filter_and_sort_items(const itemset_t &itemset, const items_t &freq_items) -> items_t {
@@ -222,7 +222,7 @@ namespace fim::fp_tree {
     }
 
     auto build_fp_tree(const database_t &database, size_t min_support) -> node_ptr {
-        const auto &item_counts = get_item_count(database);
+        const auto &item_counts = get_item_counts(database);
         const auto &[frequent_items, _] = get_ordered_frequent_items(item_counts, min_support);
 
         return build_fp_tree(database, frequent_items);

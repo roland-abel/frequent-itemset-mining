@@ -1,4 +1,4 @@
-/// @file apriori_hash_tree.h
+/// @file apriori_hash.h
 /// @brief
 ///
 /// @author Roland Abel
@@ -39,27 +39,7 @@
 
 using namespace fim::hash;
 
-namespace fim::apriori_hash_tree {
-
-//    // The prefix type.
-//    using item_t = unsigned long;
-//
-//    // The suffix type.
-//    using itemset_t = std::vector<item_t>;
-//
-//    // Collection of suffix.
-//    using itemsets_t = std::vector<itemset_t>;
-//
-//    // The transaction database type.
-//    using database_t = std::vector<itemset_t>;
-
-//    ///
-//    /// @param subset
-//    /// @param superset
-//    /// @return
-//    bool is_subset(const itemset_t &subset, const itemset_t &superset) {
-//        return std::includes(superset.begin(), superset.end(), subset.begin(), subset.end());
-//    }
+namespace fim::apriori_hash {
 
     ///
     /// @param itemset

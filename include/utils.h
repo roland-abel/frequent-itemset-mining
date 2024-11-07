@@ -111,7 +111,7 @@ namespace fim {
     ///
     struct frequency_output_t {
         itemsets_t itemsets{};
-        itemset_count_t frequencies{};
+        itemset_counts_t frequencies{};
         float min_support{};
         size_t num_items{};
         size_t num_transactions{};

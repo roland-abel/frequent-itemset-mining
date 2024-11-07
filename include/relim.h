@@ -121,7 +121,7 @@ namespace fim::algorithms::relim {
     /// @param database
     /// @param min_support
     /// @return
-    auto preprocessing(database_t &database, size_t min_support) -> item_count_t;
+    auto preprocessing(database_t &database, size_t min_support) -> item_counts_t;
 
     ///
     /// @param database

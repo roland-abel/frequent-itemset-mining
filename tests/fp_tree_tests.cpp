@@ -208,7 +208,7 @@ TEST_F(FPTreeTests, InsertIntoAllItemsetsTest) {
 TEST_F(FPTreeTests, GetFrequentItemsTest) {
     const auto min_support = 4;
 
-    const auto &item_counts = get_item_count(get_database());
+    const auto &item_counts = get_item_counts(get_database());
     const auto &[items, frequencies] = get_ordered_frequent_items(item_counts, min_support);
 
     ASSERT_EQ(items.size(), 7);
@@ -234,7 +234,7 @@ TEST_F(FPTreeTests, GetFrequentItemsTest) {
 TEST_F(FPTreeTests, SortAndFilterItems1Test) {
     const auto min_support = 4;
 
-    const auto &item_counts = get_item_count(get_database());
+    const auto &item_counts = get_item_counts(get_database());
     const auto &[frequent_items, _] = get_ordered_frequent_items(item_counts, min_support);
     const itemset_t &itemset = {Milk, Bread, Cheese, Butter, Coffee, Sugar, Flour, Cream};
 

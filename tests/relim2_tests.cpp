@@ -81,8 +81,8 @@ protected:
 
 TEST_F(Relim2Tests, ItemComparerTest) {
     const auto db = get_database();
-    const auto &count = item_count_t::get_item_count(db);
-    const auto comp = count.get_item_comparer();
+    const auto &counts = item_counts_t::get_item_counts(db);
+    const auto comp = counts.get_item_comparer();
 
     // item order: e < a < c < b < d
     EXPECT_TRUE(comp('e', 'a'));
@@ -106,8 +106,8 @@ TEST_F(Relim2Tests, ItemComparerTest) {
 }
 
 TEST_F(Relim2Tests, LexicographicalCompareTest) {
-    const auto &count = item_count_t::get_item_count(get_database());
-    const auto comp = count.get_item_comparer();
+    const auto &counts = item_counts_t::get_item_counts(get_database());
+    const auto comp = counts.get_item_comparer();
 
     EXPECT_TRUE(lexicographical_compare(itemset_t{'a', 'd'}, itemset_t{'a'}, comp));
     EXPECT_TRUE(lexicographical_compare(itemset_t{'e', 'd'}, itemset_t{'a'}, comp));
@@ -121,8 +121,8 @@ TEST_F(Relim2Tests, LexicographicalCompareTest) {
 }
 
 TEST_F(Relim2Tests, AddSuffixItemsetTest) {
-    const auto &count = item_count_t::get_item_count(get_database());
-    const auto comp = count.get_item_comparer();
+    const auto &counts = item_counts_t::get_item_counts(get_database());
+    const auto comp = counts.get_item_comparer();
 
     suffixes_t suffixes{};
 

@@ -119,26 +119,26 @@ TEST_F(ItemsetTests, HashCodeTest) {
 
 TEST_F(ItemsetTests, GetItemCountsTest) {
     const auto &database = get_database();
-    const auto &count = item_count_t::get_item_count(database);
+    const auto &counts = item_counts_t::get_item_counts(database);
 
-    ASSERT_EQ(count.size(), 8);
+    ASSERT_EQ(counts.size(), 8);
 
-    EXPECT_EQ(count.at(Milk), 8);
-    EXPECT_EQ(count.at(Butter), 7);
-    EXPECT_EQ(count.at(Sugar), 6);
-    EXPECT_EQ(count.at(Flour), 6);
-    EXPECT_EQ(count.at(Cheese), 5);
-    EXPECT_EQ(count.at(Coffee), 5);
-    EXPECT_EQ(count.at(Bread), 4);
-    EXPECT_EQ(count.at(Cream), 2);
+    EXPECT_EQ(counts.at(Milk), 8);
+    EXPECT_EQ(counts.at(Butter), 7);
+    EXPECT_EQ(counts.at(Sugar), 6);
+    EXPECT_EQ(counts.at(Flour), 6);
+    EXPECT_EQ(counts.at(Cheese), 5);
+    EXPECT_EQ(counts.at(Coffee), 5);
+    EXPECT_EQ(counts.at(Bread), 4);
+    EXPECT_EQ(counts.at(Cream), 2);
 }
 
 TEST_F(ItemsetTests, GetFrequentItemsTest) {
     const auto min_support = 4;
     const auto &database = get_database();
 
-    const auto &count = item_count_t::get_item_count(database);
-    const itemset_t &items = count.get_frequent_items(min_support);
+    const auto &counts = item_counts_t::get_item_counts(database);
+    const itemset_t &items = counts.get_frequent_items(min_support);
 
     ASSERT_EQ(items.size(), 7);
 

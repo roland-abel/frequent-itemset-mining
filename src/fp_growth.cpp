@@ -79,8 +79,8 @@ namespace fim::algorithms::fp_growth {
             freq_items.add(itemsets);
         };
 
-        const auto &count = get_item_count(database);
-        const auto &[items, _] = get_ordered_frequent_items(count, min_support);
+        const auto &counts = get_item_counts(database);
+        const auto &[items, _] = get_ordered_frequent_items(counts, min_support);
         const auto &root = build_fp_tree(database, items);
         const auto &items_along_path = tree_has_single_path(root);
 

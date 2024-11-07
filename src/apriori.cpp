@@ -41,23 +41,23 @@ namespace fim::algorithms::apriori {
         const auto is_frequent = [=](const auto &pair) -> bool { return pair.second >= min_support; };
         const auto get_item = [](const auto &pair) -> itemset_t { return itemset_t{pair.first}; };
 
-        item_count_t item_count{};
+        item_counts_t item_counts{};
         for (const item_t &item: database | std::views::join) {
-            ++item_count[item];
+            ++item_counts[item];
         }
 
-        return item_count
+        return item_counts
                | filter(is_frequent)
                | transform(get_item)
                | to<itemsets_t>();
     }
 
-    auto get_support_count(
+    auto get_support_counts(
             const database_t &db,
             const itemsets_t &itemsets,
-            const is_subset_t &is_subset) -> itemset_count_t {
+            const is_subset_t &is_subset) -> itemset_counts_t {
 
-        itemset_count_t count{};
+        itemset_counts_t count{};
 
         for (const auto &trans: db) {
             for (const auto &x: itemsets) {
@@ -96,7 +96,7 @@ namespace fim::algorithms::apriori {
             return candidates;
         };
 
-        auto all_subset_frequent = [&](const itemset_t &candidate) -> bool {
+        auto all_subsets_frequent = [&](const itemset_t &candidate) -> bool {
             auto is_frequent = [&](const itemset_t &itemset) {
                 return std::ranges::contains(frequent_itemsets, itemset);
             };
@@ -111,14 +111,15 @@ namespace fim::algorithms::apriori {
         };
 
         return create_candidates()
-               | filter(all_subset_frequent)
+               | filter(all_subsets_frequent)
                | to<itemsets_t>();
     }
 
     auto prune(itemsets_t &candidates, const database_t &database, size_t min_support) -> void {
-        const auto count = get_support_count(database, candidates, is_subset);
+        const auto &counts = get_support_counts(database, candidates, is_subset);
+
         const auto is_infrequent = [&](const itemset_t &z) -> bool {
-            return !count.contains(z) || count.at(z) < min_support;
+            return !counts.contains(z) || counts.at(z) < min_support;
         };
 
         std::erase_if(candidates, is_infrequent);

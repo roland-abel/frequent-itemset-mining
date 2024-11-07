@@ -46,15 +46,15 @@ enum Items {
 class HashTreeTests : public ::testing::Test {
 protected:
     static auto hash_func(const item_t &item) {
-        return item % 5;
+        return item % 3;
     }
 
-    static auto get_itemsets() -> itemsets_t {
-        return {
+    static database_t get_database() {
+        return database_t{
                 {Milk,   Cheese, Butter, Bread,  Sugar,  Flour, Cream},
                 {Cheese, Butter, Bread,  Coffee, Sugar,  Flour},
                 {Milk,   Butter, Coffee, Sugar,  Flour},
-                {Milk,   Butter},
+                {Milk,   Cream,  Butter},
                 {Milk,   Butter, Coffee},
                 {Milk,   Flour},
                 {Milk,   Cheese, Butter, Bread,  Coffee, Sugar, Flour},
@@ -66,7 +66,7 @@ protected:
 };
 
 TEST_F(HashTreeTests, InsertSearchTest) {
-    const itemset_t itemset =  {Milk, Cheese, Butter, Bread, Sugar, Flour, Cream};
+    const itemset_t itemset = {Milk, Cheese, Butter, Bread, Sugar};
     hash_tree tree(5, hash_func);
 
     tree.insert(itemset);
@@ -75,4 +75,14 @@ TEST_F(HashTreeTests, InsertSearchTest) {
     ASSERT_TRUE(opt.has_value());
     EXPECT_EQ(opt.value(), itemset);
 }
-
+//
+//TEST_F(HashTreeTests, InsertDatabaseAndSearchTest) {
+//    hash_tree tree(8, hash_func);
+//
+//    const auto &db = get_database();
+//    for (const auto &x: db) {
+//        tree.insert(x);
+//    }
+//
+////    ASSERT_TRUE(tree.search({Milk, Butter, Coffee}).has_value());
+//}

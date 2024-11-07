@@ -150,15 +150,15 @@ namespace fim {
         return std::distance(it_x, x.end()) > std::distance(it_y, y.end());
     }
 
-    auto item_count_t::get_item_count(const database_t &database) -> item_count_t {
-        item_count_t counts{};
+    auto item_counts_t::get_item_counts(const database_t &database) -> item_counts_t {
+        item_counts_t counts{};
         for (const auto &item: database | std::views::join) {
             ++counts[item];
         }
         return std::move(counts);
     }
 
-    auto item_count_t::get_frequent_items(size_t min_support) const -> itemset_t {
+    auto item_counts_t::get_frequent_items(size_t min_support) const -> itemset_t {
         auto is_frequent = [=](const auto &kv) { return kv.second >= min_support; };
         auto get_item = [](const auto &kv) { return kv.first; };
 
@@ -174,7 +174,7 @@ namespace fim {
         return items;
     }
 
-    auto item_count_t::get_item_comparer() const -> item_compare_t {
+    auto item_counts_t::get_item_comparer() const -> item_compare_t {
         return [&](const item_t &i, const item_t &j) -> bool {
             const auto weight_i = at(i);
             const auto weight_j = at(j);

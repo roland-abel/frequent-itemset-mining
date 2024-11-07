@@ -31,13 +31,13 @@ find_package(nlohmann_json CONFIG REQUIRED)
 
 add_library(${FIM_LIB_NAME}
         itemset.cpp
-        utils.cpp
+        cli/utils.cpp
         hash_tree.cpp
         reader.cpp
         writer.cpp
         rules.cpp
         apriori.cpp
-        apriori_hash_tree.cpp
+        apriori_hash.cpp
         fp_tree.cpp
         fp_growth.cpp
         eclat.cpp

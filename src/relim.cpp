@@ -116,8 +116,8 @@ namespace fim::algorithms::relim {
         return conditional_db;
     }
 
-    auto preprocessing(database_t &database, size_t min_support) -> item_count_t {
-        const auto &item_count = item_count_t::get_item_count(database);
+    auto preprocessing(database_t &database, size_t min_support) -> item_counts_t {
+        const auto &item_count = item_counts_t::get_item_counts(database);
         const auto &comparer = item_count.get_item_comparer();
 
         auto is_infreq_item = [&](const item_t &item) -> bool {

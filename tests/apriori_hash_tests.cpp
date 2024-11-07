@@ -1,4 +1,4 @@
-/// @file apriori_hash_tree_tests.cpp
+/// @file apriori_hash_tests.cpp
 /// @brief Unit test for the Apriori Hash Tree algorithm.
 ///
 /// @author Roland Abel
@@ -28,14 +28,14 @@
 
 #include <gtest/gtest.h>
 #include <ranges>
-#include "apriori_hash_tree.h"
+#include "apriori_hash.h"
 #include "test_data.h"
 
 using namespace fim;
 using namespace fim::tests;
-using namespace fim::apriori_hash_tree;
+using namespace fim::apriori_hash;
 
-class AprioriHashTreeTests : public ::testing::Test {
+class AprioriHashTests : public ::testing::Test {
 protected:
 
     database_t get_database() {
@@ -54,18 +54,18 @@ protected:
     }
 };
 
-TEST_F(AprioriHashTreeTests, DummyTest) {
+TEST_F(AprioriHashTests, DummyTest) {
 //    EXPECT_TRUE(false);
 }
 
 //
-//TEST_F(AprioriHashTreeTests, SetDifferenceTest) {
+//TEST_F(AprioriHashTests, SetDifferenceTest) {
 //    EXPECT_EQ(set_difference({Milk, Coffee, Bread}, {Milk, Coffee, Bread}), itemset_t{});
 //    EXPECT_EQ(set_difference({Milk, Coffee, Bread}, {Coffee}), itemset_t({Milk, Bread}));
 //    EXPECT_EQ(set_difference({Coffee, Bread, Sugar}, {Coffee, Sugar, Milk}), itemset_t({Bread}));
 //}
 //
-//TEST_F(AprioriHashTreeTests, SetUnionTest) {
+//TEST_F(AprioriHashTests, SetUnionTest) {
 //    EXPECT_EQ(set_union({Milk, Coffee, Bread}, {}), itemset_t({Milk, Coffee, Bread}));
 //    EXPECT_EQ(set_union({Milk, Coffee, Bread}, {Coffee}), itemset_t({Milk, Coffee, Bread}));
 //    EXPECT_EQ(set_union({Coffee, Bread, Sugar}, {Coffee, Sugar, Milk}), itemset_t({Coffee, Bread, Sugar, Sugar, Milk}));
@@ -90,7 +90,7 @@ TEST_F(AprioriHashTreeTests, DummyTest) {
 //    EXPECT_TRUE(candidates.contains({Butter, Coffee, Sugar, Flour, Cream}));
 //}
 
-TEST_F(AprioriHashTreeTests, AprioriHtAlgorithmTest) {
+TEST_F(AprioriHashTests, AprioriAlgorithmTest) {
     const auto min_support = 4;
     const auto &db = get_database();
 
