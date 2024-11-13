@@ -34,7 +34,6 @@
 #include <optional>
 #include <set>
 #include <algorithm>
-
 #include "hash_tree.h"
 
 using namespace fim::hash;

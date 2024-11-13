@@ -28,7 +28,6 @@
 
 #pragma once
 
-#include "utils.h"
 #include "fp_tree.h"
 
 namespace fim::algorithms::fp_growth {

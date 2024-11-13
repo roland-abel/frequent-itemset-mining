@@ -28,7 +28,7 @@
 
 #pragma once
 
-#include "utils.h"
+#include "itemset.h"
 
 namespace fim::fp_tree {
     struct node_t;

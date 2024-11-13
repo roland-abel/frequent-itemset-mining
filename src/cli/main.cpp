@@ -30,6 +30,7 @@
 #include <string>
 #include "CLI/CLI.hpp"
 #include "utils.h"
+#include "reader.h"
 
 using namespace std;
 using namespace fim;
@@ -68,11 +69,13 @@ void add_options(CLI::App &app, configuration_t &config) {
     app.add_option("-s, --min-support", config.min_support)
             ->description("Minimum support threshold for the frequent suffix")
             ->check(CLI::Range(0.0f, 1.f))
+            ->default_val(0.8)
             ->option_text("(between 0 and 1)");
 
     app.add_option("-c, --min-confidence", config.min_confidence)
             ->description("Minimum confidence threshold")
             ->check(CLI::Range(0.0f, 1.f))
+            ->default_val(0.8)
             ->option_text("(between 0 and 1)");
 
     app.add_option("-a, --algorithm", config.algorithm)
@@ -96,7 +99,36 @@ auto main(int argc, char **argv) -> int {
     configuration_t config{};
     add_options(app, config);
 
-    CLI11_PARSE(app, argc, argv);
+    // --input "C:\Users\Roland\Projects\frequent-itemset-mining\benchmarks\data\retail.dat" --output result.csv --min-support 0.4
+
+    app.callback([&]() {
+
+        auto read_csv = data::read_csv(config.input_path);
+
+        auto to_csv = [&](const auto &itemsets) {
+            return itemsets.value().size();
+        };
+
+        auto apply_algorithm = [&](database_t &db) {
+            return get_algorithm(config.algorithm).transform([&](const auto &algo) -> itemsets_t {
+                return algo(db, static_cast<size_t>(config.min_support * db.size()));
+            });
+        };
+
+        auto result = read_csv
+                .transform(apply_algorithm)
+                .transform(to_csv);
+
+        if (result.has_value()) {
+            std::cout << result.value() << std::endl;
+        }
+    });
+
+    try {
+        app.parse(argc, argv);
+    } catch (const CLI::ParseError &e) {
+        return app.exit(e);
+    }
 
     std::cout << "Input file        : " << config.input_path << std::endl;
     std::cout << "Output file       : " << config.output_path << std::endl;

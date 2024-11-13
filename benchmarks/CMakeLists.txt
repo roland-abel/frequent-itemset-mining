@@ -26,35 +26,27 @@
 # THE SOFTWARE.
 
 set(BENCHMARK_DIR ${CMAKE_SOURCE_DIR}/benchmarks)
-set(DATA_DIR ${BENCHMARK_DIR}/data)
-set(DATA_OUT_DIR ${CMAKE_BINARY_DIR}/benchmarks/data)
+set(BENCHMARK_DATA_DIR ${BENCHMARK_DIR}/data)
+set(BENCHMARK_DATA_OUT_DIR ${CMAKE_BINARY_DIR}/benchmarks/data)
 
-file(GLOB DATA_FILES "${DATA_DIR}/**.dat")
+file(GLOB BENCHMARK_DATA_FILES "${BENCHMARK_DATA_DIR}/**.dat")
 file(GLOB BENCHMARK_TESTS "**_benchmark.cpp")
 
 add_executable(${BENCHMARK_NAME}
         ${BENCHMARK_TESTS}
-        benchmark_main.cpp
-)
+        benchmark_main.cpp)
 
 find_package(benchmark CONFIG REQUIRED)
 
 target_include_directories(${BENCHMARK_NAME} PRIVATE ${INCLUDE_DIR})
 target_link_libraries(${BENCHMARK_NAME}
         PRIVATE benchmark::benchmark benchmark::benchmark_main
-        ${FIM_LIB_NAME}
-)
+        ${FIM_LIB_NAME})
 
-add_custom_command(
-        TARGET ${BENCHMARK_NAME} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E make_directory ${DATA_OUT_DIR}
-)
+message("Create folder ${BENCHMARK_DATA_OUT_DIR}")
+file(MAKE_DIRECTORY ${BENCHMARK_DATA_OUT_DIR})
 
-foreach(DATA_FILE IN LISTS DATA_FILES)
-    add_custom_command(
-            TARGET ${BENCHMARK_NAME} POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            ${DATA_FILE} ${DATA_OUT_DIR}
-    )
+foreach(FILE IN LISTS BENCHMARK_DATA_FILES)
+    message("Copy data file ${FILE}")
+    file(COPY ${FILE} DESTINATION ${BENCHMARK_DATA_OUT_DIR})
 endforeach()
-

@@ -36,17 +36,6 @@ using namespace fim;
 using namespace fim::data;
 
 class ReaderTests : public ::testing::Test {
-protected:
-    enum Items {
-        Milk = 1,
-        Bread,
-        Cheese,
-        Butter,
-        Coffee,
-        Sugar,
-        Flour,
-        Cream
-    };
 };
 
 TEST_F(ReaderTests, ReadCsvEmptyTest) {
@@ -97,16 +86,16 @@ TEST_F(ReaderTests, ReadCsvReadSimpleTransactionsTest) {
     const auto &result = read_csv(iss);
     ASSERT_TRUE(result.has_value());
 
-    const auto &database = result.value();
-    ASSERT_EQ(database.size(), 3);
+    const auto &db = result.value();
+    ASSERT_EQ(db.size(), 3);
 
-    EXPECT_EQ(database[0], itemset_t({1, 2, 3}));
-    EXPECT_EQ(database[1], itemset_t({1, 2}));
-    EXPECT_EQ(database[2], itemset_t({1, 2, 3, 4}));
+    EXPECT_EQ(db[0], itemset_t({1, 2, 3}));
+    EXPECT_EQ(db[1], itemset_t({1, 2}));
+    EXPECT_EQ(db[2], itemset_t({1, 2, 3, 4}));
 }
 
 TEST_F(ReaderTests, ReadCsvTransactionsTest) {
-    std::string csv = "Sample database (CSV)\n"
+    std::string csv = "Sample db (CSV)\n"
                       "1,2,3,4,6,7,8\n"
                       "2,3,4,5,6,7\n"
                       "1,4,5,6,7\n"
@@ -124,17 +113,17 @@ TEST_F(ReaderTests, ReadCsvTransactionsTest) {
     const auto &result = read_csv(iss, csv_config_t{1, ','});
     ASSERT_TRUE(result.has_value());
 
-    const auto &database = result.value();
-    ASSERT_EQ(database.size(), 10);
+    const auto &db = result.value();
+    ASSERT_EQ(db.size(), 10);
 
-    EXPECT_EQ(database[0], itemset_t({Milk, Cheese, Butter, Bread, Sugar, Flour, Cream}));
-    EXPECT_EQ(database[1], itemset_t({Cheese, Butter, Bread, Coffee, Sugar, Flour}));
-    EXPECT_EQ(database[2], itemset_t({Milk, Butter, Coffee, Sugar, Flour}));
-    EXPECT_EQ(database[3], itemset_t({Milk, Butter}));
-    EXPECT_EQ(database[4], itemset_t({Milk, Butter, Coffee}));
-    EXPECT_EQ(database[5], itemset_t({Milk, Flour}));
-    EXPECT_EQ(database[6], itemset_t({Milk, Cheese, Butter, Bread, Coffee, Sugar, Flour}));
-    EXPECT_EQ(database[7], itemset_t({Cream}));
-    EXPECT_EQ(database[8], itemset_t({Milk, Cheese, Butter, Sugar}));
-    EXPECT_EQ(database[9], itemset_t({Milk, Cheese, Bread, Coffee, Sugar, Flour}));
+    EXPECT_EQ(db[0], itemset_t({1, 2, 3, 4, 6, 7, 8}));
+    EXPECT_EQ(db[1], itemset_t({2, 3, 4, 5, 6, 7}));
+    EXPECT_EQ(db[2], itemset_t({1, 4, 5, 6, 7}));
+    EXPECT_EQ(db[3], itemset_t({1, 4}));
+    EXPECT_EQ(db[4], itemset_t({1, 4, 5}));
+    EXPECT_EQ(db[5], itemset_t({1, 7}));
+    EXPECT_EQ(db[6], itemset_t({1, 2, 3, 4, 5, 6, 7}));
+    EXPECT_EQ(db[7], itemset_t({8}));
+    EXPECT_EQ(db[8], itemset_t({1, 3, 4, 6}));
+    EXPECT_EQ(db[9], itemset_t({1, 2, 3, 5, 6, 7}));
 }

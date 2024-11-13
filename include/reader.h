@@ -46,10 +46,14 @@ namespace fim::data {
     /// Reads the transactions from the input stream as CSV.
     /// @param input The input stream to read from.
     /// @return The transactions if successful, or an error code if failed.
-    auto read_csv(std::istream &input, const csv_config_t &config = csv_config_t{}) -> read_result_t;
+    auto read_csv(
+            std::istream &input,
+            const csv_config_t &config = csv_config_t{}) -> read_result_t;
 
     /// Reads transactions from the given file.
     /// @param filename The name of the file to read from.
     /// @return The transactions if successful, or an error code if failed.
-    auto read_csv(const std::string_view &filename, const csv_config_t &config = csv_config_t{}) -> read_result_t;
+    auto read_csv(
+            const std::string_view &filename,
+            const csv_config_t &config = csv_config_t{}) -> read_result_t;
 }

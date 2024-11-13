@@ -29,9 +29,15 @@
 #pragma once
 
 #include <set>
+#include <map>
 #include <unordered_map>
+#include <expected>
 #include <chrono>
 #include "itemset.h"
+#include "apriori.h"
+#include "fp_growth.h"
+#include "relim.h"
+#include "eclat.h"
 
 namespace fim {
 
@@ -68,7 +74,19 @@ namespace fim {
         UNKNOWN,
         APRIORI,
         FP_GROWTH,
+        RELIM,
+        ECLAT
     };
+
+    using algorithm_function_t = std::function<itemsets_t(database_t &database, size_t min_support)>;
+
+    enum class algorithm_error_t {
+        UNKNOWN_ALGORITHM,
+    };
+
+    ///
+    /// @return
+    auto get_algorithm(const algorithm_t &algorithm) -> std::expected<algorithm_function_t, algorithm_error_t>;
 
     ///
     /// @param algorithm

@@ -28,7 +28,6 @@
 
 #pragma once
 
-#include <array>
 #include <map>
 #include "utils.h"
 
@@ -37,18 +36,31 @@ namespace fim {
     namespace {
         constexpr std::string_view APRIORI = "apriori";
         constexpr std::string_view FP_GROWTH = "fp-growth";
+        constexpr std::string_view ECLAT = "eclat";
+        constexpr std::string_view RELIM = "relim";
         constexpr std::string_view UNKNOWN = "unknown";
     }
 
     const auto map_string_to_algorithm = std::map<std::string_view, algorithm_t>{
             {APRIORI,   algorithm_t::APRIORI},
-            {FP_GROWTH, algorithm_t::FP_GROWTH}
+            {FP_GROWTH, algorithm_t::FP_GROWTH},
+            {RELIM,     algorithm_t::RELIM},
+            {ECLAT,     algorithm_t::ECLAT}
     };
 
     const auto map_algorithm_to_string = std::map<algorithm_t, std::string_view>{
             {algorithm_t::APRIORI,   APRIORI},
             {algorithm_t::FP_GROWTH, FP_GROWTH},
+            {algorithm_t::ECLAT,     ECLAT},
+            {algorithm_t::RELIM,     RELIM},
             {algorithm_t::UNKNOWN,   UNKNOWN}
+    };
+
+    const auto map_algorithm_function = std::map<algorithm_t, algorithm_function_t>{
+            {algorithm_t::APRIORI,   fim::algorithms::apriori::apriori_algorithm},
+            {algorithm_t::FP_GROWTH, fim::algorithms::fp_growth::fp_growth_algorithm},
+            {algorithm_t::RELIM,     fim::algorithms::relim::relim_algorithm},
+            {algorithm_t::ECLAT,     fim::algorithms::eclat::eclat_algorithm},
     };
 
     auto to_string(algorithm_t algorithm) -> std::string {
@@ -60,13 +72,12 @@ namespace fim {
         return it != map_string_to_algorithm.end() ? it->second : algorithm_t::UNKNOWN;
     }
 
-    code_t hash_code(const itemset_t &x) {
-        code_t hash = 0;
-        for (const auto &item: x) {
-            hash ^= std::hash<item_t>()(item) + 0x9e3779b9 + (hash << 6) + (hash >> 2);
+    auto get_algorithm(const algorithm_t &algorithm) -> std::expected<algorithm_function_t, algorithm_error_t> {
+        if (algorithm != algorithm_t::UNKNOWN) {
+            return map_algorithm_function.at(algorithm);
         }
-        return hash;
-    }
+        return  std::unexpected(algorithm_error_t::UNKNOWN_ALGORITHM);
+    };
 
     auto to_datetime(
             std::chrono::year year,

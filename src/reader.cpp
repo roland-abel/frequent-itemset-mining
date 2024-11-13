@@ -38,7 +38,7 @@ namespace fim::data {
         std::string line;
 
         if ((input.bad() || input.fail())) {
-            return std::unexpected(io_error_t::UNKNOWN_ERROR);
+            return std::unexpected{io_error_t::UNKNOWN_ERROR};
         }
 
         for (auto i = 0; i < config.skip_rows; ++i) {
@@ -57,30 +57,30 @@ namespace fim::data {
                     itemset.push_back(value);
                 }
             } catch (const std::invalid_argument &) {
-                return std::unexpected(io_error_t::INVALID_FORMAT);
+                return std::unexpected{io_error_t::INVALID_FORMAT};
             }
             catch (const std::out_of_range &) {
-                return std::unexpected(io_error_t::VALUE_OUT_OF_RANGE);
+                return std::unexpected{io_error_t::VALUE_OUT_OF_RANGE};
             }
 
             if (line_stream.fail() && !line_stream.eof()) {
-                return std::unexpected(io_error_t::INVALID_FORMAT);
+                return std::unexpected{io_error_t::INVALID_FORMAT};
             }
 
             database.push_back(std::move(itemset));
         }
 
         if (database.empty()) {
-            return std::unexpected(io_error_t::EMPTY_ERROR);
+            return std::unexpected{io_error_t::EMPTY_ERROR};
         }
 
-        return database;
+        return std::move(database);
     }
 
     auto read_csv(const std::string_view &filename, const csv_config_t &config) -> read_result_t {
         std::ifstream file(filename.data());
         if (!file.is_open()) {
-            return std::unexpected(io_error_t::FILE_NOT_FOUND);
+            return std::unexpected{io_error_t::FILE_NOT_FOUND};
         }
 
         return read_csv(file, config);

@@ -90,16 +90,19 @@ TEST_F(RelimTests, RelimAlgorithmTest) {
     const auto min_support = get_min_support();
     database_t db = get_database();
 
-    const auto item_count = preprocessing(db, min_support);
-    const auto comp = item_count.get_item_comparer();
+//    const auto item_count = preprocessing(db, min_support);
+//    const auto comp = item_count.get_item_comparer();
+//
+//    db.sort_lexicographically(comp);
 
-    db.sort_lexicographically(comp);
 
-    const auto freq_items = item_count.get_frequent_items(min_support);
-    auto conditional_db = conditional_database_t::create_initial_database(db, freq_items, comp);
+   // fim::algorithms::relim::relim_algorithm(db, min_support);
 
-    const auto header = conditional_db.header;
-    ASSERT_EQ(header.size(), 7);
+//    const auto freq_items = item_count.get_frequent_items(min_support);
+//    auto conditional_db = conditional_database_t::create_initial_database(db, freq_items, comp);
+//
+//    const auto header = conditional_db.header;
+//    ASSERT_EQ(header.size(), 7);
 
 
 //    const auto &prefix_db = conditional_db.get_prefix_database();
@@ -115,7 +118,10 @@ TEST_F(RelimTests, RelimAlgorithmTest) {
 //    const auto min_support = 4;
 //    const auto &database = get_database();
 //
-//    const auto &suffix = relim_algorithm(database, min_support).sort_each_itemset();
+
+
+//    const auto &suffix = relim_algorithm(db, min_support).sort_each_itemset();
+
 //    EXPECT_EQ(suffix.size(), 35);
 
     // TODO

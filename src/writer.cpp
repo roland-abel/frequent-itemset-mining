@@ -27,7 +27,6 @@
 /// THE SOFTWARE.
 
 #include <nlohmann/json.hpp>
-#include "rules.h"
 #include "writer.h"
 
 using namespace nlohmann;
