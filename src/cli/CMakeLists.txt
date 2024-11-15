@@ -26,7 +26,6 @@
 # THE SOFTWARE.
 
 find_package(CLI11 CONFIG REQUIRED)
-set(nlohmann-json_IMPLICIT_CONVERSIONS OFF)
 
 add_executable(${CLI_EXE_NAME} main.cpp)
 target_link_libraries(${CLI_EXE_NAME} PRIVATE CLI11::CLI11 ${FIM_LIB_NAME})

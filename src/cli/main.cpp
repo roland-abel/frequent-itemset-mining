@@ -26,33 +26,25 @@
 /// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 /// THE SOFTWARE.
 
+#include <expected>
 #include <iostream>
 #include <string>
 #include "CLI/CLI.hpp"
-#include "utils.h"
+#include "types.h"
 #include "reader.h"
+#include "writer.h"
 
 using namespace std;
 using namespace fim;
 
-namespace {
+void add_options(CLI::App &app, configuration_t &config) {
+
     const std::map<std::string, algorithm_t> map_string_to_algorithm{
             {"apriori",   algorithm_t::APRIORI},
             {"fp-growth", algorithm_t::FP_GROWTH},
+            {"relim",     algorithm_t::RELIM},
+            {"eclat",     algorithm_t::ECLAT}
     };
-
-    const std::map<algorithm_t, std::string> map_algorithm_to_string{
-            {algorithm_t::APRIORI,   "apriori"},
-            {algorithm_t::FP_GROWTH, "fp-growth"}
-    };
-
-    std::ostream &operator<<(std::ostream &out, const algorithm_t algorithm) {
-        auto it = map_algorithm_to_string.find(algorithm);
-        return out << (it != map_algorithm_to_string.end() ? it->second : std::string{});
-    };
-}
-
-void add_options(CLI::App &app, configuration_t &config) {
 
     app.add_option("-i, --input", config.input_path)
             ->description("Path to the input file containing the database")
@@ -72,24 +64,11 @@ void add_options(CLI::App &app, configuration_t &config) {
             ->default_val(0.8)
             ->option_text("(between 0 and 1)");
 
-    app.add_option("-c, --min-confidence", config.min_confidence)
-            ->description("Minimum confidence threshold")
-            ->check(CLI::Range(0.0f, 1.f))
-            ->default_val(0.8)
-            ->option_text("(between 0 and 1)");
-
     app.add_option("-a, --algorithm", config.algorithm)
             ->description("Specifies which algorithm to use.")
             ->default_val(algorithm_t::APRIORI)
             ->transform(CLI::CheckedTransformer(map_string_to_algorithm, CLI::ignore_case))
-            ->option_text("('apriori' or 'fp-growth')");
-
-    app.add_option("-m, --max-length", config.max_length)
-            ->description("Maximum length of the suffix to be found")
-            ->option_text(" ");
-
-    app.add_flag("-v, --verbose", config.is_verbose)
-            ->description("Enables verbose mode");
+            ->option_text("('apriori', 'fp-growth', 'eclat', 'relim')");
 }
 
 auto main(int argc, char **argv) -> int {
@@ -99,29 +78,37 @@ auto main(int argc, char **argv) -> int {
     configuration_t config{};
     add_options(app, config);
 
-    // --input "C:\Users\Roland\Projects\frequent-itemset-mining\benchmarks\data\retail.dat" --output result.csv --min-support 0.4
-
     app.callback([&]() {
-
-        auto read_csv = data::read_csv(config.input_path);
-
-        auto to_csv = [&](const auto &itemsets) {
-            return itemsets.value().size();
+        auto min_support_abs = [&](const database_t &db) -> size_t {
+            return static_cast<size_t>(config.min_support * db.size());
         };
 
-        auto apply_algorithm = [&](database_t &db) {
-            return get_algorithm(config.algorithm).transform([&](const auto &algo) -> itemsets_t {
-                return algo(db, static_cast<size_t>(config.min_support * db.size()));
-            });
+        auto read_config = data::read_csv_config_t{
+                .skip_rows =  0,
+                .separator =  ' '
         };
 
-        auto result = read_csv
-                .transform(apply_algorithm)
-                .transform(to_csv);
+        auto write_config = data::write_csv_config_t{
+                .with_header = true,
+                .separator = ' '
+        };
 
-        if (result.has_value()) {
-            std::cout << result.value() << std::endl;
-        }
+        auto read_csv = [&]() -> data::read_result_t {
+            return data::read_csv(config.input_path, read_config);
+        };
+
+        auto to_csv = [&](const itemsets_t &itemsets) -> data::write_result_t {
+            return data::to_csv(config.output_path, itemsets, write_config);
+        };
+
+        auto apply_algorithm = [&](const database_t &database) -> itemsets_t {
+            const auto algorithm = get_algorithm(config.algorithm);
+            auto &db = const_cast<database_t &>(database);
+
+            return algorithm(db, min_support_abs(db));
+        };
+
+        read_csv().transform(apply_algorithm).transform(to_csv);
     });
 
     try {
@@ -133,9 +120,7 @@ auto main(int argc, char **argv) -> int {
     std::cout << "Input file        : " << config.input_path << std::endl;
     std::cout << "Output file       : " << config.output_path << std::endl;
     std::cout << "Minimum support   : " << config.min_support << std::endl;
-    std::cout << "Minimum confidence: " << config.min_confidence << std::endl;
-    std::cout << "Algorithm         : " << config.algorithm << std::endl;
-    std::cout << "Verbose           : " << config.is_verbose << std::endl;
+    std::cout << "Algorithm         : " << (int) config.algorithm << std::endl;
 
     return 0;
 }

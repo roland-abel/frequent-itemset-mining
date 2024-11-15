@@ -27,107 +27,55 @@
 /// THE SOFTWARE.
 
 #include <gtest/gtest.h>
-#include "test_data.h"
+#include <iostream>
+#include <sstream>
+#include <string>
+#include "itemset.h"
 #include "writer.h"
 
 using namespace std;
-using namespace std::chrono;
-
 using namespace fim;
 using namespace fim::data;
-using namespace fim::tests;
-
-using frequencies_t = itemset_counts_t; // TODO
 
 class WriterTests : public ::testing::Test {
-protected:
+public:
+    itemsets_t itemsets = {
+            {1, 2, 3, 4, 6, 7, 8},
+            {6, 7, 8},
+            {1, 2, 3, 4, 6, 7, 8},
+            {6},
+            {3, 4, 6, 7, 8},
+            {2, 3, 7, 8}
+    };
 
-    static auto get_frequent_itemsets() -> std::pair<itemsets_t, frequencies_t> {
-        const std::set<std::pair<itemset_t, size_t>> itemsets_frequencies = {
-                {{Milk,   Bread, Butter}, 63},
-                {{Coffee, Milk,  Cheese}, 74},
-                {{Coffee, Milk,  Bread},  82},
-        };
-
-        itemsets_t itemsets{};
-        frequencies_t frequencies{};
-
-        for (const auto &[itemset, frequency]: itemsets_frequencies) {
-//            suffix.insert(suffix);
-//            frequencies[fim::hash_code(suffix)] = frequency;
-        }
-        return {itemsets, frequencies};
+    std::string get_next_line(std::istringstream &iss) {
+        std::string line;
+        return std::getline(iss, line) ? line : std::string{};
     }
 };
 
-TEST_F(WriterTests, WriterEmptyTest) {
-    const auto creation_data = to_datetime(year{2024}, month{9}, day{1}, hours{14}, minutes{30}, seconds{5});
-    const auto &[itemsets, frequencies] = get_frequent_itemsets();
+TEST_F(WriterTests, WriterEmptyCsvTest) {
+    std::ostringstream oss;
+    const auto &result = to_csv(oss, itemsets_t{});
 
-    const frequency_output_t output = {
-            itemsets,
-            frequencies,
-            0.6,
-            10,
-            100,
-            creation_data,
-            algorithm_t::APRIORI
-    };
-    
-    std::stringstream ss;
-    ss << output;
+    ASSERT_FALSE(result.has_value());
+    EXPECT_EQ(result.error(), io_error_t::EMPTY_ERROR);
+}
 
-    frequency_output_t deserialized;
-    ss >> deserialized;
+TEST_F(WriterTests, WriterCsvWithHeaderTest) {
+    auto config = write_csv_config_t{true, ' '};
 
-    EXPECT_EQ(output.num_items, deserialized.num_items);
-    EXPECT_EQ(output.num_transactions, deserialized.num_transactions);
-    EXPECT_EQ(output.min_support, deserialized.min_support);
-    EXPECT_EQ(output.algorithm, deserialized.algorithm);
+    std::ostringstream oss;
+    const auto &result = to_csv(oss, itemsets, config);
 
-    EXPECT_EQ(output.itemsets, deserialized.itemsets);
-    EXPECT_EQ(output.frequencies, deserialized.frequencies);
+    ASSERT_TRUE(result.has_value());
+    std::istringstream iss(oss.str());
 
-//    EXPECT_TRUE(deserialized.suffix.contains({Milk, Bread, Butter}));   // TODO
-//    EXPECT_TRUE(deserialized.suffix.contains({Coffee, Milk, Cheese}));
-//    EXPECT_TRUE(deserialized.suffix.contains({Coffee, Milk, Bread}));
-//
-//    const auto get_frequency = [&](const itemset_t x) {
-//        return deserialized.frequencies[hash_code(x)];
-//    };
-
-//    EXPECT_EQ(get_frequency({Milk, Bread, Butter}), 63);
-//    EXPECT_EQ(get_frequency({Coffee, Milk, Cheese}), 74);
-//    EXPECT_EQ(get_frequency({Coffee, Milk, Bread}), 82);
-
-//    {{Milk,   Bread, Butter}, 63},
-//    {{Coffee, Milk,  Cheese}, 74},
-//    {{Coffee, Milk,  Bread},  82},
-
-
-
-    std::cout << output << std::endl;
-
-
-
-//    std::cout << to_json(result) << std::endl;
-
-//    fim::io::write(
-//            std::cout,
-//            suffix,
-//            frequencies,
-//            0.75,
-//            suffix.size(),
-//            3,
-//            creation_data,
-//            algorithm_t::APRIORI)
-//            << std::endl;
-
-
-//    std::istringstream iss("");
-//
-//    const auto &result = read_csv(iss);
-//    ASSERT_FALSE(result.has_value());
-//    EXPECT_EQ(result.error(), io_error_t::EMPTY_ERROR);
-
+    EXPECT_EQ(get_next_line(iss), "itemset_length, itemset");
+    EXPECT_EQ(get_next_line(iss), "7, 1 2 3 4 6 7 8");
+    EXPECT_EQ(get_next_line(iss), "3, 6 7 8");
+    EXPECT_EQ(get_next_line(iss), "7, 1 2 3 4 6 7 8");
+    EXPECT_EQ(get_next_line(iss), "1, 6");
+    EXPECT_EQ(get_next_line(iss), "5, 3 4 6 7 8");
+    EXPECT_EQ(get_next_line(iss), "4, 2 3 7 8");
 }

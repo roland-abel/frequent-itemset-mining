@@ -45,7 +45,7 @@ namespace fim::tests {
         Cream
     };
 
-    /// Gets the test data for the Apriori- and FP-Growth algorithms.
+    /// Gets the test data for the Apriori- and FP-Growth algorithm.
     /// @return The test transactions.
     database_t get_database();
 }

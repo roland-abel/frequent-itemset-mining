@@ -1,10 +1,10 @@
-/// @file apriori_tests.cpp
-/// @brief Unit test for the Apriori algorithm.
+/// @file data.h
+/// @brief
 ///
 /// @author Roland Abel
-/// @date December 8, 2023
+/// @date November 13, 2024
 ///
-/// Copyright (c) 2023 Roland Abel
+/// Copyright (c) 2024 Roland Abel
 ///
 /// This software is released under the MIT License.
 ///
@@ -26,29 +26,16 @@
 /// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 /// THE SOFTWARE.
 
-#include <gtest/gtest.h>
-#include "utils.h"
+#pragma once
 
-using namespace fim;
-using namespace std::chrono;
+namespace fim::data {
 
-class UtilsTests : public ::testing::Test {
-};
-
-TEST(UtilsTests, AlgorithmToStringTest) {
-    EXPECT_EQ(to_string(algorithm_t::APRIORI), "apriori");
-    EXPECT_EQ(to_string(algorithm_t::FP_GROWTH), "fp-growth");
-    EXPECT_EQ(to_string(algorithm_t::UNKNOWN), "unknown");
+    // Reader/writer error codes.
+    enum class io_error_t {
+        FILE_NOT_FOUND,
+        INVALID_FORMAT,
+        VALUE_OUT_OF_RANGE,
+        UNKNOWN_ERROR,
+        EMPTY_ERROR
+    };
 }
-
-TEST(UtilsTests, AlgorithmToEnumTest) {
-    EXPECT_EQ(to_algorithm("apriori"), algorithm_t::APRIORI);
-    EXPECT_EQ(to_algorithm("fp-growth"), algorithm_t::FP_GROWTH);
-    EXPECT_EQ(to_algorithm("X"), algorithm_t::UNKNOWN);
-}
-
-TEST(UtilsTests, Iso8601DatetimeTest) {
-    const auto dt = to_datetime(year{2024}, month{9}, day{1}, hours{14}, minutes{30}, seconds{5});
-    EXPECT_EQ(iso8601_datetime(dt), "2024-09-01T14:30:05Z");
-}
-

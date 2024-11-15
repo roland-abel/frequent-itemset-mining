@@ -31,7 +31,7 @@
 #include "relim.h"
 
 using namespace fim;
-using namespace fim::algorithms::relim;
+using namespace fim::algorithm::relim;
 
 using std::views::transform;
 
@@ -96,7 +96,7 @@ TEST_F(RelimTests, RelimAlgorithmTest) {
 //    db.sort_lexicographically(comp);
 
 
-   // fim::algorithms::relim::relim_algorithm(db, min_support);
+   // fim::algorithm::relim::relim_algorithm(db, min_support);
 
 //    const auto freq_items = item_count.get_frequent_items(min_support);
 //    auto conditional_db = conditional_database_t::create_initial_database(db, freq_items, comp);

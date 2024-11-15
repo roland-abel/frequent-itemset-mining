@@ -38,7 +38,7 @@ static void relim_benchmark(benchmark::State &state, const std::string_view &fil
     const auto min_support = static_cast<size_t>((double) state.range(0) * 0.01 * (double) db.size());
 
     for ([[maybe_unused]] auto _: state) {
-        fim::algorithms::relim::relim_algorithm(db, min_support);
+        fim::algorithm::relim::relim_algorithm(db, min_support);
     }
 }
 

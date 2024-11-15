@@ -26,6 +26,9 @@
 /// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 /// THE SOFTWARE.
 
+#include <istream>
+#include <sstream>
+#include <fstream>
 #include "reader.h"
 #include "itemset.h"
 
@@ -33,7 +36,7 @@ using namespace fim;
 
 namespace fim::data {
 
-    auto read_csv(std::istream &input, const csv_config_t &config) -> read_result_t {
+    auto read_csv(std::istream &input, const read_csv_config_t &config) -> read_result_t {
         database_t database{};
         std::string line;
 
@@ -77,12 +80,12 @@ namespace fim::data {
         return std::move(database);
     }
 
-    auto read_csv(const std::string_view &filename, const csv_config_t &config) -> read_result_t {
-        std::ifstream file(filename.data());
-        if (!file.is_open()) {
+    auto read_csv(const std::string_view &file_path, const read_csv_config_t &config) -> read_result_t {
+        std::ifstream ifs(file_path.data());
+        if (!ifs.is_open()) {
             return std::unexpected{io_error_t::FILE_NOT_FOUND};
         }
 
-        return read_csv(file, config);
+        return read_csv(ifs, config);
     }
 }

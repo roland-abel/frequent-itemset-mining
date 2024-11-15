@@ -31,7 +31,7 @@
 #include "eclat.h"
 
 using namespace fim;
-using namespace fim::algorithms::eclat;
+using namespace fim::algorithm::eclat;
 
 using std::views::transform;
 

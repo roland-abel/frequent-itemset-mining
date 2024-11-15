@@ -28,32 +28,29 @@
 
 #pragma once
 
-#include <fstream>
+#include <ostream>
 #include <expected>
 #include "itemset.h"
-#include "utils.h"
+#include "data.h"
 
 namespace fim::data {
 
-    struct csv_config_t {
+    /// Configuration for reading of csv data
+    struct read_csv_config_t {
         size_t skip_rows = 0;
         char separator = ' ';
     };
 
-    /// Result type for the @refitem read_csv` function.
+    /// Result type
     using read_result_t = std::expected<database_t, io_error_t>;
 
     /// Reads the transactions from the input stream as CSV.
     /// @param input The input stream to read from.
     /// @return The transactions if successful, or an error code if failed.
-    auto read_csv(
-            std::istream &input,
-            const csv_config_t &config = csv_config_t{}) -> read_result_t;
+    auto read_csv(std::istream &input, const read_csv_config_t &config = read_csv_config_t{}) -> read_result_t;
 
     /// Reads transactions from the given file.
-    /// @param filename The name of the file to read from.
+    /// @param file_path The path of the file to read from.
     /// @return The transactions if successful, or an error code if failed.
-    auto read_csv(
-            const std::string_view &filename,
-            const csv_config_t &config = csv_config_t{}) -> read_result_t;
+    auto read_csv(const std::string_view &file_path, const read_csv_config_t &config = read_csv_config_t{}) -> read_result_t;
 }

@@ -31,7 +31,7 @@
 #include "apriori.h"
 
 using namespace std;
-using namespace fim::algorithms::apriori;
+using namespace fim::algorithm::apriori;
 
 static void apriori_benchmark(benchmark::State &state, const std::string_view &filename) {
     auto db = fim::data::read_csv(filename).value();

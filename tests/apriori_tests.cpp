@@ -31,7 +31,7 @@
 #include "apriori.h"
 
 using namespace fim;
-using namespace fim::algorithms::apriori;
+using namespace fim::algorithm::apriori;
 
 using std::views::transform;
 

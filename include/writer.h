@@ -28,72 +28,31 @@
 
 #pragma once
 
-#include "utils.h"
+#include <expected>
+#include "data.h"
 
 namespace fim::data {
 
-// CSV
-//    itemset_length,itemset,support,transaction_count
-//    1,"Brot",0.60,200
-//    1,"Butter",0.50,180
-//    2,"Brot, Butter",0.45,150
-//    2,"Milch, Butter",0.40,135
-//    3,"Brot, Milch, Butter",0.30,100
+    /// Configuration for writing of csv data
+    struct write_csv_config_t {
+        bool with_header = true;
+        char separator = ' ';
+    };
 
-// JSON
-//{
-//    "frequent_itemsets": [
-//{
-//    "itemset": ["Brot", "Butter"],
-//    "support": 0.45,
-//    "transaction_count": 150
-//},
-//{
-//"itemset": ["Milch", "Butter"],
-//"support": 0.40,
-//"transaction_count": 135
-//},
-//{
-//"itemset": ["Brot", "Milch", "Butter"],
-//"support": 0.30,
-//"transaction_count": 100
-//},
-//{
-//"itemset": ["Käse", "Wurst"],
-//"support": 0.35,
-//"transaction_count": 120
-//}
-//]
-//}
-
-
+    /// Result type
+    using write_result_t = std::expected<itemsets_t, io_error_t>;
 
     ///
     /// @param os
-    /// @param result
+    /// @param database
+    /// @param config
     /// @return
-    std::ostream& operator<<(std::ostream& os, const frequency_output_t& result);
+    auto to_csv(std::ostream &os, const itemsets_t &itemsets, const write_csv_config_t &config = write_csv_config_t{}) -> write_result_t;
 
     ///
-    /// @param os
-    /// @param output
+    /// @param file_path
+    /// @param database
+    /// @param config
     /// @return
-    auto to_json(std::ostream& os, const frequency_output_t &output);
-
-    ///
-    /// @param filename
-    /// @param output
-    /// @return
-    auto to_json(const std::string &filename, const frequency_output_t &output) -> io_error_t;
-
-    ///
-    /// @param output
-    /// @return
-    auto to_json(const frequency_output_t &output) -> std::string;
-
-    ///
-    /// @param is
-    /// @param result
-    /// @return
-    std::istream& operator>>(std::istream& is, frequency_output_t& result);
+    auto to_csv(const std::string_view &file_path, const itemsets_t &itemsets, const write_csv_config_t &config = write_csv_config_t{}) -> write_result_t;
 }

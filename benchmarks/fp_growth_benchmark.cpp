@@ -38,7 +38,7 @@ static void fp_growth_benchmark(benchmark::State &state, const std::string_view 
     const auto min_support = static_cast<size_t>((double) state.range(0) * 0.01 * (double) db.size());
 
     for ([[maybe_unused]] auto _: state) {
-        fim::algorithms::fp_growth::fp_growth_algorithm(db, min_support);
+        fim::algorithm::fp_growth::fp_growth_algorithm(db, min_support);
     }
 }
 

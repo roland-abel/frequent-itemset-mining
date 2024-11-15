@@ -28,14 +28,14 @@
 
 #include "apriori.h"
 
-namespace fim::algorithms::apriori {
+namespace fim::algorithm::apriori {
 
     using std::views::transform;
     using std::views::filter;
     using std::ranges::to;
 
     using namespace fim;
-    using namespace fim::algorithms::apriori;
+    using namespace fim::algorithm::apriori;
 
     auto all_frequent_one_itemsets(const database_t &database, size_t min_support) -> itemsets_t {
         const auto is_frequent = [=](const auto &pair) -> bool { return pair.second >= min_support; };

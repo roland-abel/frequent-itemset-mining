@@ -31,7 +31,4 @@
 #include "apriori_hash.h"
 
 namespace fim::apriori_hash {
-
-
-
 }

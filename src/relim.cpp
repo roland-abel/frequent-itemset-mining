@@ -30,7 +30,7 @@
 #include <ranges>
 #include "relim.h"
 
-namespace fim::algorithms::relim {
+namespace fim::algorithm::relim {
 
     using std::views::filter;
     using std::views::transform;

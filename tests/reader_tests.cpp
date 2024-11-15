@@ -27,8 +27,8 @@
 /// THE SOFTWARE.
 
 #include <gtest/gtest.h>
+#include <fstream>
 #include "itemset.h"
-#include "utils.h"
 #include "reader.h"
 
 using namespace std;
@@ -48,7 +48,7 @@ TEST_F(ReaderTests, ReadCsvEmptyTest) {
 
 TEST_F(ReaderTests, ReadCsvNoValuesTest) {
     std::istringstream iss("A\nB\nC\n");
-    const auto &result = read_csv(iss, csv_config_t{3, ' '});
+    const auto &result = read_csv(iss, read_csv_config_t{3, ' '});
 
     ASSERT_FALSE(result.has_value());
     EXPECT_EQ(result.error(), io_error_t::EMPTY_ERROR);
@@ -110,7 +110,7 @@ TEST_F(ReaderTests, ReadCsvTransactionsTest) {
 
     std::istringstream iss(csv);
 
-    const auto &result = read_csv(iss, csv_config_t{1, ','});
+    const auto &result = read_csv(iss, read_csv_config_t{1, ','});
     ASSERT_TRUE(result.has_value());
 
     const auto &db = result.value();

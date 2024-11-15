@@ -26,108 +26,61 @@
 /// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 /// THE SOFTWARE.
 
-#include <nlohmann/json.hpp>
+#include <ranges>
+#include <string>
+#include <iostream>
+#include <fstream>
+#include <filesystem>
+#include "itemset.h"
 #include "writer.h"
 
-using namespace nlohmann;
 using namespace fim;
 
 namespace fim::data {
 
-//    namespace {
-//        constexpr std::string_view APRIORI = "Apriori";
-//        constexpr std::string_view FP_GROWTH = "FP-Growth";
-//        constexpr std::string_view UNKNOWN = "Unknown";
-//    }
-//
-//    constexpr std::array<std::pair<algorithm_t, std::string_view>, 2> algorithm_map = {
-//            {
-//                    {algorithm_t::APRIORI, APRIORI},
-//                    {algorithm_t::FP_GROWTH, FP_GROWTH},
-//            }};
-//
-//    constexpr std::string_view to_string(const algorithm_t algorithm) {
-//        for (const auto &pair: algorithm_map) {
-//            if (pair.first == algorithm) return pair.second;
-//        }
-//        return UNKNOWN;
-//    }
-//
-//    constexpr algorithm_t to_algorithm(std::string_view str) {
-//        for (const auto &pair: algorithm_map) {
-//            if (pair.second == str) return pair.first;
-//        }
-//        return algorithm_t::UNKNOWN;
-//    }
+    auto to_csv(std::ostream &os, const itemsets_t &itemsets, const write_csv_config_t &config) -> write_result_t {
+        using std::ranges::views::transform;
+        using std::ranges::views::join_with;
 
-    auto operator<<(std::ostream &os, const frequency_output_t &result) -> std::ostream & {
-        json document_json{};
-        document_json["metadata"] = {
-                {"min_support",      result.min_support},
-                {"num_transactions", result.num_transactions},
-                {"num_items",        result.num_items},
-                {"algorithm",        to_string(result.algorithm)},
-                {"creation_date",    iso8601_datetime(result.creation_datetime)},
+        auto write_header = [&]() {
+            os << "itemset_length, itemset" << std::endl;
         };
 
-        for (const auto &itemset: result.itemsets) {
-            const auto frequency = result.frequencies.at(itemset);
-            document_json["frequent_itemsets"].push_back(json{
-                    {"suffix",   itemset},
-                    {"frequency", frequency},
-            });
+        auto write_itemset = [&](const itemset_t &itemset) {
+            os << itemset.size() << ", ";
+            std::ranges::for_each(itemset
+                                  | transform([](const item_t &item) { return std::to_string(item); })
+                                  | join_with(config.separator), [&](const auto &item) { os << item; });
+            os << std::endl;
+        };
+
+        if (itemsets.empty()) {
+            return std::unexpected{io_error_t::EMPTY_ERROR};
         }
-        return os << document_json;
-    }
 
-    std::istream &operator>>(std::istream &is, frequency_output_t &result) {
-        json j;
-        is >> j;
-
-        result.frequencies = {};
-        result.itemsets = {};
-
-        result.min_support = j["metadata"]["min_support"];
-        result.num_transactions = j["metadata"]["num_transactions"];
-        result.num_items = j["metadata"]["num_items"];
-        result.algorithm = to_algorithm(j["metadata"]["algorithm"]);
-
-        auto frequent_itemsets = j["frequent_itemsets"];
-
-        // TODO
-
-//        for (const auto x: frequent_itemsets) {
-//            const auto suffix = x["suffix"].template get<itemset_t>();
-//            const auto frequency = x["frequency"].template get<size_t>();
-//            const auto hash = hash_code(suffix);
-//
-//            result.frequencies[hash] = frequency;
-//            result.suffix.insert(suffix);
-//        }
-        return is;
-    }
-
-    auto to_json(const frequency_output_t &output) -> std::string {
-        auto get_support = [&](const itemset_t &x) {
-            return static_cast<float>(output.frequencies.at(x) / output.num_transactions);
-        };
-
-        json document_json{};
-        document_json["metadata"] = {
-                {"min_support",      std::format("{:.2f}", output.min_support)},
-                {"num_transactions", output.num_transactions},
-                {"num_items",        output.num_items},
-                {"algorithm",        to_string(output.algorithm)},
-                {"creation_date",    iso8601_datetime(output.creation_datetime)},
-        };
-
-        for (const auto &itemset: output.itemsets) {
-            const auto support = get_support(itemset);
-            document_json["frequent_itemsets"].push_back(nlohmann::json{
-                    {"suffix", itemset},
-                    {"support", std::format("{:.2f}", support)},
-            });
+        if (config.with_header) {
+            write_header();
         }
-        return document_json.dump(4);
+
+        for (const itemset_t &itemset: itemsets) {
+            write_itemset(itemset);
+        }
+        return write_result_t{itemsets};
     }
+
+    auto to_csv(const std::string_view &file_path, const itemsets_t &itemsets, const write_csv_config_t &config) -> write_result_t {
+        std::filesystem::path path = std::filesystem::path(file_path).parent_path();
+
+        if (!std::filesystem::exists(path)) {
+            std::filesystem::create_directories(path);
+        }
+
+        std::ofstream ofs(file_path.data());
+
+        if (!ofs) {
+            return std::unexpected{io_error_t::UNKNOWN_ERROR};
+        }
+
+        return to_csv(ofs, itemsets, config);
+    };
 }

@@ -32,7 +32,7 @@
 #include <algorithm>
 #include "itemset.h"
 
-namespace fim::algorithms::apriori {
+namespace fim::algorithm::apriori {
 
     using namespace fim;
 

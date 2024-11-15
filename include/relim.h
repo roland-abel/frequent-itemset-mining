@@ -32,7 +32,7 @@
 #include <utility>
 #include "itemset.h"
 
-namespace fim::algorithms::relim {
+namespace fim::algorithm::relim {
     using std::views::transform;
     using std::ranges::to;
     using std::views::drop;

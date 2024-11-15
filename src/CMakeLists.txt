@@ -27,11 +27,8 @@
 
 set(INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include)
 
-find_package(nlohmann_json CONFIG REQUIRED)
-
 add_library(${FIM_LIB_NAME}
         itemset.cpp
-        cli/utils.cpp
         hash_tree.cpp
         reader.cpp
         writer.cpp
@@ -40,12 +37,9 @@ add_library(${FIM_LIB_NAME}
         fp_tree.cpp
         fp_growth.cpp
         eclat.cpp
-        relim.cpp
-)
+        relim.cpp)
 
-target_link_libraries(${FIM_LIB_NAME} PRIVATE nlohmann_json::nlohmann_json)
 set(INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include)
-
 target_include_directories(${FIM_LIB_NAME} PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}
         ${INCLUDE_DIR})

@@ -1,8 +1,8 @@
-/// @file eclat.h
+/// @file utils.h
 /// @brief
 ///
 /// @author Roland Abel
-/// @date September 08, 2024
+/// @date July 07, 2024
 ///
 /// Copyright (c) 2024 Roland Abel
 ///
@@ -28,34 +28,40 @@
 
 #pragma once
 
-#include <set>
 #include "itemset.h"
+#include "apriori.h"
+#include "fp_growth.h"
+#include "relim.h"
+#include "eclat.h"
 
-namespace fim::algorithm::eclat {
-
-    // Transaction id
-    using tid_t = size_t;
-
-    // Transactions identification set
-    using tidset_t = std::set<tid_t>;
-
-    // The vertical transaction database type.
-    using vertical_database_t = std::unordered_map<item_t, tidset_t>;
-
-    /// Computes the intersection of two tid sets.
-    /// @param x The first suffix.
-    /// @param y The second suffix.
-    /// @return The union of the two suffix.
-    auto set_intersection(const tidset_t &x, const tidset_t &y) -> tidset_t;
-
-    /// Converts the given transaction data to a vertical representation of the data.
-    /// @param database The transaction data
-    /// @return The vertical representation of the transaction data.
-    auto to_vertical_database(const database_t &database) -> vertical_database_t;
+namespace fim {
 
     ///
-    /// @param database
-    /// @param min_support
-    /// @return
-    auto eclat_algorithm(const database_t &database, size_t min_support) -> itemsets_t;
+    using algorithm_function_t = std::function<itemsets_t(database_t &database, size_t min_support)>;
+
+    ///
+    enum class algorithm_t : int {
+        APRIORI,
+        FP_GROWTH,
+        RELIM,
+        ECLAT
+    };
+
+    struct configuration_t {
+        std::string input_path;
+        std::string output_path;
+        float min_support;
+        algorithm_t algorithm;
+    };
+
+    const auto map_algorithm_function = std::map<algorithm_t, algorithm_function_t>{
+            {algorithm_t::APRIORI,   fim::algorithm::apriori::apriori_algorithm},
+            {algorithm_t::FP_GROWTH, fim::algorithm::fp_growth::fp_growth_algorithm},
+            {algorithm_t::RELIM,     fim::algorithm::relim::relim_algorithm},
+            {algorithm_t::ECLAT,     fim::algorithm::eclat::eclat_algorithm},
+    };
+
+    algorithm_function_t get_algorithm(const algorithm_t algorithm) {
+        return map_algorithm_function.at(algorithm);
+    }
 }
