@@ -10,7 +10,7 @@
 ///
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
 /// of this software and associated documentation files (the "Software"), to deal
-/// in the Software without restriction, including without limitation the rights
+/// with the Software without restriction, including without limitation the rights
 /// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 /// copies of the Software, and to permit persons to whom the Software is
 /// furnished to do so, subject to the following conditions:
@@ -35,16 +35,15 @@ namespace fim::algorithm::fp_growth {
     using namespace fim;
     using namespace fim::fp_tree;
 
-    /// Generates the conditional transaction from the given FP-Tree.
-    /// @param node The current node in the FP-Tree being processed.
-    /// @param item  The prefix for which conditional database_ are being generated.
-    /// @return The database_ that will be populated with the conditional database_.
+    /// @brief Generates the conditional transaction database from the given FP-Tree.
+    /// @param node The current node in the FP-Tree being processed, which represents a prefix.
+    /// @param item The item for which the conditional transaction database is being generated.
+    /// @return A new database containing the conditional transactions that correspond to the given item and node.
     auto conditional_transactions(const node_ptr &node, item_t item) -> database_t;
 
-    /// Applies the FP-Growth algorithm to find frequent suffix from the given database_.
+    /// @brief Applies the FP-Growth algorithm to find frequent itemsets from the given database.
     /// @param database A collection of transactions, where each transaction is a set of items.
-    /// @param min_support The minimum support threshold for an suffix to be considered frequent.
-    /// @return A set of frequent suffix, where each suffix is a collection of items that meet
-    /// the minimum support threshold.
+    /// @param min_support The minimum support threshold that an itemset must meet to be considered frequent.
+    /// @return A collection of frequent itemsets that meet or exceed the minimum support.
     auto fp_growth_algorithm(const database_t &database, size_t min_support) -> itemsets_t;
 }

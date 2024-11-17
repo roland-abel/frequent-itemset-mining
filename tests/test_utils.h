@@ -26,8 +26,7 @@
 /// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 /// THE SOFTWARE.
 
-#ifndef _TEST_UTILITIES_H
-#define _TEST_UTILITIES_H
+#pragma once
 
 #include <vector>
 #include <algorithm>
@@ -44,5 +43,3 @@
         EXPECT_EQ(it1, (list1).end()) << "First list has more elements."; \
         EXPECT_EQ(it2, (list2).end()) << "Second list has more elements."; \
     } while (0)
-
-#endif // _TEST_UTILITIES_H

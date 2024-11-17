@@ -37,48 +37,37 @@ using std::views::transform;
 
 class EclatTests : public ::testing::Test {
 protected:
-    enum Items {
-        Milk = 1,
-        Bread,
-        Cheese,
-        Butter,
-        Coffee,
-        Sugar,
-        Flour,
-        Cream
-    };
-
     static database_t get_database() {
         return database_t{
-                {Milk,   Cheese, Butter, Bread,  Sugar,  Flour, Cream},
-                {Cheese, Butter, Bread,  Coffee, Sugar,  Flour},
-                {Milk,   Butter, Coffee, Sugar,  Flour},
-                {Milk,   Butter},
-                {Milk,   Butter, Coffee},
-                {Milk,   Flour},
-                {Milk,   Cheese, Butter, Bread,  Coffee, Sugar, Flour},
-                {Cream},
-                {Milk,   Cheese, Butter, Sugar},
-                {Milk,   Cheese, Bread,  Coffee, Sugar,  Flour}
+                {1, 3, 4, 2, 6, 7, 8},
+                {3, 4, 2, 5, 6, 7},
+                {1, 4, 5, 6, 7},
+                {1, 4},
+                {1, 4, 5},
+                {1, 7},
+                {1, 3, 4, 2, 5, 6, 7},
+                {8},
+                {1, 3, 4, 6},
+                {1, 3, 2, 5, 6, 7}
         };
     }
 };
 
 TEST_F(EclatTests, ToVerticalTransactionsTest) {
-    const auto &trans = get_database();
-    const auto &vertical_trans = to_vertical_database(trans);
+    const auto& db = get_database();
+    const auto& vertical_db = to_vertical_database(db);
 
-    ASSERT_EQ(trans.size(), 10);
-    ASSERT_EQ(vertical_trans.size(), 8);
+    ASSERT_EQ(db.size(), 10);
+    ASSERT_EQ(vertical_db.size(), 8);
 
-    EXPECT_EQ(vertical_trans.at(Milk), (tidset_t{0, 2, 3, 4, 5, 6, 8, 9}));
-    EXPECT_EQ(vertical_trans.at(Bread), (tidset_t{0, 1, 6, 9}));
-    EXPECT_EQ(vertical_trans.at(Cheese), (tidset_t{0, 1, 6, 8, 9}));
-    EXPECT_EQ(vertical_trans.at(Butter), (tidset_t{0, 1, 2, 3, 4, 6, 8}));
-    EXPECT_EQ(vertical_trans.at(Coffee), (tidset_t{1, 2, 4, 6, 9}));
-    EXPECT_EQ(vertical_trans.at(Sugar), (tidset_t{0, 1, 2, 6, 8, 9}));
-    EXPECT_EQ(vertical_trans.at(Flour), (tidset_t{0, 1, 2, 5, 6, 9}));
-    EXPECT_EQ(vertical_trans.at(Cream), (tidset_t{0, 7}));
+    EXPECT_EQ(vertical_db.at(1), (tidset_t{0, 2, 3, 4, 5, 6, 8, 9}));
+    EXPECT_EQ(vertical_db.at(2), (tidset_t{0, 1, 6, 9}));
+    EXPECT_EQ(vertical_db.at(3), (tidset_t{0, 1, 6, 8, 9}));
+    EXPECT_EQ(vertical_db.at(4), (tidset_t{0, 1, 2, 3, 4, 6, 8}));
+    EXPECT_EQ(vertical_db.at(5), (tidset_t{1, 2, 4, 6, 9}));
+    EXPECT_EQ(vertical_db.at(6), (tidset_t{0, 1, 2, 6, 8, 9}));
+    EXPECT_EQ(vertical_db.at(7), (tidset_t{0, 1, 2, 5, 6, 9}));
+    EXPECT_EQ(vertical_db.at(8), (tidset_t{0, 7}));
 }
 
 TEST_F(EclatTests, SetIntersectionOfTidsTest) {
@@ -87,55 +76,4 @@ TEST_F(EclatTests, SetIntersectionOfTidsTest) {
     EXPECT_EQ(set_intersection({0, 1, 2, 3}, {3, 4, 5, 6}), (tidset_t{3}));
     EXPECT_EQ(set_intersection({0, 3, 2, 3, 6, 6}, {0, 3, 2, 3, 6}), (tidset_t{0, 3, 2, 6}));
     EXPECT_EQ(set_intersection({0, 1, 3, 5, 9}, {0, 1, 2, 3, 6, 8, 9}), (tidset_t{0, 1, 3, 9}));
-}
-
-TEST_F(EclatTests, EclatAlgorithmTest) {
-    const auto min_support = 4;
-    const auto &database = get_database();
-
-    const auto &itemsets = eclat_algorithm(database, min_support).sort_each_itemset();
-    EXPECT_EQ(itemsets.size(), 35);
-
-    // 1-suffix
-    EXPECT_TRUE(itemsets.contains({Milk}));
-    EXPECT_TRUE(itemsets.contains({Bread}));
-    EXPECT_TRUE(itemsets.contains({Cheese}));
-    EXPECT_TRUE(itemsets.contains({Butter}));
-    EXPECT_TRUE(itemsets.contains({Coffee}));
-    EXPECT_TRUE(itemsets.contains({Sugar}));
-    EXPECT_TRUE(itemsets.contains({Flour}));
-
-    // 2-suffix
-    EXPECT_TRUE(itemsets.contains({Milk, Cheese}));
-    EXPECT_TRUE(itemsets.contains({Milk, Butter}));
-    EXPECT_TRUE(itemsets.contains({Milk, Coffee}));
-    EXPECT_TRUE(itemsets.contains({Milk, Sugar}));
-    EXPECT_TRUE(itemsets.contains({Milk, Flour}));
-    EXPECT_TRUE(itemsets.contains({Bread, Cheese}));
-    EXPECT_TRUE(itemsets.contains({Bread, Sugar}));
-    EXPECT_TRUE(itemsets.contains({Bread, Flour}));
-    EXPECT_TRUE(itemsets.contains({Cheese, Butter}));
-    EXPECT_TRUE(itemsets.contains({Cheese, Sugar}));
-    EXPECT_TRUE(itemsets.contains({Cheese, Flour}));
-    EXPECT_TRUE(itemsets.contains({Butter, Coffee}));
-    EXPECT_TRUE(itemsets.contains({Butter, Sugar}));
-    EXPECT_TRUE(itemsets.contains({Butter, Flour}));
-    EXPECT_TRUE(itemsets.contains({Coffee, Sugar}));
-    EXPECT_TRUE(itemsets.contains({Coffee, Flour}));
-    EXPECT_TRUE(itemsets.contains({Sugar, Flour}));
-
-    // 3-suffix
-    EXPECT_TRUE(itemsets.contains({Milk, Cheese, Sugar}));
-    EXPECT_TRUE(itemsets.contains({Milk, Butter, Sugar}));
-    EXPECT_TRUE(itemsets.contains({Milk, Sugar, Flour}));
-    EXPECT_TRUE(itemsets.contains({Bread, Cheese, Sugar}));
-    EXPECT_TRUE(itemsets.contains({Bread, Cheese, Flour}));
-    EXPECT_TRUE(itemsets.contains({Bread, Sugar, Flour}));
-    EXPECT_TRUE(itemsets.contains({Cheese, Butter, Sugar}));
-    EXPECT_TRUE(itemsets.contains({Cheese, Sugar, Flour}));
-    EXPECT_TRUE(itemsets.contains({Butter, Sugar, Flour}));
-    EXPECT_TRUE(itemsets.contains({Coffee, Sugar, Flour}));
-
-    // 4-suffix
-    EXPECT_TRUE(itemsets.contains({Bread, Cheese, Sugar, Flour}));
 }

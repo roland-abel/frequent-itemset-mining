@@ -29,8 +29,8 @@
 #pragma once
 
 #include <ranges>
-#include <utility>
 #include "itemset.h"
+#include "database.h"
 
 namespace fim::algorithm::relim {
     using std::views::transform;
@@ -50,14 +50,17 @@ namespace fim::algorithm::relim {
     struct suffixes_t : std::list<suffix_t> {
         using std::list<suffix_t>::list;
 
+        /// Adds an itemset to the list, maintaining lexicographical order.
+        /// The itemset is inserted into the list based on the comparison function,
+        /// ensuring that the list remains sorted.
         ///
-        /// @param itemset
-        /// @param comp
-        /// @param quantity
+        /// @param itemset The itemset to be added to the list.
+        /// @param compare The comparison function used to determine the order of the items in the list.
+        /// @param count The current number of items in the list.
         auto add_itemset(
-                const itemset_t &itemset,
-                const item_compare_t &comp,
-                size_t quantity = 1) -> void;
+            const itemset_t &itemset,
+            const item_compare_t &compare,
+            size_t count = 1) -> void;
     };
 
     /// Head element
@@ -73,21 +76,22 @@ namespace fim::algorithm::relim {
     /// @brief
     struct conditional_database_t {
         header_t header{};
-        item_compare_t item_comparer = default_item_comparer;
+        item_compare_t compare{};
 
         /// @brief
         /// @param freq_items
-        explicit conditional_database_t(const itemset_t &freq_items, item_compare_t comp);
+        /// @param compare
+        explicit conditional_database_t(const itemset_t &freq_items, const item_compare_t &compare);
 
         ///
         /// @param database
         /// @param freq_items
-        /// @param item_comparer
+        /// @param compare
         /// @return
         static auto create_initial_database(
-                const database_t &database,
-                const itemset_t &freq_items,
-                const item_compare_t &comp) -> conditional_database_t;
+            const database_t &database,
+            const itemset_t &freq_items,
+            const item_compare_t &compare) -> conditional_database_t;
 
         ///
         /// @return
@@ -96,36 +100,12 @@ namespace fim::algorithm::relim {
         ///
         /// @param prefix_db
         /// @return
-        auto eliminate(const conditional_database_t &prefix_db) -> item_t {
-            const auto &prefix = header.back().prefix;
-            header.pop_back();
-
-            auto it = header.rbegin();
-            auto it_prefix = prefix_db.header.rbegin();
-
-            while (it != header.rend() && it_prefix != prefix_db.header.rend()) {
-                it->count += it_prefix->count;
-
-                for (const auto &[count, itemset]: it_prefix->suffixes) {
-                    it->suffixes.add_itemset(itemset, item_comparer, count);
-                }
-
-                it++;
-                it_prefix++;
-            }
-            return prefix;
-        }
+        auto eliminate(const conditional_database_t &prefix_db) -> item_t;
     };
-
-    // Removes all infrequent items from the database and sorts all prefix sets.
-    /// @param database
-    /// @param min_support
-    /// @return
-    auto preprocessing(database_t &database, size_t min_support) -> item_counts_t;
 
     ///
     /// @param database
-    /// @param cond_db
+    /// @param min_support
     /// @return
-    auto relim_algorithm(database_t &database, size_t cond_db) -> itemsets_t;
+    auto relim_algorithm(const database_t &database, size_t min_support) -> itemsets_t;
 }

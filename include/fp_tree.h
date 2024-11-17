@@ -1,5 +1,5 @@
 /// @file fp_tree.h
-/// @brief
+/// @brief Implementation of an FP-Tree data structure used for the FP-Growth algorithm.
 ///
 /// @author Roland Abel
 /// @date August 10, 2024
@@ -10,7 +10,7 @@
 ///
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
 /// of this software and associated documentation files (the "Software"), to deal
-/// in the Software without restriction, including without limitation the rights
+/// with the Software without restriction, including without limitation the rights
 /// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 /// copies of the Software, and to permit persons to whom the Software is
 /// furnished to do so, subject to the following conditions:
@@ -29,6 +29,7 @@
 #pragma once
 
 #include "itemset.h"
+#include "database.h"
 
 namespace fim::fp_tree {
     struct node_t;
@@ -39,100 +40,83 @@ namespace fim::fp_tree {
     using node_ptr = std::shared_ptr<node_t>;
     using children_t = std::vector<node_ptr>;
 
-    /// Represents a node in a FP-tree tree
-    struct node_t : public std::enable_shared_from_this<node_t> {
+    /// @brief Represents a node in an FP-tree.
+    struct node_t : std::enable_shared_from_this<node_t> {
         using parent_ptr = std::weak_ptr<node_t>;
 
-        item_t item{};
-        size_t frequency{};
-        parent_ptr parent;
-        children_t children{};
+        item_t item{}; ///< The item stored in this node.
+        size_t frequency{}; ///< The frequency of the item in the database.
+        parent_ptr parent; ///< A weak pointer to the parent node.
+        children_t children{}; ///< A list of child nodes.
 
-        /// Constructs a node with the given prefix, frequency, and optional parent.
-        /// @param item The prefix to be stored in the node.
-        /// @param frequency The frequency of the prefix.
+        /// @brief Constructs a node with the given item, frequency, and optional parent.
+        /// @param item The item to be stored in the node.
+        /// @param frequency The frequency of the item.
         /// @param parent An optional shared pointer to the parent node.
         node_t(item_t item, size_t frequency, const std::shared_ptr<node_t> &parent = nullptr);
 
-        /// Default constructor.
+        /// @brief Default constructor for node_t.
         node_t() = default;
 
-        /// Checks if this node is the root node.
+        /// @brief Checks if this node is the root node of the FP-tree.
         /// @return True if this node is the root, otherwise false.
         bool is_root() const;
 
-        /// Creates the root node_t for an FP-tree.
-        /// @return A shared pointer to the newly created root node_t.
+        /// @brief Creates and returns the root node for an FP-tree.
+        /// @return A shared pointer to the newly created root node.
         static node_ptr create_root();
 
-        /// Adds a child node with the specified prefix and frequency.
-        /// @param child_item The prefix to be added as a child.
-        /// @param child_frequency The frequency of the child prefix.
+        /// @brief Adds a child node with the specified item and frequency to this node.
+        /// @param child_item The item for the new child node.
+        /// @param child_frequency The frequency of the child item.
         /// @return A shared pointer to the newly added child node.
         node_ptr add_child(const item_t &child_item, size_t child_frequency);
 
-        /// Finds the child node with is associated with the the specified prefix.
-        /// @param child_item The prefix to find in the children.
-        /// @return An optional shared pointer to the child node if found; otherwise, std::nullopt
+        /// @brief Finds the child node corresponding to the specified item.
+        /// @param child_item The item to find in the list of children.
+        /// @return An optional shared pointer to the child node if found; otherwise, std::nullopt.
         std::optional<node_ptr> find_child_item(const item_t &child_item) const;
 
-        /// Checks if there exists a path in the tree matching the given items and frequencies.
-        /// @param items A vector of items to be matched in the tree path.
+        /// @brief Checks if a path matching the given items and their frequencies exist in the tree.
+        /// @param items A vector of items to be matched in the path.
         /// @param frequencies A vector of frequencies corresponding to the items.
-        /// @return True if a path matching all items and frequencies is found; otherwise, false.
+        /// @return True if a path matching all items and frequencies is found, otherwise false.
         bool has_path_with_frequencies(const items_t &items, const std::vector<size_t> &frequencies) const;
     };
 
-    /// Gets the frequency of the given prefix.
-    /// @param root The
-    /// @param item
-    /// @return
+    /// @brief Gets the frequency of the given item in the FP-tree.
+    /// @param root The root node of the FP-tree.
+    /// @param item The item whose frequency is to be retrieved.
+    /// @return The frequency of the specified item.
     auto get_item_frequency(const node_ptr &root, item_t item) -> size_t;
 
-    /// Checks whether a given FP-tree root has a single path from the root to a leaf.
-    /// @param root A pointer to the current root in the FP-tree.
-    /// @return A pair where the first element is a boolean indicating whether the tree has a single path,
-    /// and the second element is an suffix representing the sequence of items along that path.
-    auto tree_has_single_path(const node_ptr &root) -> std::optional<itemset_t>;
+    /// @brief Checks if a given FP-tree is a single path from the root to a leaf node.
+    /// @param root A pointer to the root node of the FP-tree.
+    /// @return A boolean value indicating whether the tree is a single path.
+    /// If true, the return value will contain an itemset representing the sequence of items along that path.
+    auto tree_is_single_path(const node_ptr &root) -> std::optional<itemset_t>;
 
-    ///
-    /// @param database
-    /// @return
-    auto get_item_counts(const database_t &database) -> item_counts_t;
-
-    /// Gets a sorted list of frequent items from the given transactions.
-    /// @param counts
-    /// @param min_support The minimum support threshold for items to be considered frequent.
-    /// @return A list of items that exceed the minimum support threshold, sorted in order of frequency.
-    auto get_ordered_frequent_items(const item_counts_t &counts, size_t min_support) -> std::pair<items_t, item_counts_t>;
-
-    /// Creates the power set of the given set of items.
-    /// @param items The input suffix for which the power set is to created.
-    /// @return The set of all subsets of the given items.
+    /// @brief Creates the power set of the given set of items (all subsets of the items).
+    /// @param items The input itemset for which the power set is to be created.
+    /// @param include_empty_set If true, the empty set will be included in the power set.
+    /// @return The power set of the given items as a collection of itemsets.
     auto power_set(const itemset_t &items, bool include_empty_set = true) -> itemsets_t;
 
-    /// Insert a specified prefix into each subset of the given suffix.
-    /// @param itemsets The set of suffix to be expanded.
-    /// @param item The prefix to be added to each subset within the suffix.
-    /// @return A new set of suffix where each original subset has been expanded with the given prefix.
+    /// @brief Inserts a specified item into each subset of the given itemsets.
+    /// @param itemsets A collection of itemsets.
+    /// @param item The item to be inserted into each subset.
+    /// @return A new collection of itemsets where the specified item has been added to each original subset.
     auto insert_into_each_itemsets(const itemsets_t &itemsets, item_t item) -> itemsets_t;
 
-    /// Sorts the items in the x according to the order defined by the frequent items list
-    /// and removes any items not in the frequent items list.
-    /// @param itemset The original set of items to be filtered.
-    /// @param freq_items A list of items considered frequent.
-    /// @return A list of items from the x that are also in the frequent items list, maintaining their order.
+    /// @brief Filters and sorts the items in the input itemset according to the order of frequent items.
+    /// @param itemset The original itemset to be filtered and sorted.
+    /// @param freq_items A list of frequent items, used to determine the order.
+    /// @return Sorted list of items, sorted by their frequency.
     auto filter_and_sort_items(const itemset_t &itemset, const items_t &freq_items) -> items_t;
 
-    /// Builds a FP-tree from the given database based on the minimum support.
-    /// @param database A collection of transactions, where each transaction is a set of items.
-    /// @param min_support The minimum support threshold for an prefix to be considered frequent.
-    /// @return A shared pointer to the root node of the constructed FP-tree.
-    auto build_fp_tree(const database_t &database, size_t min_support) -> node_ptr;
-
-    ///
-    /// @param database
-    /// @param freq_items
-    /// @return
+    /// @brief Builds an FP-tree from the given transaction database using the frequent items list.
+    /// @param database The transaction database containing the items and their frequencies.
+    /// @param freq_items The list of frequent items used to build the FP-tree.
+    /// @return A shared pointer to the root node of the newly constructed FP-tree.
     auto build_fp_tree(const database_t &database, const items_t &freq_items) -> node_ptr;
 }

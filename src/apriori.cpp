@@ -33,50 +33,33 @@ namespace fim::algorithm::apriori {
     using std::views::transform;
     using std::views::filter;
     using std::ranges::to;
+    using std::ranges::copy;
+    using std::ranges::sort;
 
     using namespace fim;
     using namespace fim::algorithm::apriori;
 
-    auto all_frequent_one_itemsets(const database_t &database, size_t min_support) -> itemsets_t {
-        const auto is_frequent = [=](const auto &pair) -> bool { return pair.second >= min_support; };
-        const auto get_item = [](const auto &pair) -> itemset_t { return itemset_t{pair.first}; };
-
-        item_counts_t item_counts{};
-        for (const item_t &item: database | std::views::join) {
-            ++item_counts[item];
-        }
+    auto all_frequent_one_itemsets(const item_counts_t& item_counts, size_t min_support) -> itemsets_t {
+        const auto is_frequent = [=](const auto& pair) -> bool { return pair.second >= min_support; };
+        const auto to_itemset = [](const auto& pair) -> itemset_t { return itemset_t{pair.first}; };
 
         return item_counts
                | filter(is_frequent)
-               | transform(get_item)
+               | transform(to_itemset)
                | to<itemsets_t>();
     }
 
-    auto get_support_counts(
-            const database_t &db,
-            const itemsets_t &itemsets,
-            const is_subset_t &is_subset) -> itemset_counts_t {
+    auto generate_candidates(
+            const itemsets_t& frequent_itemsets,
+            size_t k,
+            const item_compare_t& compare) -> itemsets_t {
 
-        itemset_counts_t count{};
-
-        for (const auto &trans: db) {
-            for (const auto &x: itemsets) {
-                if (is_subset(x, trans)) {
-                    ++count[x];
-                }
-            }
-        }
-        return std::move(count);
-    }
-
-    auto generate_candidates(const itemsets_t &frequent_itemsets, size_t k) -> itemsets_t {
-        // Check whether the (k-2) first items of x and y are matched
-        auto merge_itemsets_if_equal_prefix = [&](const itemset_t &x, const itemset_t &y) -> std::optional<itemset_t> {
+        auto merge_itemsets_if_equal_prefix = [&](const itemset_t& x, const itemset_t& y) -> std::optional<itemset_t> {
             if (std::ranges::equal(x | std::views::take(k - 2), y | std::views::take(k - 2))) {
                 itemset_t candidate{};
-                std::ranges::copy(x | std::views::take(k - 1), std::back_inserter(candidate));
+                copy(x | std::views::take(k - 1), std::back_inserter(candidate));
                 candidate.push_back(y[k - 2]);
-                std::ranges::sort(candidate);
+                candidate.sort_itemset(compare);
 
                 return candidate;
             }
@@ -86,8 +69,8 @@ namespace fim::algorithm::apriori {
         // Combine pairs of frequent frequent_itemsets
         auto create_candidates = [&]() -> itemsets_t {
             itemsets_t candidates{};
-            for (auto x = frequent_itemsets.begin(); x != frequent_itemsets.end(); x++) {
-                for (auto y = std::next(x); y != frequent_itemsets.end(); y++) {
+            for (auto x = frequent_itemsets.begin(); x != frequent_itemsets.end(); ++x) {
+                for (auto y = std::next(x); y != frequent_itemsets.end(); ++y) {
                     if (auto matched = merge_itemsets_if_equal_prefix(*x, *y); matched) {
                         candidates.emplace_back(std::move(*matched));
                     }
@@ -96,14 +79,14 @@ namespace fim::algorithm::apriori {
             return candidates;
         };
 
-        auto all_subsets_frequent = [&](const itemset_t &candidate) -> bool {
-            auto is_frequent = [&](const itemset_t &itemset) {
+        auto all_subsets_frequent = [&](const itemset_t& candidate) -> bool {
+            auto is_frequent = [&](const itemset_t& itemset) {
                 return std::ranges::contains(frequent_itemsets, itemset);
             };
 
-            auto create_subset = [&](const item_t &item) {
+            auto create_subset = [&](const item_t& item) {
                 return candidate
-                       | filter([&](const item_t &i) { return i != item; })
+                       | filter([&](const item_t& i) { return i != item; })
                        | to<itemset_t>();
             };
 
@@ -115,32 +98,40 @@ namespace fim::algorithm::apriori {
                | to<itemsets_t>();
     }
 
-    auto prune(itemsets_t &candidates, const database_t &database, size_t min_support) -> void {
-        const auto &counts = get_support_counts(database, candidates, is_subset);
+    auto prune(
+            itemsets_t& candidates,
+            const database_t& database,
+            size_t min_support,
+            const item_compare_t& compare) -> void {
 
-        const auto is_infrequent = [&](const itemset_t &z) -> bool {
+        const auto& counts = itemset_counts_t::create_itemset_counts(database, candidates, compare);
+        const auto is_infrequent = [&](const itemset_t& z) -> bool {
             return !counts.contains(z) || counts.at(z) < min_support;
         };
 
         std::erase_if(candidates, is_infrequent);
     }
 
-    auto apriori_algorithm(const database_t &database, size_t min_support) -> itemsets_t {
+    auto apriori_algorithm(const database_t& database, size_t min_support) -> itemsets_t {
         itemsets_t freq_itemsets{};
-        auto insert_itemset = [&](const auto &itemsets) {
-            std::ranges::copy(itemsets, std::back_inserter(freq_itemsets));
+
+        const auto [db, item_counts] = database.transaction_reduction(min_support);
+        const auto compare = item_counts.get_item_compare();
+
+        auto insert_itemset = [&](const auto& itemsets) {
+            copy(itemsets, std::back_inserter(freq_itemsets));
         };
 
-        // Find all 1-element suffix
-        auto itemsets = all_frequent_one_itemsets(database, min_support);
+        // Find all 1-element suffixes
+        auto itemsets = all_frequent_one_itemsets(item_counts, min_support);
         insert_itemset(itemsets);
 
         for (auto k = 2; !itemsets.empty(); k++) {
             // Create k-itemset from the previous (k-1)-suffix
-            itemsets = generate_candidates(itemsets, k);
+            itemsets = generate_candidates(itemsets, k, compare);
 
             // Remove all itemset with low support
-            prune(itemsets, database, min_support);
+            prune(itemsets, db, min_support, compare);
 
             // Insert frequent candidates
             insert_itemset(itemsets);

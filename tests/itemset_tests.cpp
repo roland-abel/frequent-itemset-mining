@@ -29,124 +29,92 @@
 #include <gtest/gtest.h>
 #include <ranges>
 #include "itemset.h"
+#include "database.h"
 
 using std::views::transform;
 using namespace fim;
 
 class ItemsetTests : public ::testing::Test {
 protected:
-    enum Items {
-        Milk = 1,
-        Bread,
-        Cheese,
-        Butter,
-        Coffee,
-        Sugar,
-        Flour,
-        Cream
-    };
-
     static database_t get_database() {
         return database_t{
-                {Milk,   Cheese, Butter, Bread,  Sugar,  Flour, Cream},
-                {Cheese, Butter, Bread,  Coffee, Sugar,  Flour},
-                {Milk,   Butter, Coffee, Sugar,  Flour},
-                {Milk,   Butter},
-                {Milk,   Butter, Coffee},
-                {Milk,   Flour},
-                {Milk,   Cheese, Butter, Bread,  Coffee, Sugar, Flour},
-                {Cream},
-                {Milk,   Cheese, Butter, Sugar},
-                {Milk,   Cheese, Bread,  Coffee, Sugar,  Flour}
-        }.sort_database();
+                {1, 3, 4, 2, 6, 7, 8},
+                {3, 4, 2, 5, 6, 7},
+                {1, 4, 5, 6, 7},
+                {1, 4},
+                {1, 4, 5},
+                {1, 7},
+                {1, 3, 4, 2, 5, 6, 7},
+                {8},
+                {1, 3, 4, 6},
+                {1, 3, 2, 5, 6, 7}
+        };
     }
 };
 
 TEST_F(ItemsetTests, SortTest) {
-    auto x = itemset_t{Sugar, Cheese, Cream, Bread};
+    auto x = itemset_t{6, 3, 8, 2};
 
-    EXPECT_TRUE(itemset_t({Milk, Butter, Sugar}).contains(Butter));
-    EXPECT_TRUE(itemset_t({Milk, Coffee, Flour}).contains(Coffee));
+    EXPECT_TRUE(itemset_t({1, 4, 6}).contains(4));
+    EXPECT_TRUE(itemset_t({1, 5, 7}).contains(5));
 
-    EXPECT_FALSE(itemset_t({}).contains(Coffee));
-    EXPECT_FALSE(itemset_t({Milk, Cheese, Flour}).contains(Coffee));
+    EXPECT_FALSE(itemset_t({}).contains(5));
+    EXPECT_FALSE(itemset_t({1, 3, 7}).contains(5));
 }
 
 TEST_F(ItemsetTests, ContainsTest) {
-    EXPECT_TRUE(itemset_t({Milk, Butter, Sugar}).contains(Butter));
-    EXPECT_TRUE(itemset_t({Milk, Coffee, Flour}).contains(Coffee));
+    EXPECT_TRUE(itemset_t({1, 4, 6}).contains(4));
+    EXPECT_TRUE(itemset_t({1, 5, 7}).contains(5));
 
-    EXPECT_FALSE(itemset_t({}).contains(Coffee));
-    EXPECT_FALSE(itemset_t({Milk, Cheese, Flour}).contains(Coffee));
+    EXPECT_FALSE(itemset_t({}).contains(5));
+    EXPECT_FALSE(itemset_t({1, 3, 7}).contains(5));
 }
 
 TEST_F(ItemsetTests, IsSubsetTest) {
     EXPECT_TRUE(is_subset({}, {}));
-    EXPECT_TRUE(is_subset({Sugar, Flour}, {Butter, Sugar, Flour}));
-    EXPECT_TRUE(is_subset({Sugar, Flour}, {Sugar, Coffee, Flour, Butter}));
+    EXPECT_TRUE(is_subset({6, 7}, {4, 6, 7}));
+    EXPECT_TRUE(is_subset({6, 7}, {6, 5, 7, 4}));
 
-    EXPECT_FALSE(is_subset({Milk, Butter}, {}));
-    EXPECT_FALSE(is_subset({Flour, Sugar}, {Sugar, Flour}));
-    EXPECT_FALSE(is_subset({Milk, Flour}, {}));
-    EXPECT_FALSE(is_subset({Flour, Milk}, {Butter, Sugar, Flour}));
-    EXPECT_FALSE(is_subset({Flour, Milk}, {Milk, Coffee, Sugar}));
+    EXPECT_FALSE(is_subset({1, 4}, {}));
+    EXPECT_FALSE(is_subset({7, 6}, {6, 7}));
+    EXPECT_FALSE(is_subset({1, 7}, {}));
+    EXPECT_FALSE(is_subset({7, 1}, {4, 6, 7}));
+    EXPECT_FALSE(is_subset({7, 1}, {1, 5, 6}));
+}
+
+TEST_F(ItemsetTests, IsSubsetMemberTest) {
+    EXPECT_TRUE(itemset_t{}.is_subset({}));
+    EXPECT_TRUE(itemset_t({6, 7}).is_subset({4, 6, 7}));
+    EXPECT_TRUE(itemset_t({6, 7}).is_subset({6, 5, 7, 4}));
+
+    EXPECT_FALSE(itemset_t({1, 4}).is_subset({}));
+    EXPECT_FALSE(itemset_t({7, 6}).is_subset({6, 7}));
+    EXPECT_FALSE(itemset_t({1, 7}).is_subset({}));
+    EXPECT_FALSE(itemset_t({7, 1}).is_subset({4, 6, 7}));
+    EXPECT_FALSE(itemset_t({7, 1}).is_subset({1, 5, 6}));
 }
 
 TEST_F(ItemsetTests, SetDifferenceTest) {
-    EXPECT_EQ(set_difference({Milk, Coffee, Bread}, {Milk, Coffee, Bread}), itemset_t{});
-    EXPECT_EQ(set_difference({Milk, Coffee, Bread}, {Coffee}), itemset_t({Milk, Bread}));
-    EXPECT_EQ(set_difference({Coffee, Bread, Sugar}, {Coffee, Sugar, Milk}), itemset_t({Bread}));
+    EXPECT_EQ(set_difference({1, 5, 2}, {1, 5, 2}), itemset_t{});
+    EXPECT_EQ(set_difference({1, 5, 2}, {5}), itemset_t({1, 2}));
+    EXPECT_EQ(set_difference({5, 2, 6}, {5, 6, 1}), itemset_t({2}));
 }
 
 TEST_F(ItemsetTests, SetUnionTest) {
-    EXPECT_EQ(set_union({Milk, Coffee, Bread}, {}), itemset_t({Milk, Coffee, Bread}));
-    EXPECT_EQ(set_union({Milk, Coffee, Bread}, {Coffee}), itemset_t({Milk, Coffee, Bread}));
-    EXPECT_EQ(set_union({Coffee, Bread, Sugar}, {Coffee, Sugar, Milk}), itemset_t({Coffee, Bread, Sugar, Milk}));
+    EXPECT_EQ(set_union({1, 5, 2}, {}), itemset_t({1, 5, 2}));
+    EXPECT_EQ(set_union({1, 5, 2}, {5}), itemset_t({1, 5, 2}));
+    EXPECT_EQ(set_union({5, 2, 6}, {5, 6, 1}), itemset_t({5, 2, 6, 1}));
 }
 
 TEST_F(ItemsetTests, HashCodeTest) {
     auto hash = itemset_hash();
 
-    const auto code1 = hash(itemset_t{Coffee, Milk, Bread}.sort_itemset());
-    const auto code2 = hash(itemset_t{Milk, Coffee, Bread}.sort_itemset());
+    const auto code1 = hash(itemset_t{5, 1, 2}.sort_itemset());
+    const auto code2 = hash(itemset_t{1, 5, 2}.sort_itemset());
 
-    const auto code3 = hash(itemset_t{Coffee, Milk, Bread});
-    const auto code4 = hash(itemset_t{Coffee, Milk, Sugar});
+    const auto code3 = hash(itemset_t{5, 1, 2});
+    const auto code4 = hash(itemset_t{5, 1, 6});
 
     EXPECT_EQ(code1, code2);
     EXPECT_NE(code3, code4);
-}
-
-TEST_F(ItemsetTests, GetItemCountsTest) {
-    const auto &database = get_database();
-    const auto &counts = item_counts_t::get_item_counts(database);
-
-    ASSERT_EQ(counts.size(), 8);
-
-    EXPECT_EQ(counts.at(Milk), 8);
-    EXPECT_EQ(counts.at(Butter), 7);
-    EXPECT_EQ(counts.at(Sugar), 6);
-    EXPECT_EQ(counts.at(Flour), 6);
-    EXPECT_EQ(counts.at(Cheese), 5);
-    EXPECT_EQ(counts.at(Coffee), 5);
-    EXPECT_EQ(counts.at(Bread), 4);
-    EXPECT_EQ(counts.at(Cream), 2);
-}
-
-TEST_F(ItemsetTests, GetFrequentItemsTest) {
-    const auto min_support = 4;
-    const auto &database = get_database();
-
-    const auto &counts = item_counts_t::get_item_counts(database);
-    const itemset_t &items = counts.get_frequent_items(min_support);
-
-    ASSERT_EQ(items.size(), 7);
-
-    EXPECT_EQ(items[0], Milk);
-    EXPECT_EQ(items[1], Butter);
-    EXPECT_EQ(items[2], Sugar);
-    EXPECT_EQ(items[3], Flour);
-    EXPECT_EQ(items[4], Cheese);
-    EXPECT_EQ(items[5], Coffee);
-    EXPECT_EQ(items[6], Bread);
 }

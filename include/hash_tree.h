@@ -31,6 +31,9 @@
 
 #include <functional>
 #include <utility>
+#include <stack>
+#include <memory>
+#include <iterator>
 #include "itemset.h"
 
 namespace fim::hash {
@@ -91,6 +94,102 @@ namespace fim::hash {
         itemsets_t itemsets_{};
     };
 
+
+    class hash_tree_itemset_iterator {
+    public:
+        using value_type = itemset_t; // Typ der einzelnen Itemsets
+        using difference_type = std::ptrdiff_t;
+        using pointer = const value_type *;
+        using reference = const value_type &;
+        using iterator_category = std::forward_iterator_tag;
+
+        // Constructor: Start from the root
+        explicit hash_tree_itemset_iterator(std::shared_ptr<hash_tree_node> root) {
+            if (root) {
+                stack_.push(root);
+                advance_to_next_itemset();
+            }
+        }
+
+        // End iterator constructor
+        hash_tree_itemset_iterator() = default;
+
+        // Dereference to get the current itemset
+        auto operator*() const -> reference {
+            return *current_itemset_;
+        }
+
+        // Move to the next itemset
+        auto operator++() -> hash_tree_itemset_iterator & {
+            ++current_itemset_index_;
+            advance_to_next_itemset();
+            return *this;
+        }
+
+        // Postfix increment
+        auto operator++(int) -> hash_tree_itemset_iterator {
+            auto temp = *this;
+            ++(*this);
+            return temp;
+        }
+
+        // Comparison operators
+        auto operator==(const hash_tree_itemset_iterator &other) const -> bool {
+            return current_itemset_ == other.current_itemset_ &&
+                   current_itemset_index_ == other.current_itemset_index_ &&
+                   stack_ == other.stack_;
+        }
+
+        auto operator!=(const hash_tree_itemset_iterator &other) const -> bool {
+            return !(*this == other);
+        }
+
+    private:
+        std::stack<std::shared_ptr<hash_tree_node>> stack_;
+        std::shared_ptr<leaf_node> current_leaf_ = nullptr;
+        const itemsets_t *current_itemsets_ = nullptr;
+        size_t current_itemset_index_ = 0;
+        pointer current_itemset_ = nullptr;
+
+        // Advance to the next itemset
+        void advance_to_next_itemset() {
+            while (true) {
+                // Check if we are inside a valid leaf's itemsets
+                if (current_itemsets_ && current_itemset_index_ < current_itemsets_->size()) {
+                    current_itemset_ = &(*current_itemsets_)[current_itemset_index_];
+                    return;
+                }
+
+                // Move to the next leaf node
+                current_leaf_ = nullptr;
+                current_itemsets_ = nullptr;
+                current_itemset_index_ = 0;
+
+                // If the stack is empty, we're done
+                if (stack_.empty()) {
+                    current_itemset_ = nullptr;
+                    return;
+                }
+
+                auto node = stack_.top();
+                stack_.pop();
+
+                if (node->is_leaf()) {
+                    current_leaf_ = std::static_pointer_cast<leaf_node>(node);
+                    current_itemsets_ = &current_leaf_->itemsets();
+                    current_itemset_index_ = 0;
+                } else {
+                    auto inner = std::dynamic_pointer_cast<inner_node>(node);
+                    if (inner) {
+                        for (const auto &[_, child] : inner->children()) {
+                            stack_.push(child);
+                        }
+                    }
+                }
+            }
+        }
+    };
+
     /// Hash tree type.
     class hash_tree {
     public:
@@ -107,6 +206,14 @@ namespace fim::hash {
         /// @param itemset
         /// @return
         [[nodiscard]] auto search(const itemset_t &itemset) const -> std::optional<itemset_t>;
+
+        auto begin() -> hash_tree_itemset_iterator {
+            return hash_tree_itemset_iterator(root_);
+        }
+
+        auto end() -> hash_tree_itemset_iterator {
+            return hash_tree_itemset_iterator();
+        }
 
     private:
         ///

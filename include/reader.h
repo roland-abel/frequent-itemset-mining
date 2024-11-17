@@ -28,29 +28,49 @@
 
 #pragma once
 
-#include <ostream>
 #include <expected>
 #include "itemset.h"
+#include "database.h"
 #include "data.h"
 
 namespace fim::data {
-
     /// Configuration for reading of csv data
     struct read_csv_config_t {
         size_t skip_rows = 0;
         char separator = ' ';
     };
 
+    // Struktur für das Itemset und den zugehörigen Support-Wert
+    struct itemset_support_t {
+        itemset_t itemset;  // Das Itemset als Vektor von size_t
+        float support;                // Der zugehörige Support-Wert
+    };
+
     /// Result type
     using read_result_t = std::expected<database_t, io_error_t>;
 
+//    // Itemset type
+//    using itemset_t = std::vector<size_t>;
+
+    using result_t = std::vector<itemset_support_t>;  // Rückgabewert ist ein Vektor von itemset_support_t
+
     /// Reads the transactions from the input stream as CSV.
-    /// @param input The input stream to read from.
+    /// @param is The input stream to read from.
+    /// @param config The configuration structure to specify the behavior of the reader.
     /// @return The transactions if successful, or an error code if failed.
-    auto read_csv(std::istream &input, const read_csv_config_t &config = read_csv_config_t{}) -> read_result_t;
+    auto read_csv(std::istream &is, const read_csv_config_t &config = read_csv_config_t{}) -> read_result_t;
 
     /// Reads transactions from the given file.
     /// @param file_path The path of the file to read from.
+    /// @param config The configuration structure to specify the behavior of the reader.
     /// @return The transactions if successful, or an error code if failed.
-    auto read_csv(const std::string_view &file_path, const read_csv_config_t &config = read_csv_config_t{}) -> read_result_t;
+    auto read_csv(
+        const std::string_view &file_path,
+        const read_csv_config_t &config = read_csv_config_t{}) -> read_result_t;
+
+    // Funktion zum Einlesen der Result-Datei
+    auto read_result_csv(std::istream &is, const read_csv_config_t &config = read_csv_config_t{}) -> result_t;
+
+
+    auto read_result_csv(const std::string_view &file_path, const read_csv_config_t &config = read_csv_config_t{}) -> result_t;
 }

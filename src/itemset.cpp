@@ -33,22 +33,24 @@
 #include "itemset.h"
 
 namespace fim {
-
-    auto default_item_comparer(const item_t &i, const item_t &j) -> bool {
+    auto default_item_compare(const item_t &i, const item_t &j) -> bool {
         return i < j;
     }
 
-    itemset_t::itemset_t(const item_t &item)
-            : std::vector<item_t>() {
+    itemset_t::itemset_t(const item_t &item) : std::vector<item_t>() {
         emplace_back(item);
     }
 
     itemset_t::itemset_t(std::initializer_list<item_t> items)
-            : std::vector<item_t>(items) {
+        : std::vector<item_t>(std::move(items)) {
     }
 
     auto itemset_t::is_subset(const itemset_t &superset) const -> bool {
         return std::ranges::includes(superset, *this);
+    }
+
+    auto itemset_t::is_subset(const itemset_t &superset, const item_compare_t &comp) const -> bool {
+        return std::ranges::includes(superset, *this, comp);
     }
 
     auto itemset_t::set_union(const itemset_t &y) const -> itemset_t {
@@ -69,9 +71,13 @@ namespace fim {
         return std::ranges::contains(*this, item);
     }
 
-    auto itemset_t::sort_itemset(const item_compare_t &comp) -> itemset_t & {
-        std::sort(begin(), end(), comp);
+    auto itemset_t::sort_itemset(const item_compare_t &compare) -> itemset_t & {
+        std::sort(begin(), end(), compare);
         return *this;
+    }
+
+    auto itemset_t::sort_itemset(const item_compare_t &compare) const -> itemset_t {
+        return itemset_t{*this}.sort_itemset(compare);
     }
 
     auto itemset_t::add(const item_t &item) -> itemset_t & {
@@ -85,6 +91,10 @@ namespace fim {
             seed ^= std::hash<item_t>{}(item) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
         }
         return seed;
+    }
+
+    itemsets_t::itemsets_t(const std::vector<itemset_t> &itemsets)
+        : std::vector<itemset_t>(std::move(itemsets)) {
     }
 
     auto itemsets_t::add(const itemset_t &itemset) -> void {
@@ -105,9 +115,9 @@ namespace fim {
         return std::ranges::contains(*this, itemset);
     }
 
-    auto itemsets_t::sort_each_itemset(const item_compare_t &comp) -> itemsets_t {
+    auto itemsets_t::sort_each_itemset(const item_compare_t &compare) -> itemsets_t {
         for (auto &itemset: *this) {
-            itemset.sort_itemset(comp);
+            itemset.sort_itemset(compare);
         }
         return *this;
     }
@@ -127,7 +137,7 @@ namespace fim {
     std::ostream &operator<<(std::ostream &os, const itemset_t &x) {
         os << "{";
         for (auto itr = x.begin(); itr != x.end(); ++itr) {
-            os << (char) *itr;
+            os << *itr;
             if (std::next(itr) != x.end()) {
                 os << ", ";
             }
@@ -141,63 +151,14 @@ namespace fim {
         auto it_y = y.begin();
 
         for (; it_x != x.end() && it_y != y.end(); ++it_x, ++it_y) {
-            if (comp(*it_x, *it_y))
+            if (comp(*it_x, *it_y)) {
                 return true;
+            }
 
-            if (comp(*it_y, *it_x))
+            if (comp(*it_y, *it_x)) {
                 return false;
+            }
         }
         return std::distance(it_x, x.end()) > std::distance(it_y, y.end());
-    }
-
-    auto item_counts_t::get_item_counts(const database_t &database) -> item_counts_t {
-        item_counts_t counts{};
-        for (const auto &item: database | std::views::join) {
-            ++counts[item];
-        }
-        return std::move(counts);
-    }
-
-    auto item_counts_t::get_frequent_items(size_t min_support) const -> itemset_t {
-        auto is_frequent = [=](const auto &kv) { return kv.second >= min_support; };
-        auto get_item = [](const auto &kv) { return kv.first; };
-
-        auto items = *this
-                     | std::views::filter(is_frequent)
-                     | std::views::transform(get_item)
-                     | std::ranges::to<itemset_t>();
-
-        std::ranges::sort(items, [&](const item_t &x, const item_t &y) {
-            return at(x) > at(y);
-        });
-
-        return items;
-    }
-
-    auto item_counts_t::get_item_comparer() const -> item_compare_t {
-        return [&](const item_t &i, const item_t &j) -> bool {
-            const auto weight_i = at(i);
-            const auto weight_j = at(j);
-
-            return (weight_i != weight_j) ? (weight_i < weight_j) : (i < j);
-        };
-    }
-
-    database_t::database_t(itemsets_t itemsets)
-            : std::vector<itemset_t>(std::move(itemsets)) {
-    }
-
-    auto database_t::sort_lexicographically(const item_compare_t &comp) -> database_t {
-        std::ranges::sort(*this, [&](const itemset_t &x, const itemset_t &y) {
-            return lexicographical_compare(x, y, comp);
-        });
-        return *this;
-    }
-
-    auto database_t::sort_database(const item_compare_t &comp) -> database_t {
-        for (auto &trans: *this) {
-            trans.sort_itemset(comp);
-        }
-        return sort_lexicographically();
     }
 }

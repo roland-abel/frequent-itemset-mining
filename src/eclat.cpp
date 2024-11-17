@@ -53,7 +53,7 @@ namespace fim::algorithm::eclat {
     }
 
     auto eclat_algorithm(const database_t &database, size_t min_support) -> itemsets_t {
-        itemsets_t frequent_itemsets{};
+        itemsets_t freq_itemsets{};
 
         // Creates initial tids.
         auto all_tids = [&]() -> tidset_t {
@@ -63,7 +63,7 @@ namespace fim::algorithm::eclat {
         auto create_frequent_itemset = [&](const item_t &item, const itemset_t &prefix) -> itemset_t {
             itemset_t itemset = prefix;
             itemset.add(item);
-            frequent_itemsets.add(itemset);
+            freq_itemsets.add(itemset);
 
             return itemset;
         };
@@ -100,6 +100,6 @@ namespace fim::algorithm::eclat {
         const auto &vertical_trans = to_vertical_database(database);
         eclat_({}, vertical_trans, all_tids());
 
-        return frequent_itemsets;
+        return freq_itemsets;
     }
 }

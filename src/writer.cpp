@@ -28,7 +28,6 @@
 
 #include <ranges>
 #include <string>
-#include <iostream>
 #include <fstream>
 #include <filesystem>
 #include "itemset.h"
@@ -37,7 +36,6 @@
 using namespace fim;
 
 namespace fim::data {
-
     auto to_csv(std::ostream &os, const itemsets_t &itemsets, const write_csv_config_t &config) -> write_result_t {
         using std::ranges::views::transform;
         using std::ranges::views::join_with;
@@ -68,11 +66,14 @@ namespace fim::data {
         return write_result_t{itemsets};
     }
 
-    auto to_csv(const std::string_view &file_path, const itemsets_t &itemsets, const write_csv_config_t &config) -> write_result_t {
+    auto to_csv(
+        const std::string_view &file_path,
+        const itemsets_t &itemsets,
+        const write_csv_config_t &config) -> write_result_t {
         std::filesystem::path path = std::filesystem::path(file_path).parent_path();
 
-        if (!std::filesystem::exists(path)) {
-            std::filesystem::create_directories(path);
+        if (!exists(path)) {
+            create_directories(path);
         }
 
         std::ofstream ofs(file_path.data());

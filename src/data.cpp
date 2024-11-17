@@ -1,8 +1,8 @@
-/// @file test_data.cpp
+/// @file data.cpp
 /// @brief
 ///
 /// @author Roland Abel
-/// @date August 25, 2024
+/// @date December 08, 2024
 ///
 /// Copyright (c) 2024 Roland Abel
 ///
@@ -26,22 +26,28 @@
 /// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 /// THE SOFTWARE.
 
-#include "test_data.h"
+#include <istream>
+#include <sstream>
+#include "data.h"
 
-using namespace fim::tests;
-using namespace fim;
+namespace fim::data {
 
-database_t fim::tests::get_database() {
-    return {
-            {Milk,   Cheese, Butter, Bread,  Sugar,  Flour, Cream},
-            {Cheese, Butter, Bread,  Coffee, Sugar,  Flour},
-            {Milk,   Butter, Coffee, Sugar,  Flour},
-            {Milk,   Butter},
-            {Milk,   Butter, Coffee},
-            {Milk,   Flour},
-            {Milk,   Cheese, Butter, Bread,  Coffee, Sugar, Flour},
-            {Cream},
-            {Milk,   Cheese, Butter, Sugar},
-            {Milk,   Cheese, Bread,  Coffee, Sugar,  Flour}
-    };
+    auto compare_streams(std::istringstream &iss, const std::ostringstream &oss) -> bool {
+        std::string input_line;
+        std::string output_line;
+
+        std::istringstream string_stream(oss.str());
+        while (std::getline(iss, input_line)) {
+            if (!std::getline(string_stream, output_line)) {
+                return false;
+            }
+            if (input_line != output_line) {
+                return false;
+            }
+        }
+        if (std::getline(string_stream, output_line)) {
+            return false;
+        }
+        return true;
+    }
 }

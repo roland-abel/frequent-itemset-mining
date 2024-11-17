@@ -10,7 +10,7 @@
 ///
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
 /// of this software and associated documentation files (the "Software"), to deal
-/// in the Software without restriction, including without limitation the rights
+/// with the Software without restriction, including without limitation the rights
 /// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 /// copies of the Software, and to permit persons to whom the Software is
 /// furnished to do so, subject to the following conditions:
@@ -32,7 +32,6 @@
 #include "data.h"
 
 namespace fim::data {
-
     /// Configuration for writing of csv data
     struct write_csv_config_t {
         bool with_header = true;
@@ -44,15 +43,21 @@ namespace fim::data {
 
     ///
     /// @param os
-    /// @param database
+    /// @param itemsets
     /// @param config
-    /// @return
-    auto to_csv(std::ostream &os, const itemsets_t &itemsets, const write_csv_config_t &config = write_csv_config_t{}) -> write_result_t;
+    /// @return the result of the writing.
+    auto to_csv(
+        std::ostream &os,
+        const itemsets_t &itemsets,
+        const write_csv_config_t &config = write_csv_config_t{}) -> write_result_t;
 
     ///
     /// @param file_path
-    /// @param database
+    /// @param itemsets
     /// @param config
-    /// @return
-    auto to_csv(const std::string_view &file_path, const itemsets_t &itemsets, const write_csv_config_t &config = write_csv_config_t{}) -> write_result_t;
+    /// @return the result of the writing.
+    auto to_csv(
+        const std::string_view &file_path,
+        const itemsets_t &itemsets,
+        const write_csv_config_t &config = write_csv_config_t{}) -> write_result_t;
 }

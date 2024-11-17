@@ -2,7 +2,7 @@
 /// @brief Unit test for the readers function.
 ///
 /// @author Roland Abel
-/// @date August 30, 2024
+/// @date August 30, 2024.
 ///
 /// Copyright (c) 2023 Roland Abel
 ///
@@ -10,7 +10,7 @@
 ///
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
 /// of this software and associated documentation files (the "Software"), to deal
-/// in the Software without restriction, including without limitation the rights
+/// with the Software without restriction, including without limitation the rights
 /// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 /// copies of the Software, and to permit persons to whom the Software is
 /// furnished to do so, subject to the following conditions:
@@ -96,17 +96,17 @@ TEST_F(ReaderTests, ReadCsvReadSimpleTransactionsTest) {
 
 TEST_F(ReaderTests, ReadCsvTransactionsTest) {
     std::string csv = "Sample db (CSV)\n"
-                      "1,2,3,4,6,7,8\n"
-                      "2,3,4,5,6,7\n"
-                      "1,4,5,6,7\n"
-                      "1,4\n"
-                      "1,4,5\n"
-                      "1,7\n"
-                      "1,2,3,4,5,6,7\n"
-                      "8\n"
-                      "1,3,4,6\n"
-                      "1,2,3,5,6,7\n"
-                      "";
+            "1,2,3,4,6,7,8\n"
+            "2,3,4,5,6,7\n"
+            "1,4,5,6,7\n"
+            "1,4\n"
+            "1,4,5\n"
+            "1,7\n"
+            "1,2,3,4,5,6,7\n"
+            "8\n"
+            "1,3,4,6\n"
+            "1,2,3,5,6,7\n"
+            "";
 
     std::istringstream iss(csv);
 
@@ -126,4 +126,9 @@ TEST_F(ReaderTests, ReadCsvTransactionsTest) {
     EXPECT_EQ(db[7], itemset_t({8}));
     EXPECT_EQ(db[8], itemset_t({1, 3, 4, 6}));
     EXPECT_EQ(db[9], itemset_t({1, 2, 3, 5, 6, 7}));
+}
+
+TEST_F(ReaderTests, ReadCsvFromFileTest) {
+    constexpr auto config = read_csv_config_t{0, ','};
+    EXPECT_TRUE(read_csv("./data/data_01.csv", config).has_value());
 }

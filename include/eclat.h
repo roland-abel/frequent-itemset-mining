@@ -1,5 +1,5 @@
 /// @file eclat.h
-/// @brief
+/// @brief Implementation of the ECLAT algorithm.
 ///
 /// @author Roland Abel
 /// @date September 08, 2024
@@ -10,7 +10,7 @@
 ///
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
 /// of this software and associated documentation files (the "Software"), to deal
-/// in the Software without restriction, including without limitation the rights
+/// with the Software without restriction, including without limitation the rights
 /// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 /// copies of the Software, and to permit persons to whom the Software is
 /// furnished to do so, subject to the following conditions:
@@ -30,32 +30,32 @@
 
 #include <set>
 #include "itemset.h"
+#include "database.h"
 
 namespace fim::algorithm::eclat {
-
-    // Transaction id
+    // Transaction id type, representing a unique identifier for each transaction.
     using tid_t = size_t;
 
-    // Transactions identification set
+    // Transaction identification set, representing a collection of transaction ids.
     using tidset_t = std::set<tid_t>;
 
-    // The vertical transaction database type.
+    // The vertical transaction database type, mapping item identifiers to the set of ids containing that item.
     using vertical_database_t = std::unordered_map<item_t, tidset_t>;
 
-    /// Computes the intersection of two tid sets.
-    /// @param x The first suffix.
-    /// @param y The second suffix.
-    /// @return The union of the two suffix.
+    /// @brief Computes the intersection of two transaction-id sets.
+    /// @param x The first transaction id set (suffix).
+    /// @param y The second transaction id set (suffix).
+    /// @return The intersection of the two sets, containing only transaction ids that appear in both sets.
     auto set_intersection(const tidset_t &x, const tidset_t &y) -> tidset_t;
 
-    /// Converts the given transaction data to a vertical representation of the data.
-    /// @param database The transaction data
-    /// @return The vertical representation of the transaction data.
+    /// @brief Converts the given transaction database to a vertical representation.
+    /// @param database The transaction database, which is a collection of itemsets (transactions).
+    /// @return A vertical database, which maps each item to the set of transaction ids that contain it.
     auto to_vertical_database(const database_t &database) -> vertical_database_t;
 
-    ///
-    /// @param database
-    /// @param min_support
-    /// @return
+    /// @brief Implements the ECLAT algorithm to find frequent itemsets in the transaction database.
+    /// @param database The transaction database used to find frequent itemsets.
+    /// @param min_support The minimum support threshold for considering an itemset as frequent.
+    /// @return A collection of frequent itemsets that meet or exceed the minimum support.
     auto eclat_algorithm(const database_t &database, size_t min_support) -> itemsets_t;
 }

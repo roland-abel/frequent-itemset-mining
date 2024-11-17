@@ -37,83 +37,50 @@ using std::views::transform;
 
 class FPGrowthTests : public ::testing::Test {
 protected:
-    enum Items {
-        Milk = 1,
-        Bread,
-        Cheese,
-        Butter,
-        Coffee,
-        Sugar,
-        Flour,
-        Cream
-    };
+    static size_t min_support() { return 4; }
 
     static database_t get_database() {
         return database_t{
-                {Milk,   Cheese, Butter, Bread,  Sugar,  Flour, Cream},
-                {Cheese, Butter, Bread,  Coffee, Sugar,  Flour},
-                {Milk,   Butter, Coffee, Sugar,  Flour},
-                {Milk,   Butter},
-                {Milk,   Butter, Coffee},
-                {Milk,   Flour},
-                {Milk,   Cheese, Butter, Bread,  Coffee, Sugar, Flour},
-                {Cream},
-                {Milk,   Cheese, Butter, Sugar},
-                {Milk,   Cheese, Bread,  Coffee, Sugar,  Flour}
-        }.sort_database();
+                {1, 3, 4, 2, 6, 7, 8},
+                {3, 4, 2, 5, 6, 7},
+                {1, 4, 5, 6, 7},
+                {1, 4},
+                {1, 4, 5},
+                {1, 7},
+                {1, 3, 4, 2, 5, 6, 7},
+                {8},
+                {1, 3, 4, 6},
+                {1, 3, 2, 5, 6, 7}
+        };
     }
 };
 
-TEST_F(FPGrowthTests, FpGrowthAlgorithmTest) {
-    const auto min_support = 4;
-    const auto &db = get_database();
+TEST_F(FPGrowthTests, ConditionalTransactions1Test) {
+    const auto [db, item_counts] = get_database().transaction_reduction(min_support());
+    const auto &freq_items = item_counts.get_frequent_items(min_support());
 
-    const auto &itemsets = fp_growth_algorithm(db, min_support).sort_each_itemset();
-    EXPECT_EQ(itemsets.size(), 35);
+    const auto& root = build_fp_tree(db, freq_items);
+    const auto& trans = conditional_transactions(root, 7);
 
-    // 1-suffix
-    EXPECT_TRUE(itemsets.contains({Milk}));
-    EXPECT_TRUE(itemsets.contains({Bread}));
-    EXPECT_TRUE(itemsets.contains({Cheese}));
-    EXPECT_TRUE(itemsets.contains({Butter}));
-    EXPECT_TRUE(itemsets.contains({Coffee}));
-    EXPECT_TRUE(itemsets.contains({Sugar}));
-    EXPECT_TRUE(itemsets.contains({Flour}));
+    ASSERT_EQ(trans.size(), 6);
+    EXPECT_EQ(trans[0], (itemset_t{1, 4, 6}));
+    EXPECT_EQ(trans[1], (itemset_t{1, 4, 6}));
+    EXPECT_EQ(trans[2], (itemset_t{1, 4, 6}));
+    EXPECT_EQ(trans[3], (itemset_t{{1, 6}}));
+    EXPECT_EQ(trans[4], itemset_t{1});
+    EXPECT_EQ(trans[5], (itemset_t{{4, 6}}));
+}
 
-    // 2-suffix
-    EXPECT_TRUE(itemsets.contains({Milk, Cheese}));
-    EXPECT_TRUE(itemsets.contains({Milk, Butter}));
-    EXPECT_TRUE(itemsets.contains({Milk, Coffee}));
-    EXPECT_TRUE(itemsets.contains({Milk, Sugar}));
-    EXPECT_TRUE(itemsets.contains({Milk, Flour}));
-    EXPECT_TRUE(itemsets.contains({Bread, Cheese}));
-    EXPECT_TRUE(itemsets.contains({Bread, Sugar}));
-    EXPECT_TRUE(itemsets.contains({Bread, Flour}));
-    EXPECT_TRUE(itemsets.contains({Cheese, Butter}));
-    EXPECT_TRUE(itemsets.contains({Cheese, Sugar}));
-    EXPECT_TRUE(itemsets.contains({Cheese, Flour}));
-    EXPECT_TRUE(itemsets.contains({Butter, Coffee}));
-    EXPECT_TRUE(itemsets.contains({Butter, Sugar}));
-    EXPECT_TRUE(itemsets.contains({Butter, Flour}));
-    EXPECT_TRUE(itemsets.contains({Coffee, Sugar}));
-    EXPECT_TRUE(itemsets.contains({Coffee, Flour}));
-    EXPECT_TRUE(itemsets.contains({Sugar, Flour}));
+TEST_F(FPGrowthTests, ConditionalTransactions2Test) {
+    const auto [db, item_counts] = get_database().transaction_reduction(min_support());
+    const auto &freq_items = item_counts.get_frequent_items(min_support());
 
-    // 3-suffix
-    EXPECT_TRUE(itemsets.contains({Milk, Cheese, Sugar}));
-    EXPECT_TRUE(itemsets.contains({Milk, Butter, Sugar}));
-    EXPECT_TRUE(itemsets.contains({Milk, Sugar, Flour}));
-    EXPECT_TRUE(itemsets.contains({Bread, Cheese, Sugar}));
-    EXPECT_TRUE(itemsets.contains({Bread, Cheese, Flour}));
-    EXPECT_TRUE(itemsets.contains({Bread, Sugar, Flour}));
-    EXPECT_TRUE(itemsets.contains({Cheese, Butter, Sugar}));
-    EXPECT_TRUE(itemsets.contains({Cheese, Sugar, Flour}));
-    EXPECT_TRUE(itemsets.contains({Butter, Sugar, Flour}));
-    EXPECT_TRUE(itemsets.contains({Coffee, Sugar, Flour}));
+    const auto& root = build_fp_tree(db, freq_items);
+    const auto& trans = conditional_transactions(root, 2);
 
-    // 4-suffix
-    EXPECT_TRUE(itemsets.contains({Bread, Cheese, Sugar, Flour}));
-
-    EXPECT_FALSE(itemsets.contains({Milk, Cheese, Sugar, Flour}));
-    EXPECT_FALSE(itemsets.contains({Milk, Butter, Sugar, Flour}));
+    ASSERT_EQ(trans.size(), 4);
+    EXPECT_EQ(trans[0], (itemset_t{1, 3, 4, 5, 6, 7}));
+    EXPECT_EQ(trans[1], (itemset_t{1, 3, 4, 6, 7}));
+    EXPECT_EQ(trans[2], (itemset_t{1, 3, 5, 6, 7}));
+    EXPECT_EQ(trans[3], (itemset_t{3, 4, 5, 6, 7}));
 }

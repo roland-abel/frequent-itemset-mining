@@ -28,7 +28,6 @@
 
 #include <functional>
 #include <algorithm>
-#include <execution>
 #include <ranges>
 #include "fp_tree.h"
 #include "fp_growth.h"
@@ -39,12 +38,12 @@ namespace fim::algorithm::fp_growth {
     using std::views::filter;
     using std::views::transform;
 
-    auto conditional_transactions(const node_ptr &root, item_t item) -> database_t {
+    auto conditional_transactions(const node_ptr& root, item_t item) -> database_t {
         database_t transactions{};
 
-        std::function<void(const node_ptr &)> conditional_transactions_ = [&](const node_ptr &node) -> void {
+        std::function<void(const node_ptr&)> conditional_transactions_ = [&](const node_ptr& node) -> void {
             // traverses from a given node to the root and collects the items along the path with regard to the frequency
-            auto collect_path = [&](const node_ptr &node) -> itemset_t {
+            auto collect_path = [&](const node_ptr& node) -> itemset_t {
                 itemset_t path{};
 
                 node_ptr current = node->parent.lock();
@@ -61,7 +60,7 @@ namespace fim::algorithm::fp_growth {
                     transactions.emplace_back(items);
                 }
             } else {
-                for (const auto &child: node->children) {
+                for (const auto& child: node->children) {
                     conditional_transactions_(child);
                 }
             }
@@ -72,23 +71,25 @@ namespace fim::algorithm::fp_growth {
     }
 
     auto fp_growth_algorithm(const database_t &database, size_t min_support) -> itemsets_t {
-        itemsets_t freq_items{};
+        itemsets_t freq_itemsets{};
+
+        const auto [db, item_counts] = database.transaction_reduction(min_support);
+        const auto compare = item_counts.get_item_compare();
 
         const auto update_frequent_itemsets = [&](const item_t &item, const itemsets_t &itemsets) {
-            freq_items.add(itemset_t{item});
-            freq_items.add(itemsets);
+            freq_itemsets.add(itemset_t{item});
+            freq_itemsets.add(itemsets);
         };
 
-        const auto &counts = get_item_counts(database);
-        const auto &[items, _] = get_ordered_frequent_items(counts, min_support);
-        const auto &root = build_fp_tree(database, items);
-        const auto &items_along_path = tree_has_single_path(root);
+        const auto& freq_items = item_counts.get_frequent_items(min_support);
+        const auto& root = build_fp_tree(db, freq_items);
+        const auto& items_along_path = tree_is_single_path(root);
 
         if (items_along_path.has_value()) {
             return power_set(items_along_path.value(), false);
         } else {
             // traverses all frequent items in the reversed order
-            for (auto &item: std::ranges::reverse_view(items)) {
+            for (auto &item: std::ranges::reverse_view(freq_items)) {
                 const auto &cond_trans = conditional_transactions(root, item);
                 const auto &cond_itemsets = fp_growth_algorithm(cond_trans, min_support);
                 const auto &itemsets = insert_into_each_itemsets(cond_itemsets, item);
@@ -96,6 +97,6 @@ namespace fim::algorithm::fp_growth {
                 update_frequent_itemsets(item, itemsets);
             }
         }
-        return freq_items;
+        return freq_itemsets;
     }
 }

@@ -32,14 +32,13 @@
 #include "fp_tree.h"
 
 namespace fim::fp_tree {
-
     using std::views::filter;
     using std::views::transform;
     using std::ranges::find;
     using std::ranges::to;
 
     node_t::node_t(item_t item, size_t frequency, const std::shared_ptr<node_t> &parent)
-            : item(item), frequency(frequency), parent(parent), children({}) {
+        : item(item), frequency(frequency), parent(parent), children({}) {
     }
 
     bool node_t::is_root() const {
@@ -106,7 +105,7 @@ namespace fim::fp_tree {
         return frequency;
     }
 
-    auto tree_has_single_path(const node_ptr &root) -> std::optional<itemset_t> {
+    auto tree_is_single_path(const node_ptr &root) -> std::optional<itemset_t> {
         itemset_t items_along_path{};
 
         if (root->children.size() != 1) {
@@ -163,28 +162,6 @@ namespace fim::fp_tree {
                | to<itemsets_t>();
     }
 
-    auto get_item_counts(const database_t &database) -> item_counts_t {
-        auto counts = item_counts_t{};
-        for (const auto &item: database | std::views::join) {
-            ++counts[item];
-        }
-        return counts;
-    }
-
-    auto get_ordered_frequent_items(const item_counts_t &counts, size_t min_support) -> std::pair<items_t, item_counts_t> {
-        auto is_frequent = [=](const auto &kv) { return kv.second >= min_support; };
-
-        auto items = counts
-                     | filter(is_frequent)
-                     | std::views::keys
-                     | to<std::vector>();
-
-        std::ranges::sort(items, [&](const item_t &x, const item_t &y) {
-            return counts.at(x) > counts.at(y);
-        });
-        return {items, counts};
-    }
-
     auto filter_and_sort_items(const itemset_t &itemset, const items_t &freq_items) -> items_t {
         auto is_frequent = [&](const auto &item) { return find(itemset, item) != itemset.end(); };
 
@@ -192,7 +169,7 @@ namespace fim::fp_tree {
                      | filter(is_frequent)
                      | to<std::vector>();
 
-        std::sort(items.begin(), items.end(), [&](const item_t &x, const item_t &y) {
+        std::ranges::sort(items, [&](const item_t &x, const item_t &y) {
             return find(freq_items, x) < find(freq_items, y);
         });
 
@@ -201,11 +178,12 @@ namespace fim::fp_tree {
 
     auto build_fp_tree(const database_t &database, const items_t &freq_items) -> node_ptr {
         auto root = node_t::create_root();
+
         auto insert_items = [&](const items_t &items) {
             auto current = root;
             for (auto it = items.begin(); it != items.end(); it++) {
                 const auto item = *it;
-                auto node = current->find_child_item(item)
+                const auto node = current->find_child_item(item)
                         .or_else([&]() -> std::optional<node_ptr> { return current->add_child(item, 0); })
                         .value();
 
@@ -215,16 +193,10 @@ namespace fim::fp_tree {
         };
 
         for (const auto &trans: database) {
-            const auto &items = filter_and_sort_items(trans, freq_items);
-            insert_items(items);
+            const auto &itemset = filter_and_sort_items(trans, freq_items);
+            insert_items(itemset);
         }
+
         return root;
-    }
-
-    auto build_fp_tree(const database_t &database, size_t min_support) -> node_ptr {
-        const auto &item_counts = get_item_counts(database);
-        const auto &[frequent_items, _] = get_ordered_frequent_items(item_counts, min_support);
-
-        return build_fp_tree(database, frequent_items);
     }
 }

@@ -4,7 +4,7 @@
 /// @author Roland Abel
 /// @date July 2, 2024
 ///
-/// Copyright (c) 2023 Roland Abel
+/// Copyright (c) 2024 Roland Abel
 ///
 /// This software is released under the MIT License.
 ///

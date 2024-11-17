@@ -34,12 +34,11 @@ set(TEST_DIR ${CMAKE_SOURCE_DIR}/tests)
 set(TEST_DATA_DIR ${TEST_DIR}/data)
 set(TEST_DATA_OUT_DIR ${CMAKE_BINARY_DIR}/tests/data)
 
-file(GLOB TEST_DATA_FILES "${TEST_DATA_DIR}/**.dat")
+file(GLOB TEST_DATA_FILES "${TEST_DATA_DIR}/**.csv")
 file(GLOB UNIT_TESTS "**_tests.cpp")
 
 add_executable(${UNIT_TEST_NAME}
         ${UNIT_TESTS}
-        test_data.cpp
         test_main.cpp)
 
 target_include_directories(${UNIT_TEST_NAME} PUBLIC ${INCLUDE_DIR})

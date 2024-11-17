@@ -34,8 +34,8 @@ using namespace std;
 using namespace fim::algorithm::apriori;
 
 static void apriori_benchmark(benchmark::State &state, const std::string_view &filename) {
-    auto db = fim::data::read_csv(filename).value();
-    const auto min_support = static_cast<size_t>((double) state.range(0) * 0.01 * (double) db.size());
+    auto db = data::read_csv(filename).value();
+    const size_t min_support = static_cast<double>(state.range(0)) * 0.01 * static_cast<double>(db.size());
 
     for ([[maybe_unused]] auto _: state) {
         apriori_algorithm(db, min_support);

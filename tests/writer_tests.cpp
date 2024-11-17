@@ -10,7 +10,7 @@
 ///
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
 /// of this software and associated documentation files (the "Software"), to deal
-/// in the Software without restriction, including without limitation the rights
+/// with the Software without restriction, including without limitation the rights
 /// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 /// copies of the Software, and to permit persons to whom the Software is
 /// furnished to do so, subject to the following conditions:
@@ -27,7 +27,6 @@
 /// THE SOFTWARE.
 
 #include <gtest/gtest.h>
-#include <iostream>
 #include <sstream>
 #include <string>
 #include "itemset.h"
@@ -48,7 +47,7 @@ public:
             {2, 3, 7, 8}
     };
 
-    std::string get_next_line(std::istringstream &iss) {
+    static std::string get_next_line(std::istringstream &iss) {
         std::string line;
         return std::getline(iss, line) ? line : std::string{};
     }

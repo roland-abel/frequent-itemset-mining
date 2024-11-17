@@ -30,12 +30,20 @@
 #include <iostream>
 #include <string>
 #include "CLI/CLI.hpp"
-#include "types.h"
+#include "algorithms.h"
 #include "reader.h"
 #include "writer.h"
 
 using namespace std;
 using namespace fim;
+using namespace fim::algorithm;
+
+struct configuration_t {
+    std::string input_path;
+    std::string output_path;
+    float min_support;
+    algorithm_t algorithm;
+};
 
 void add_options(CLI::App &app, configuration_t &config) {
 
@@ -53,7 +61,7 @@ void add_options(CLI::App &app, configuration_t &config) {
             ->check(CLI::ExistingFile);
 
     app.add_option("-o, --output", config.output_path)
-            ->description("Path to the output file where the frequent suffix will be saved")
+            ->description("Path to the output file where the frequent itemsets will be saved")
             ->required()
             ->option_text("(none existing file)")
             ->check(CLI::NonexistentPath);
@@ -78,12 +86,8 @@ auto main(int argc, char **argv) -> int {
     configuration_t config{};
     add_options(app, config);
 
-    app.callback([&]() {
-        auto min_support_abs = [&](const database_t &db) -> size_t {
-            return static_cast<size_t>(config.min_support * db.size());
-        };
-
-        auto read_config = data::read_csv_config_t{
+    app.callback([&] {
+        const auto read_config = data::read_csv_config_t{
                 .skip_rows =  0,
                 .separator =  ' '
         };
@@ -102,13 +106,16 @@ auto main(int argc, char **argv) -> int {
         };
 
         auto apply_algorithm = [&](const database_t &database) -> itemsets_t {
-            const auto algorithm = get_algorithm(config.algorithm);
+            const auto min_support_abs = config.min_support * database.size();
             auto &db = const_cast<database_t &>(database);
 
-            return algorithm(db, min_support_abs(db));
+            const auto algorithm = get_algorithm(config.algorithm);
+            return algorithm(db,min_support_abs);
         };
 
-        read_csv().transform(apply_algorithm).transform(to_csv);
+        auto result = read_csv().transform(apply_algorithm).transform(to_csv);
+        if (result.has_value()) {
+        }
     });
 
     try {
@@ -120,7 +127,7 @@ auto main(int argc, char **argv) -> int {
     std::cout << "Input file        : " << config.input_path << std::endl;
     std::cout << "Output file       : " << config.output_path << std::endl;
     std::cout << "Minimum support   : " << config.min_support << std::endl;
-    std::cout << "Algorithm         : " << (int) config.algorithm << std::endl;
+    std::cout << "Algorithm         : " << static_cast<int>(config.algorithm) << std::endl;
 
     return 0;
 }

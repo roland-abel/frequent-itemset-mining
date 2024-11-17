@@ -1,5 +1,5 @@
-/// @file utils.h
-/// @brief
+/// @file algorithms.h
+/// @brief Enum type and mapping to frequent itemset mining algorithms.
 ///
 /// @author Roland Abel
 /// @date July 07, 2024
@@ -10,7 +10,7 @@
 ///
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
 /// of this software and associated documentation files (the "Software"), to deal
-/// in the Software without restriction, including without limitation the rights
+/// with the Software without restriction, including without limitation the rights
 /// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 /// copies of the Software, and to permit persons to whom the Software is
 /// furnished to do so, subject to the following conditions:
@@ -34,12 +34,13 @@
 #include "relim.h"
 #include "eclat.h"
 
-namespace fim {
+namespace fim::algorithm {
 
-    ///
-    using algorithm_function_t = std::function<itemsets_t(database_t &database, size_t min_support)>;
+    /// Define a type alias for a function that takes a database and a minimum support value as inputs,
+    /// and perform a frequent itemset mining algorithm.
+    using algorithm_function_t = std::function<itemsets_t(const database_t &database, size_t min_support)>;
 
-    ///
+    /// Enum of frequent itemset mining algorithms.
     enum class algorithm_t : int {
         APRIORI,
         FP_GROWTH,
@@ -47,21 +48,18 @@ namespace fim {
         ECLAT
     };
 
-    struct configuration_t {
-        std::string input_path;
-        std::string output_path;
-        float min_support;
-        algorithm_t algorithm;
-    };
-
+    // Map from an enum to function pointers representing frequent itemset mining algorithms.
     const auto map_algorithm_function = std::map<algorithm_t, algorithm_function_t>{
-            {algorithm_t::APRIORI,   fim::algorithm::apriori::apriori_algorithm},
-            {algorithm_t::FP_GROWTH, fim::algorithm::fp_growth::fp_growth_algorithm},
-            {algorithm_t::RELIM,     fim::algorithm::relim::relim_algorithm},
-            {algorithm_t::ECLAT,     fim::algorithm::eclat::eclat_algorithm},
+        {algorithm_t::APRIORI, apriori::apriori_algorithm},
+        {algorithm_t::FP_GROWTH, fp_growth::fp_growth_algorithm},
+        {algorithm_t::RELIM, relim::relim_algorithm},
+        {algorithm_t::ECLAT, eclat::eclat_algorithm},
     };
 
-    algorithm_function_t get_algorithm(const algorithm_t algorithm) {
+    /// @brief Retrieves the algorithm function associated with the specified enum type.
+    /// @param algorithm The specified enum algorithm type.
+    /// @return A function pointer to the algorithm that corresponds to the provided algorithm type.
+    inline algorithm_function_t get_algorithm(const algorithm_t algorithm) {
         return map_algorithm_function.at(algorithm);
     }
 }

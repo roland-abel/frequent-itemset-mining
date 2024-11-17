@@ -32,57 +32,43 @@
 using namespace fim;
 using namespace fim::hash;
 
-enum Items {
-    Milk = 1,
-    Bread,
-    Cheese,
-    Butter,
-    Coffee,
-    Sugar,
-    Flour,
-    Cream
-};
-
 class HashTreeTests : public ::testing::Test {
 protected:
     static auto hash_func(const item_t &item) {
-        return item % 3;
-    }
-
-    static database_t get_database() {
-        return database_t{
-                {Milk,   Cheese, Butter, Bread,  Sugar,  Flour, Cream},
-                {Cheese, Butter, Bread,  Coffee, Sugar,  Flour},
-                {Milk,   Butter, Coffee, Sugar,  Flour},
-                {Milk,   Cream,  Butter},
-                {Milk,   Butter, Coffee},
-                {Milk,   Flour},
-                {Milk,   Cheese, Butter, Bread,  Coffee, Sugar, Flour},
-                {Cream},
-                {Milk,   Cheese, Butter, Sugar},
-                {Milk,   Cheese, Bread,  Coffee, Sugar,  Flour}
-        };
+        return item % 5;
     }
 };
 
 TEST_F(HashTreeTests, InsertSearchTest) {
-    const itemset_t itemset = {Milk, Cheese, Butter, Bread, Sugar};
-    hash_tree tree(5, hash_func);
+    hash_tree tree(3, hash_func);
 
-    tree.insert(itemset);
-    const auto opt = tree.search(itemset);
+    tree.insert({0, 1, 2});
+    tree.insert({3, 6, 7});
+    tree.insert({3, 5, 7});
+    tree.insert({2, 4, 6});
+    tree.insert({2, 4, 7});
 
-    ASSERT_TRUE(opt.has_value());
-    EXPECT_EQ(opt.value(), itemset);
+    EXPECT_TRUE(tree.search({0, 1, 2}).has_value());
+    EXPECT_TRUE(tree.search({3, 6, 7}).has_value());
+    EXPECT_TRUE(tree.search({3, 5, 7}).has_value());
+    EXPECT_TRUE(tree.search({2, 4, 6}).has_value());
+    EXPECT_TRUE(tree.search({2, 4, 7}).has_value());
 }
-//
-//TEST_F(HashTreeTests, InsertDatabaseAndSearchTest) {
-//    hash_tree tree(8, hash_func);
-//
-//    const auto &db = get_database();
-//    for (const auto &x: db) {
-//        tree.insert(x);
-//    }
-//
-////    ASSERT_TRUE(tree.search({Milk, Butter, Coffee}).has_value());
-//}
+
+TEST_F(HashTreeTests, HashTreeIteratorTest) {
+    hash_tree tree(3, hash_func);
+
+    tree.insert({0, 1, 2});
+    tree.insert({3, 6, 7});
+    tree.insert({3, 5, 7});
+    tree.insert({2, 4, 6});
+    tree.insert({2, 4, 7});
+
+    auto it = tree.begin();
+
+    EXPECT_EQ(*it, itemset_t({2, 4, 6}));
+    EXPECT_EQ(*(++it), itemset_t({2, 4, 7}));
+    EXPECT_EQ(*(++it), itemset_t({3, 6, 7}));
+    EXPECT_EQ(*(++it), itemset_t({3, 5, 7}));
+    EXPECT_EQ(*(++it), itemset_t({0, 1, 2}));
+}

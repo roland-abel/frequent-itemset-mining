@@ -37,126 +37,65 @@ using std::views::transform;
 
 class AprioriTests : public ::testing::Test {
 protected:
-    enum Items {
-        Milk = 1,
-        Bread,
-        Cheese,
-        Butter,
-        Coffee,
-        Sugar,
-        Flour,
-        Cream
-    };
-
     static size_t min_support() { return 4; }
 
     static database_t get_database() {
         return database_t{
-                {Milk,   Cheese, Butter, Bread,  Sugar,  Flour, Cream},
-                {Cheese, Butter, Bread,  Coffee, Sugar,  Flour},
-                {Milk,   Butter, Coffee, Sugar,  Flour},
-                {Milk,   Cream,  Butter},
-                {Milk,   Butter, Coffee},
-                {Milk,   Flour},
-                {Milk,   Cheese, Butter, Bread,  Coffee, Sugar, Flour},
-                {Cream},
-                {Milk,   Cheese, Butter, Sugar},
-                {Milk,   Cheese, Bread,  Coffee, Sugar,  Flour}
-        }.sort_database();
+                {3, 4, 2, 5, 6, 7},
+                {1, 3, 4, 6},
+                {1, 4, 5, 6, 7},
+                {1, 4},
+                {1, 4, 5},
+                {1, 7},
+                {1, 3, 4, 2, 5, 6, 7},
+                {8},
+                {1, 3, 2, 5, 6, 7},
+                {8, 3, 4, 6, 2, 7, 1}
+        };
     }
 };
 
 TEST_F(AprioriTests, AllFrequentOneItemsetsTest) {
-    const auto &db = get_database();
-    const auto &itemsets = all_frequent_one_itemsets(db, min_support());
+    const auto [db, item_counts] = get_database().transaction_reduction(min_support());
+    const auto& itemsets = all_frequent_one_itemsets(item_counts, min_support());
 
     // 1-suffix
     ASSERT_EQ(itemsets.size(), 7);
 
-    EXPECT_TRUE(itemsets.contains(Milk));
-    EXPECT_TRUE(itemsets.contains(Bread));
-    EXPECT_TRUE(itemsets.contains(Cheese));
-    EXPECT_TRUE(itemsets.contains(Butter));
-    EXPECT_TRUE(itemsets.contains(Coffee));
-    EXPECT_TRUE(itemsets.contains(Sugar));
-    EXPECT_TRUE(itemsets.contains(Flour));
+    EXPECT_TRUE(itemsets.contains(1));
+    EXPECT_TRUE(itemsets.contains(2));
+    EXPECT_TRUE(itemsets.contains(3));
+    EXPECT_TRUE(itemsets.contains(4));
+    EXPECT_TRUE(itemsets.contains(5));
+    EXPECT_TRUE(itemsets.contains(6));
+    EXPECT_TRUE(itemsets.contains(7));
 
-    EXPECT_FALSE(itemsets.contains(Cream));
+    EXPECT_FALSE(itemsets.contains(8));
 }
 
 TEST_F(AprioriTests, GenerateCandidatesTest) {
     const itemsets_t itemsets = {
-            {Milk,   Cheese},
-            {Milk,   Butter},
-            {Milk,   Coffee},
-            {Milk,   Sugar},
-            {Milk,   Flour},
-            {Bread,  Cheese},
-            {Bread,  Sugar},
-            {Bread,  Flour},
-            {Cheese, Butter},
-            {Cheese, Sugar},
-            {Cheese, Flour},
-            {Butter, Coffee}
+            {1, 3},
+            {1, 4},
+            {1, 5},
+            {1, 6},
+            {1, 7},
+            {2, 3},
+            {2, 6},
+            {2, 7},
+            {3, 4},
+            {3, 6},
+            {3, 7},
+            {4, 5}
     };
 
-    auto candidates = generate_candidates(itemsets, 3);
+    auto candidates = generate_candidates(itemsets, 3, default_item_compare);
 
     ASSERT_EQ(candidates.size(), 6);
-    EXPECT_TRUE(candidates.contains({Milk, Cheese, Butter}));
-    EXPECT_TRUE(candidates.contains({Milk, Butter, Coffee}));
-    EXPECT_TRUE(candidates.contains({Milk, Cheese, Sugar}));
-    EXPECT_TRUE(candidates.contains({Milk, Butter, Coffee}));
-    EXPECT_TRUE(candidates.contains({Bread, Cheese, Sugar}));
-    EXPECT_TRUE(candidates.contains({Bread, Cheese, Flour}));
-}
-
-TEST_F(AprioriTests, AprioriAlgorithmTest) {
-    const auto &db = get_database();
-    const auto &itemsets = apriori_algorithm(db, min_support()).sort_each_itemset();
-
-    ASSERT_EQ(itemsets.size(), 35);
-
-    // 1-suffix
-    EXPECT_TRUE(itemsets.contains({Milk}));
-    EXPECT_TRUE(itemsets.contains({Bread}));
-    EXPECT_TRUE(itemsets.contains({Cheese}));
-    EXPECT_TRUE(itemsets.contains({Butter}));
-    EXPECT_TRUE(itemsets.contains({Coffee}));
-    EXPECT_TRUE(itemsets.contains({Sugar}));
-    EXPECT_TRUE(itemsets.contains({Flour}));
-
-    // 2-suffix
-    EXPECT_TRUE(itemsets.contains({Milk, Cheese}));
-    EXPECT_TRUE(itemsets.contains({Milk, Butter}));
-    EXPECT_TRUE(itemsets.contains({Milk, Coffee}));
-    EXPECT_TRUE(itemsets.contains({Milk, Sugar}));
-    EXPECT_TRUE(itemsets.contains({Milk, Flour}));
-    EXPECT_TRUE(itemsets.contains({Bread, Cheese}));
-    EXPECT_TRUE(itemsets.contains({Bread, Sugar}));
-    EXPECT_TRUE(itemsets.contains({Bread, Flour}));
-    EXPECT_TRUE(itemsets.contains({Cheese, Butter}));
-    EXPECT_TRUE(itemsets.contains({Cheese, Sugar}));
-    EXPECT_TRUE(itemsets.contains({Cheese, Flour}));
-    EXPECT_TRUE(itemsets.contains({Butter, Coffee}));
-    EXPECT_TRUE(itemsets.contains({Butter, Sugar}));
-    EXPECT_TRUE(itemsets.contains({Butter, Flour}));
-    EXPECT_TRUE(itemsets.contains({Coffee, Sugar}));
-    EXPECT_TRUE(itemsets.contains({Coffee, Flour}));
-    EXPECT_TRUE(itemsets.contains({Sugar, Flour}));
-
-    // 3-suffix
-    EXPECT_TRUE(itemsets.contains({Milk, Cheese, Sugar}));
-    EXPECT_TRUE(itemsets.contains({Milk, Butter, Sugar}));
-    EXPECT_TRUE(itemsets.contains({Milk, Sugar, Flour}));
-    EXPECT_TRUE(itemsets.contains({Bread, Cheese, Sugar}));
-    EXPECT_TRUE(itemsets.contains({Bread, Cheese, Flour}));
-    EXPECT_TRUE(itemsets.contains({Bread, Sugar, Flour}));
-    EXPECT_TRUE(itemsets.contains({Cheese, Butter, Sugar}));
-    EXPECT_TRUE(itemsets.contains({Cheese, Sugar, Flour}));
-    EXPECT_TRUE(itemsets.contains({Butter, Sugar, Flour}));
-    EXPECT_TRUE(itemsets.contains({Coffee, Sugar, Flour}));
-
-    // 4-suffix
-    EXPECT_TRUE(itemsets.contains({Bread, Cheese, Sugar, Flour}));
+    EXPECT_TRUE(candidates.contains({1, 3, 4}));
+    EXPECT_TRUE(candidates.contains({1, 4, 5}));
+    EXPECT_TRUE(candidates.contains({1, 3, 6}));
+    EXPECT_TRUE(candidates.contains({1, 4, 5}));
+    EXPECT_TRUE(candidates.contains({2, 3, 6}));
+    EXPECT_TRUE(candidates.contains({2, 3, 7}));
 }

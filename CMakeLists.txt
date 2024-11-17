@@ -44,6 +44,7 @@ set(INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include)
 set(SRC_DIR ${CMAKE_SOURCE_DIR}/src)
 
 add_subdirectory(src)
+add_subdirectory(src/cli)
 add_subdirectory(tests)
 add_subdirectory(benchmarks)
-add_subdirectory(src/cli)
+
