@@ -26,9 +26,9 @@
 /// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 /// THE SOFTWARE.
 
-#include "relim.h"
 #include <algorithm>
 #include <ranges>
+#include "relim.h"
 
 namespace fim::algorithm::relim {
     using std::views::filter;

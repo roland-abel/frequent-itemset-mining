@@ -64,8 +64,8 @@ namespace fim {
             const item_compare_t &compare) -> itemset_counts_t;
 
         /// @brief Gets the count (frequency) of a specific itemset.
-        /// @param itemsets The itemset whose count is to be retrieved.
+        /// @param itemset The itemset whose count is to be retrieved.
         /// @return The count (frequency) of the specified itemset in the itemset counts map.
-        [[nodiscard]] auto get_count(const itemset_t &itemsets) const -> size_t;
+        [[nodiscard]] auto get_count(const itemset_t &itemset) const -> size_t;
     };
 }

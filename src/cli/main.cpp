@@ -46,12 +46,11 @@ struct configuration_t {
 };
 
 void add_options(CLI::App &app, configuration_t &config) {
-
     const std::map<std::string, algorithm_t> map_string_to_algorithm{
-            {"apriori",   algorithm_t::APRIORI},
-            {"fp-growth", algorithm_t::FP_GROWTH},
-            {"relim",     algorithm_t::RELIM},
-            {"eclat",     algorithm_t::ECLAT}
+        {"apriori", algorithm_t::APRIORI},
+        {"fp-growth", algorithm_t::FP_GROWTH},
+        {"relim", algorithm_t::RELIM},
+        {"eclat", algorithm_t::ECLAT}
     };
 
     app.add_option("-i, --input", config.input_path)
@@ -88,13 +87,13 @@ auto main(int argc, char **argv) -> int {
 
     app.callback([&] {
         const auto read_config = data::read_csv_config_t{
-                .skip_rows =  0,
-                .separator =  ' '
+            .skip_rows = 0,
+            .separator = ' '
         };
 
         auto write_config = data::write_csv_config_t{
-                .with_header = true,
-                .separator = ' '
+            .with_header = true,
+            .separator = ' '
         };
 
         auto read_csv = [&]() -> data::read_result_t {
@@ -110,7 +109,7 @@ auto main(int argc, char **argv) -> int {
             auto &db = const_cast<database_t &>(database);
 
             const auto algorithm = get_algorithm(config.algorithm);
-            return algorithm(db,min_support_abs);
+            return algorithm(db, min_support_abs);
         };
 
         auto result = read_csv().transform(apply_algorithm).transform(to_csv);

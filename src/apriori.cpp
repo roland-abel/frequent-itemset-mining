@@ -32,7 +32,6 @@
 #include "apriori.h"
 
 namespace fim::algorithm::apriori {
-
     using std::views::transform;
     using std::views::filter;
     using std::ranges::to;
@@ -42,9 +41,9 @@ namespace fim::algorithm::apriori {
     using namespace fim;
     using namespace fim::algorithm::apriori;
 
-    auto all_frequent_one_itemsets(const item_counts_t& item_counts, size_t min_support) -> itemsets_t {
-        const auto is_frequent = [=](const auto& pair) -> bool { return pair.second >= min_support; };
-        const auto to_itemset = [](const auto& pair) -> itemset_t { return itemset_t{pair.first}; };
+    auto all_frequent_one_itemsets(const item_counts_t &item_counts, size_t min_support) -> itemsets_t {
+        const auto is_frequent = [=](const auto &pair) -> bool { return pair.second >= min_support; };
+        const auto to_itemset = [](const auto &pair) -> itemset_t { return itemset_t{pair.first}; };
 
         return item_counts
                | filter(is_frequent)
@@ -53,11 +52,10 @@ namespace fim::algorithm::apriori {
     }
 
     auto generate_candidates(
-            const itemsets_t& frequent_itemsets,
-            size_t k,
-            const item_compare_t& compare) -> itemsets_t {
-
-        auto merge_itemsets_if_equal_prefix = [&](const itemset_t& x, const itemset_t& y) -> std::optional<itemset_t> {
+        const itemsets_t &frequent_itemsets,
+        size_t k,
+        const item_compare_t &compare) -> itemsets_t {
+        auto merge_itemsets_if_equal_prefix = [&](const itemset_t &x, const itemset_t &y) -> std::optional<itemset_t> {
             if (std::ranges::equal(x | std::views::take(k - 2), y | std::views::take(k - 2))) {
                 itemset_t candidate{};
                 copy(x | std::views::take(k - 1), std::back_inserter(candidate));
@@ -82,14 +80,14 @@ namespace fim::algorithm::apriori {
             return candidates;
         };
 
-        auto all_subsets_frequent = [&](const itemset_t& candidate) -> bool {
-            auto is_frequent = [&](const itemset_t& itemset) {
+        auto all_subsets_frequent = [&](const itemset_t &candidate) -> bool {
+            auto is_frequent = [&](const itemset_t &itemset) {
                 return std::ranges::contains(frequent_itemsets, itemset);
             };
 
-            auto create_subset = [&](const item_t& item) {
+            auto create_subset = [&](const item_t &item) {
                 return candidate
-                       | filter([&](const item_t& i) { return i != item; })
+                       | filter([&](const item_t &i) { return i != item; })
                        | to<itemset_t>();
             };
 
@@ -102,26 +100,25 @@ namespace fim::algorithm::apriori {
     }
 
     auto prune(
-            itemsets_t& candidates,
-            const database_t& database,
-            size_t min_support,
-            const item_compare_t& compare) -> void {
-
-        const auto& counts = itemset_counts_t::create_itemset_counts(database, candidates, compare);
-        const auto is_infrequent = [&](const itemset_t& z) -> bool {
+        itemsets_t &candidates,
+        const database_t &database,
+        size_t min_support,
+        const item_compare_t &compare) -> void {
+        const auto &counts = itemset_counts_t::create_itemset_counts(database, candidates, compare);
+        const auto is_infrequent = [&](const itemset_t &z) -> bool {
             return !counts.contains(z) || counts.at(z) < min_support;
         };
 
         std::erase_if(candidates, is_infrequent);
     }
 
-    auto apriori_algorithm(const database_t& database, size_t min_support) -> itemsets_t {
+    auto apriori_algorithm(const database_t &database, size_t min_support) -> itemsets_t {
         itemsets_t freq_itemsets{};
 
         const auto [db, item_counts] = database.transaction_reduction(min_support);
         const auto compare = item_counts.get_item_compare();
 
-        auto insert_itemset = [&](const auto& itemsets) {
+        auto insert_itemset = [&](const auto &itemsets) {
             copy(itemsets, std::back_inserter(freq_itemsets));
         };
 

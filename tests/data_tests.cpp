@@ -1,5 +1,5 @@
 /// @file data_tests.cpp
-/// @brief Unit test.
+/// @brief Unit test class.
 ///
 /// @author Roland Abel
 /// @date December 8, 2024

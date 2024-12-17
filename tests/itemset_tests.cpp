@@ -10,7 +10,7 @@
 ///
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
 /// of this software and associated documentation files (the "Software"), to deal
-/// in the Software without restriction, including without limitation the rights
+/// with the Software without restriction, including without limitation the rights
 /// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 /// copies of the Software, and to permit persons to whom the Software is
 /// furnished to do so, subject to the following conditions:
@@ -34,20 +34,20 @@
 using std::views::transform;
 using namespace fim;
 
-class ItemsetTests : public ::testing::Test {
+class ItemsetTests : public testing::Test {
 protected:
     static database_t get_database() {
         return database_t{
-                {1, 3, 4, 2, 6, 7, 8},
-                {3, 4, 2, 5, 6, 7},
-                {1, 4, 5, 6, 7},
-                {1, 4},
-                {1, 4, 5},
-                {1, 7},
-                {1, 3, 4, 2, 5, 6, 7},
-                {8},
-                {1, 3, 4, 6},
-                {1, 3, 2, 5, 6, 7}
+            {1, 3, 4, 2, 6, 7, 8},
+            {3, 4, 2, 5, 6, 7},
+            {1, 4, 5, 6, 7},
+            {1, 4},
+            {1, 4, 5},
+            {1, 7},
+            {1, 3, 4, 2, 5, 6, 7},
+            {8},
+            {1, 3, 4, 6},
+            {1, 3, 2, 5, 6, 7}
         };
     }
 };
@@ -107,7 +107,7 @@ TEST_F(ItemsetTests, SetUnionTest) {
 }
 
 TEST_F(ItemsetTests, HashCodeTest) {
-    auto hash = itemset_hash();
+    constexpr auto hash = itemset_hash();
 
     const auto code1 = hash(itemset_t{5, 1, 2}.sort_itemset());
     const auto code2 = hash(itemset_t{1, 5, 2}.sort_itemset());

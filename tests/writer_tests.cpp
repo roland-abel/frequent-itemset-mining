@@ -1,5 +1,5 @@
 /// @file writer_tests.cpp
-/// @brief Unit test for the read transactions function.
+/// @brief Unit test for the writer's function.
 ///
 /// @author Roland Abel
 /// @date August 31, 2024
@@ -39,12 +39,12 @@ using namespace fim::data;
 class WriterTests : public ::testing::Test {
 public:
     itemsets_t itemsets = {
-            {1, 2, 3, 4, 6, 7, 8},
-            {6, 7, 8},
-            {1, 2, 3, 4, 6, 7, 8},
-            {6},
-            {3, 4, 6, 7, 8},
-            {2, 3, 7, 8}
+        {1, 2, 3, 4, 6, 7, 8},
+        {6, 7, 8},
+        {1, 2, 3, 4, 6, 7, 8},
+        {6},
+        {3, 4, 6, 7, 8},
+        {2, 3, 7, 8}
     };
 
     static std::string get_next_line(std::istringstream &iss) {

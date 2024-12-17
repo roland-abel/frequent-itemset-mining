@@ -29,7 +29,6 @@
 #include <ostream>
 #include <functional>
 #include <algorithm>
-#include <utility>
 #include "itemset.h"
 
 namespace fim {
@@ -37,12 +36,12 @@ namespace fim {
         return i < j;
     }
 
-    itemset_t::itemset_t(const item_t &item) : std::vector<item_t>() {
+    itemset_t::itemset_t(const item_t &item) {
         emplace_back(item);
     }
 
-    itemset_t::itemset_t(std::initializer_list<item_t> items)
-        : std::vector<item_t>(std::move(items)) {
+    itemset_t::itemset_t(const std::initializer_list<item_t> items)
+        : std::vector<item_t>(items) {
     }
 
     auto itemset_t::is_subset(const itemset_t &superset) const -> bool {
@@ -128,11 +127,11 @@ namespace fim {
 
     auto set_union(const itemset_t &x, const itemset_t &y) -> itemset_t {
         return x.set_union(y);
-    };
+    }
 
     auto set_difference(const itemset_t &x, const itemset_t &y) -> itemset_t {
         return x.set_difference(y);
-    };
+    }
 
     std::ostream &operator<<(std::ostream &os, const itemset_t &x) {
         os << "{";

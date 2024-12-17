@@ -10,7 +10,7 @@
 ///
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
 /// of this software and associated documentation files (the "Software"), to deal
-/// in the Software without restriction, including without limitation the rights
+/// with the Software without restriction, including without limitation the rights
 /// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 /// copies of the Software, and to permit persons to whom the Software is
 /// furnished to do so, subject to the following conditions:
@@ -37,7 +37,7 @@ namespace fim::fp_tree {
     using std::ranges::find;
     using std::ranges::to;
 
-    node_t::node_t(item_t item, size_t frequency, const std::shared_ptr<node_t> &parent)
+    node_t::node_t(item_t item, const size_t frequency, const std::shared_ptr<node_t> &parent)
         : item(item), frequency(frequency), parent(parent), children({}) {
     }
 
@@ -56,7 +56,7 @@ namespace fim::fp_tree {
     }
 
     std::optional<node_ptr> node_t::find_child_item(const item_t &child_item) const {
-        const auto it = std::find_if(children.begin(), children.end(), [&](const node_ptr &node) {
+        const auto it = std::ranges::find_if(children, [&](const node_ptr &node) {
             return node->item == child_item;
         });
         return it != children.end() ? std::optional{*it} : std::nullopt;
@@ -137,7 +137,7 @@ namespace fim::fp_tree {
             size_t bit_position = 0;
 
             for (const auto &item: items) {
-                if (i & (1 << bit_position)) {
+                if (i & 1 << bit_position) {
                     subset.emplace_back(item);
                 }
                 ++bit_position;
@@ -181,7 +181,7 @@ namespace fim::fp_tree {
 
         auto insert_items = [&](const items_t &items) {
             auto current = root;
-            for (auto it = items.begin(); it != items.end(); it++) {
+            for (auto it = items.begin(); it != items.end(); ++it) {
                 const auto item = *it;
                 const auto node = current->find_child_item(item)
                         .or_else([&]() -> std::optional<node_ptr> { return current->add_child(item, 0); })

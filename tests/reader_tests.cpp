@@ -1,5 +1,5 @@
 /// @file reader_tests.cpp
-/// @brief Unit test for the readers function.
+/// @brief Unit test for the reader's function.
 ///
 /// @author Roland Abel
 /// @date August 30, 2024.
@@ -35,7 +35,7 @@ using namespace std;
 using namespace fim;
 using namespace fim::data;
 
-class ReaderTests : public ::testing::Test {
+class ReaderTests : public testing::Test {
 };
 
 TEST_F(ReaderTests, ReadCsvEmptyTest) {

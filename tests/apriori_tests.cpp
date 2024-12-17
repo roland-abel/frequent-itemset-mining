@@ -10,7 +10,7 @@
 ///
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
 /// of this software and associated documentation files (the "Software"), to deal
-/// in the Software without restriction, including without limitation the rights
+/// with the Software without restriction, including without limitation the rights
 /// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 /// copies of the Software, and to permit persons to whom the Software is
 /// furnished to do so, subject to the following conditions:
@@ -35,29 +35,29 @@ using namespace fim::algorithm::apriori;
 
 using std::views::transform;
 
-class AprioriTests : public ::testing::Test {
+class AprioriTests : public testing::Test {
 protected:
     static size_t min_support() { return 4; }
 
     static database_t get_database() {
         return database_t{
-                {3, 4, 2, 5, 6, 7},
-                {1, 3, 4, 6},
-                {1, 4, 5, 6, 7},
-                {1, 4},
-                {1, 4, 5},
-                {1, 7},
-                {1, 3, 4, 2, 5, 6, 7},
-                {8},
-                {1, 3, 2, 5, 6, 7},
-                {8, 3, 4, 6, 2, 7, 1}
+            {3, 4, 2, 5, 6, 7},
+            {1, 3, 4, 6},
+            {1, 4, 5, 6, 7},
+            {1, 4},
+            {1, 4, 5},
+            {1, 7},
+            {1, 3, 4, 2, 5, 6, 7},
+            {8},
+            {1, 3, 2, 5, 6, 7},
+            {8, 3, 4, 6, 2, 7, 1}
         };
     }
 };
 
 TEST_F(AprioriTests, AllFrequentOneItemsetsTest) {
     const auto [db, item_counts] = get_database().transaction_reduction(min_support());
-    const auto& itemsets = all_frequent_one_itemsets(item_counts, min_support());
+    const auto &itemsets = all_frequent_one_itemsets(item_counts, min_support());
 
     // 1-suffix
     ASSERT_EQ(itemsets.size(), 7);
@@ -75,21 +75,21 @@ TEST_F(AprioriTests, AllFrequentOneItemsetsTest) {
 
 TEST_F(AprioriTests, GenerateCandidatesTest) {
     const itemsets_t itemsets = {
-            {1, 3},
-            {1, 4},
-            {1, 5},
-            {1, 6},
-            {1, 7},
-            {2, 3},
-            {2, 6},
-            {2, 7},
-            {3, 4},
-            {3, 6},
-            {3, 7},
-            {4, 5}
+        {1, 3},
+        {1, 4},
+        {1, 5},
+        {1, 6},
+        {1, 7},
+        {2, 3},
+        {2, 6},
+        {2, 7},
+        {3, 4},
+        {3, 6},
+        {3, 7},
+        {4, 5}
     };
 
-    auto candidates = generate_candidates(itemsets, 3, default_item_compare);
+    const auto candidates = generate_candidates(itemsets, 3, default_item_compare);
 
     ASSERT_EQ(candidates.size(), 6);
     EXPECT_TRUE(candidates.contains({1, 3, 4}));

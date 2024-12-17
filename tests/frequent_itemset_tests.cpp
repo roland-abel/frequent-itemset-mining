@@ -1,5 +1,5 @@
 /// @file frequent_itemset_tests.cpp
-/// @brief
+/// @brief Unit test class.
 ///
 /// @author Roland Abel
 /// @date December 8, 2024

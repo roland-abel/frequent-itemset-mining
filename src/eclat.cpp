@@ -33,7 +33,6 @@
 #include "eclat.h"
 
 namespace fim::algorithm::eclat {
-
     auto set_intersection(const tidset_t &x, const tidset_t &y) -> tidset_t {
         tidset_t tidset{};
         std::set_intersection(x.begin(), x.end(), y.begin(), y.end(), std::inserter(tidset, tidset.begin()));
@@ -71,10 +70,9 @@ namespace fim::algorithm::eclat {
 
         using func_t = std::function<void(const itemset_t &, const vertical_database_t &, const tidset_t &)>;
         func_t eclat_ = [&](
-                const itemset_t &prefix,
-                const vertical_database_t &vertical_trans,
-                const tidset_t &current_tidset) -> void {
-
+            const itemset_t &prefix,
+            const vertical_database_t &vertical_trans,
+            const tidset_t &current_tidset) -> void {
             for (auto it = vertical_trans.begin(); it != vertical_trans.end(); ++it) {
                 const auto &[item, tidset] = *it;
                 const auto &new_tidset = set_intersection(current_tidset, tidset);

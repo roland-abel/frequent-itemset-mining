@@ -35,27 +35,27 @@ using namespace fim::algorithm::eclat;
 
 using std::views::transform;
 
-class EclatTests : public ::testing::Test {
+class EclatTests : public testing::Test {
 protected:
     static database_t get_database() {
         return database_t{
-                {1, 3, 4, 2, 6, 7, 8},
-                {3, 4, 2, 5, 6, 7},
-                {1, 4, 5, 6, 7},
-                {1, 4},
-                {1, 4, 5},
-                {1, 7},
-                {1, 3, 4, 2, 5, 6, 7},
-                {8},
-                {1, 3, 4, 6},
-                {1, 3, 2, 5, 6, 7}
+            {1, 3, 4, 2, 6, 7, 8},
+            {3, 4, 2, 5, 6, 7},
+            {1, 4, 5, 6, 7},
+            {1, 4},
+            {1, 4, 5},
+            {1, 7},
+            {1, 3, 4, 2, 5, 6, 7},
+            {8},
+            {1, 3, 4, 6},
+            {1, 3, 2, 5, 6, 7}
         };
     }
 };
 
 TEST_F(EclatTests, ToVerticalTransactionsTest) {
-    const auto& db = get_database();
-    const auto& vertical_db = to_vertical_database(db);
+    const auto &db = get_database();
+    const auto &vertical_db = to_vertical_database(db);
 
     ASSERT_EQ(db.size(), 10);
     ASSERT_EQ(vertical_db.size(), 8);

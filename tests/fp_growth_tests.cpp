@@ -35,22 +35,22 @@ using namespace fim::algorithm::fp_growth;
 
 using std::views::transform;
 
-class FPGrowthTests : public ::testing::Test {
+class FPGrowthTests : public testing::Test {
 protected:
     static size_t min_support() { return 4; }
 
     static database_t get_database() {
         return database_t{
-                {1, 3, 4, 2, 6, 7, 8},
-                {3, 4, 2, 5, 6, 7},
-                {1, 4, 5, 6, 7},
-                {1, 4},
-                {1, 4, 5},
-                {1, 7},
-                {1, 3, 4, 2, 5, 6, 7},
-                {8},
-                {1, 3, 4, 6},
-                {1, 3, 2, 5, 6, 7}
+            {1, 3, 4, 2, 6, 7, 8},
+            {3, 4, 2, 5, 6, 7},
+            {1, 4, 5, 6, 7},
+            {1, 4},
+            {1, 4, 5},
+            {1, 7},
+            {1, 3, 4, 2, 5, 6, 7},
+            {8},
+            {1, 3, 4, 6},
+            {1, 3, 2, 5, 6, 7}
         };
     }
 };
@@ -59,8 +59,8 @@ TEST_F(FPGrowthTests, ConditionalTransactions1Test) {
     const auto [db, item_counts] = get_database().transaction_reduction(min_support());
     const auto &freq_items = item_counts.get_frequent_items(min_support());
 
-    const auto& root = build_fp_tree(db, freq_items);
-    const auto& trans = conditional_transactions(root, 7);
+    const auto &root = build_fp_tree(db, freq_items);
+    const auto &trans = conditional_transactions(root, 7);
 
     ASSERT_EQ(trans.size(), 6);
     EXPECT_EQ(trans[0], (itemset_t{1, 4, 6}));
@@ -75,8 +75,8 @@ TEST_F(FPGrowthTests, ConditionalTransactions2Test) {
     const auto [db, item_counts] = get_database().transaction_reduction(min_support());
     const auto &freq_items = item_counts.get_frequent_items(min_support());
 
-    const auto& root = build_fp_tree(db, freq_items);
-    const auto& trans = conditional_transactions(root, 2);
+    const auto &root = build_fp_tree(db, freq_items);
+    const auto &trans = conditional_transactions(root, 2);
 
     ASSERT_EQ(trans.size(), 4);
     EXPECT_EQ(trans[0], (itemset_t{1, 3, 4, 5, 6, 7}));

@@ -10,7 +10,7 @@
 ///
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
 /// of this software and associated documentation files (the "Software"), to deal
-/// in the Software without restriction, including without limitation the rights
+/// with the Software without restriction, including without limitation the rights
 /// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 /// copies of the Software, and to permit persons to whom the Software is
 /// furnished to do so, subject to the following conditions:
@@ -34,29 +34,29 @@
 using std::views::transform;
 using namespace fim;
 
-class ItemsetCountsTests : public ::testing::Test {
+class ItemsetCountsTests : public testing::Test {
 protected:
     static size_t min_support() { return 4; }
 
     static database_t get_database() {
         return database_t{
-                {1, 3, 4, 2, 6, 7, 8},
-                {3, 4, 2, 5, 6, 7},
-                {1, 4, 5, 6, 7},
-                {1, 4},
-                {1, 4, 5},
-                {1, 7},
-                {1, 3, 4, 2, 5, 6, 7},
-                {8},
-                {1, 3, 4, 6},
-                {1, 3, 2, 5, 6, 7}
+            {1, 3, 4, 2, 6, 7, 8},
+            {3, 4, 2, 5, 6, 7},
+            {1, 4, 5, 6, 7},
+            {1, 4},
+            {1, 4, 5},
+            {1, 7},
+            {1, 3, 4, 2, 5, 6, 7},
+            {8},
+            {1, 3, 4, 6},
+            {1, 3, 2, 5, 6, 7}
         };
     }
 };
 
 TEST_F(ItemsetCountsTests, GetItemCountsTest) {
-    const auto& db = get_database();
-    const auto& counts = db.get_item_counts();
+    const auto &db = get_database();
+    const auto &counts = db.get_item_counts();
 
     ASSERT_EQ(counts.size(), 8);
 
@@ -71,10 +71,10 @@ TEST_F(ItemsetCountsTests, GetItemCountsTest) {
 }
 
 TEST_F(ItemsetCountsTests, GetFrequentItemsTest) {
-    const auto& db = get_database();
+    const auto &db = get_database();
 
-    const auto& counts = db.get_item_counts();
-    const itemset_t& items = counts.get_frequent_items(min_support());
+    const auto &counts = db.get_item_counts();
+    const itemset_t &items = counts.get_frequent_items(min_support());
 
     ASSERT_EQ(items.size(), 7);
 
@@ -88,18 +88,18 @@ TEST_F(ItemsetCountsTests, GetFrequentItemsTest) {
 }
 
 TEST_F(ItemsetCountsTests, GetCountTest) {
-    const auto& [db, item_counts] = get_database().transaction_reduction(min_support());
+    const auto &[db, item_counts] = get_database().transaction_reduction(min_support());
     const auto compare = item_counts.get_item_compare();
 
     itemsets_t candidates{
-            {4, 3, 1},
-            {1, 4, 5},
-            {1, 3, 6},
-            {3, 2, 7}
+        {4, 3, 1},
+        {1, 4, 5},
+        {1, 3, 6},
+        {3, 2, 7}
     };
 
     candidates.sort_each_itemset(compare);
-    const auto& counts = itemset_counts_t::create_itemset_counts(db, candidates, compare);
+    const auto &counts = itemset_counts_t::create_itemset_counts(db, candidates, compare);
 
     auto contains = [&](const itemset_t &itemset) -> bool {
         return counts.contains(itemset.sort_itemset(compare));
@@ -122,43 +122,5 @@ TEST_F(ItemsetCountsTests, GetCountTest) {
 
     EXPECT_TRUE(contains({5, 4, 1}));
     EXPECT_EQ(get_count({5, 4, 1}), 3);
-}
-
-
-TEST_F(ItemsetCountsTests, CompareItemsTest) {
-    const auto& [db, item_counts] = get_database().transaction_reduction(min_support());
-    const auto compare = item_counts.get_item_compare();
-
-    // high support -> low support
-    // items: 1 > 4 > 6 >= 7 > 3 >= 5 > 2 > 8
-
-    // EXPECT_TRUE(compare(1, 4));
-
-
-    //
-    // candidates.sort_each_itemset(comparer);
-    // const auto& counts = itemset_counts_t::create_itemset_counts(db, candidates, comparer);
-    //
-    // auto contains = [&](const itemset_t &itemset) -> bool {
-    //     return counts.contains(itemset.sort_itemset(comparer));
-    // };
-    //
-    // auto get_count = [&](const itemset_t &itemset) -> size_t {
-    //     return counts.get_count(itemset.sort_itemset(comparer));
-    // };
-    //
-    // ASSERT_EQ(counts.size(), 4);
-    //
-    // EXPECT_TRUE(contains({2, 3, 7}));
-    // EXPECT_EQ(get_count({2, 3, 7}), 4);
-    //
-    // EXPECT_TRUE(contains({3, 4, 1}));
-    // EXPECT_EQ(get_count({3, 4, 1}), 3);
-    //
-    // EXPECT_TRUE(contains({3, 6, 1}));
-    // EXPECT_EQ(get_count({3, 6, 1}), 4);
-    //
-    // EXPECT_TRUE(contains({5, 4, 1}));
-    // EXPECT_EQ(get_count({5, 4, 1}), 3);
 }
 
