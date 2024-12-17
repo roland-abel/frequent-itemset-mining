@@ -10,7 +10,7 @@
 ///
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
 /// of this software and associated documentation files (the "Software"), to deal
-/// in the Software without restriction, including without limitation the rights
+/// with the Software without restriction, including without limitation the rights
 /// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 /// copies of the Software, and to permit persons to whom the Software is
 /// furnished to do so, subject to the following conditions:
@@ -35,7 +35,7 @@
 namespace fim::algorithm::eclat {
     auto set_intersection(const tidset_t &x, const tidset_t &y) -> tidset_t {
         tidset_t tidset{};
-        std::set_intersection(x.begin(), x.end(), y.begin(), y.end(), std::inserter(tidset, tidset.begin()));
+        std::ranges::set_intersection(x, y, std::inserter(tidset, tidset.begin()));
 
         return tidset;
     }
@@ -52,12 +52,14 @@ namespace fim::algorithm::eclat {
         return vertical_trans;
     }
 
-    auto eclat_algorithm(const database_t &database, size_t min_support) -> itemsets_t {
+    auto eclat_algorithm(const database_t &database, const size_t min_support) -> itemsets_t {
         itemsets_t freq_itemsets{};
 
         // Creates initial tids.
         auto all_tids = [&]() -> tidset_t {
-            return std::views::iota(size_t{0}, database.size()) | std::ranges::to<tidset_t>();
+            return std::ranges::iota_view(0)
+                   | std::views::take(database.size())
+                   | std::ranges::to<tidset_t>();
         };
 
         auto create_frequent_itemset = [&](const item_t &item, const itemset_t &prefix) -> itemset_t {

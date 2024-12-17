@@ -1,8 +1,8 @@
-/// @file relim_benchmark.cpp
-/// @brief Benchmark test for the RElim algorithm.
+/// @file benchmark_main.cpp
+/// @brief Helper functions
 ///
 /// @author Roland Abel
-/// @date September 21, 2004
+/// @date August 30, 2004
 ///
 /// Copyright (c) 2024 Roland Abel
 ///
@@ -10,7 +10,7 @@
 ///
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
 /// of this software and associated documentation files (the "Software"), to deal
-/// in the Software without restriction, including without limitation the rights
+/// with the Software without restriction, including without limitation the rights
 /// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 /// copies of the Software, and to permit persons to whom the Software is
 /// furnished to do so, subject to the following conditions:
@@ -26,25 +26,14 @@
 /// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 /// THE SOFTWARE.
 
-#include "benchmark/benchmark.h"
-#include "reader.h"
-#include "relim.h"
-#include "utils.h"
+#pragma once
 
-using namespace std;
-using namespace fim;
+#include <benchmark/benchmark.h>
 
-static void relim_benchmark(benchmark::State &state, const std::string_view &filename) {
-    const auto db = data::read_csv(filename).value();
-    const size_t min_support = get_min_support(state, db.size());
-
-    for ([[maybe_unused]] auto _: state) {
-        algorithm::relim::relim_algorithm(db, min_support);
-    }
+/// Helper function
+inline auto get_min_support(const benchmark::State &state, const size_t db_size) -> size_t {
+    return static_cast<size_t>(static_cast<float>(state.range(0)) * 0.01 * static_cast<float>(db_size));
 }
 
-BENCHMARK_CAPTURE(relim_benchmark, "mushroom", "data/mushroom.dat")
-        ->Arg(60)
-        ->Arg(80)
-        ->Arg(90)
-        ->Unit(benchmark::kMillisecond);
+
+

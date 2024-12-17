@@ -39,7 +39,7 @@ namespace fim::data {
         database_t database{};
         std::string line;
 
-        if ((is.bad() || is.fail())) {
+        if (is.bad() || is.fail()) {
             return std::unexpected{io_error_t::UNKNOWN_ERROR};
         }
 
@@ -54,7 +54,7 @@ namespace fim::data {
             try {
                 std::string number;
                 while (std::getline(line_stream, number, config.separator)) {
-                    size_t value = std::stoull(number);
+                    const size_t value = std::stoull(number);
                     itemset.push_back(value);
                 }
             } catch (const std::invalid_argument &) {

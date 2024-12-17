@@ -10,7 +10,7 @@
 ///
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
 /// of this software and associated documentation files (the "Software"), to deal
-/// in the Software without restriction, including without limitation the rights
+/// with the Software without restriction, including without limitation the rights
 /// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 /// copies of the Software, and to permit persons to whom the Software is
 /// furnished to do so, subject to the following conditions:
@@ -53,7 +53,7 @@ namespace fim::algorithm::apriori {
 
     auto generate_candidates(
         const itemsets_t &frequent_itemsets,
-        size_t k,
+        const size_t k,
         const item_compare_t &compare) -> itemsets_t {
         auto merge_itemsets_if_equal_prefix = [&](const itemset_t &x, const itemset_t &y) -> std::optional<itemset_t> {
             if (std::ranges::equal(x | std::views::take(k - 2), y | std::views::take(k - 2))) {

@@ -37,7 +37,7 @@ namespace fim::algorithm::fp_growth {
     using std::views::filter;
     using std::views::transform;
 
-    auto conditional_transactions(const node_ptr &root, item_t item) -> database_t {
+    auto conditional_transactions(const node_ptr &root, const item_t item) -> database_t {
         database_t transactions{};
 
         std::function<void(const node_ptr &)> conditional_transactions_ = [&](const node_ptr &node) -> void {

@@ -36,7 +36,7 @@ using namespace std;
 using namespace fim;
 using namespace fim::data;
 
-class WriterTests : public ::testing::Test {
+class WriterTests : public testing::Test {
 public:
     itemsets_t itemsets = {
         {1, 2, 3, 4, 6, 7, 8},

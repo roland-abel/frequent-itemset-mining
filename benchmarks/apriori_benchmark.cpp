@@ -1,5 +1,5 @@
 /// @file apriori_benchmark.cpp
-/// @brief
+/// @brief Benchmark test for the Apriori algorithm.
 ///
 /// @author Roland Abel
 /// @date September 21, 2004
@@ -10,7 +10,7 @@
 ///
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
 /// of this software and associated documentation files (the "Software"), to deal
-/// in the Software without restriction, including without limitation the rights
+/// with the Software without restriction, including without limitation the rights
 /// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 /// copies of the Software, and to permit persons to whom the Software is
 /// furnished to do so, subject to the following conditions:
@@ -29,13 +29,14 @@
 #include "benchmark/benchmark.h"
 #include "reader.h"
 #include "apriori.h"
+#include "utils.h"
 
 using namespace std;
 using namespace fim::algorithm::apriori;
 
 static void apriori_benchmark(benchmark::State &state, const std::string_view &filename) {
-    auto db = data::read_csv(filename).value();
-    const size_t min_support = static_cast<double>(state.range(0)) * 0.01 * static_cast<double>(db.size());
+    const auto db = data::read_csv(filename).value();
+    const size_t min_support = get_min_support(state, db.size());
 
     for ([[maybe_unused]] auto _: state) {
         apriori_algorithm(db, min_support);

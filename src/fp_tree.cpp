@@ -37,7 +37,7 @@ namespace fim::fp_tree {
     using std::ranges::find;
     using std::ranges::to;
 
-    node_t::node_t(item_t item, const size_t frequency, const std::shared_ptr<node_t> &parent)
+    node_t::node_t(const item_t item, const size_t frequency, const std::shared_ptr<node_t> &parent)
         : item(item), frequency(frequency), parent(parent), children({}) {
     }
 
@@ -67,7 +67,7 @@ namespace fim::fp_tree {
             return false;
         }
 
-        node_ptr current = std::make_shared<node_t>(*this);
+        auto current = std::make_shared<node_t>(*this);
         size_t depth = 0;
 
         while (current) {
@@ -90,7 +90,7 @@ namespace fim::fp_tree {
         return depth == items.size();
     }
 
-    auto get_item_frequency(const node_ptr &root, item_t item) -> size_t {
+    auto get_item_frequency(const node_ptr &root, const item_t item) -> size_t {
         size_t frequency = 0;
 
         std::function<void(const node_ptr &)> count_frequency = [&](const node_ptr &current) -> void {
@@ -128,7 +128,7 @@ namespace fim::fp_tree {
         }
     }
 
-    auto power_set(const itemset_t &items, bool include_empty_set) -> itemsets_t {
+    auto power_set(const itemset_t &items, const bool include_empty_set) -> itemsets_t {
         itemsets_t result{};
         const auto num_subsets = static_cast<size_t>(std::pow(2, items.size()));
 
