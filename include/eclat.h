@@ -29,8 +29,8 @@
 #pragma once
 
 #include <set>
-#include "itemset.h"
 #include "database.h"
+#include "itemset.h"
 
 namespace fim::algorithm::eclat {
     // Transaction id type, representing a unique identifier for each transaction.

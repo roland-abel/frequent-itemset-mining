@@ -1,5 +1,5 @@
 /// @file fp_growth.h
-/// @brief
+/// @brief Implementation of the FP-Growth algorithm.
 ///
 /// @author Roland Abel
 /// @date August 10, 2024
@@ -31,7 +31,6 @@
 #include "fp_tree.h"
 
 namespace fim::algorithm::fp_growth {
-
     using namespace fim;
     using namespace fim::fp_tree;
 

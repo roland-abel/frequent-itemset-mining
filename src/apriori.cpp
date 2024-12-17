@@ -26,6 +26,9 @@
 /// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 /// THE SOFTWARE.
 
+#include <ranges>
+#include <algorithm>
+#include "item_counts.h"
 #include "apriori.h"
 
 namespace fim::algorithm::apriori {

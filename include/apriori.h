@@ -32,14 +32,13 @@
 #include "database.h"
 
 namespace fim::algorithm::apriori {
-
     using namespace fim;
 
     /// @brief Generates all frequent one-itemsets from the given item counts, based on the minimum support threshold.
     /// @param item_counts A collection of item counts, representing the frequency of individual items in the database.
     /// @param min_support The minimum support value used to filter frequent items.
     /// @return A collection of frequent one-itemsets that meet or exceed the minimum support.
-    auto all_frequent_one_itemsets(const item_counts_t& item_counts, size_t min_support) -> itemsets_t;
+    auto all_frequent_one_itemsets(const item_counts_t &item_counts, size_t min_support) -> itemsets_t;
 
     /// @brief Generates candidate frequent itemsets of size k from frequent itemsets of size k-1.
     /// @param frequent_itemsets A collection of frequent itemsets of size k-1.
@@ -47,9 +46,9 @@ namespace fim::algorithm::apriori {
     /// @param compare A comparison function or object used to compare itemsets for potential combinations.
     /// @return A collection of candidate frequent itemsets of size k.
     auto generate_candidates(
-            const itemsets_t& frequent_itemsets,
-            size_t k,
-            const item_compare_t& compare) -> itemsets_t;
+        const itemsets_t &frequent_itemsets,
+        size_t k,
+        const item_compare_t &compare) -> itemsets_t;
 
     /// @brief Removes candidate itemsets that do not meet the minimum support threshold.
     /// @param candidates A collection of candidate itemsets that need to be pruned based on support.
@@ -58,14 +57,14 @@ namespace fim::algorithm::apriori {
     /// @param compare A comparison function or object used to compare itemsets, likely for sorting or filtering.
     /// @return This function modifies the candidates in place.
     auto prune(
-            itemsets_t& candidates,
-            const database_t& database,
-            size_t min_support,
-            const item_compare_t& compare) -> void;
+        itemsets_t &candidates,
+        const database_t &database,
+        size_t min_support,
+        const item_compare_t &compare) -> void;
 
     /// @brief Implements the Apriori algorithm to find frequent itemsets in the given database.
     /// @param database The database used to find frequent itemsets.
     /// @param min_support The minimum support threshold for considering an itemset as frequent.
     /// @return A collection of frequent itemsets that meet or exceed the minimum support.
-    auto apriori_algorithm(const database_t& database, size_t min_support) -> itemsets_t;
+    auto apriori_algorithm(const database_t &database, size_t min_support) -> itemsets_t;
 }

@@ -27,19 +27,20 @@
 /// THE SOFTWARE.
 
 #include "item_counts.h"
+#include "database.h"
+#include <algorithm>
 
 namespace fim {
-
     auto item_counts_t::get_frequent_items(size_t min_support) const -> itemset_t {
-        auto is_frequent = [=](const auto& kv) { return kv.second >= min_support; };
-        auto to_item = [](const auto& kv) { return kv.first; };
+        auto is_frequent = [=](const auto &kv) { return kv.second >= min_support; };
+        auto to_item = [](const auto &kv) { return kv.first; };
 
         auto items = *this
                      | std::views::filter(is_frequent)
                      | std::views::transform(to_item)
                      | std::ranges::to<itemset_t>();
 
-        std::ranges::sort(items, [&](const item_t& x, const item_t& y) {
+        std::ranges::sort(items, [&](const item_t &x, const item_t &y) {
             return at(x) > at(y);
         });
 
@@ -47,7 +48,7 @@ namespace fim {
     }
 
     auto item_counts_t::get_item_compare() const -> item_compare_t {
-        return [&](const item_t& i, const item_t& j) -> bool {
+        return [&](const item_t &i, const item_t &j) -> bool {
             const auto weight_i = at(i);
             const auto weight_j = at(j);
 
@@ -55,22 +56,14 @@ namespace fim {
         };
     }
 
-    auto item_counts_t::reverse_item_compare() const -> item_compare_t {
-        const item_compare_t cmp = get_item_compare();
-        return [&cmp](const item_t& i, const item_t& j) -> bool {
-            return !cmp(i, j);
-        };
-    }
-
     auto itemset_counts_t::create_itemset_counts(
-            const itemsets_t& transactions,
-            const itemsets_t& itemsets,
-            const item_compare_t& compare) -> itemset_counts_t {
-
+        const database_t &transactions,
+        const itemsets_t &itemsets,
+        const item_compare_t &compare) -> itemset_counts_t {
         itemset_counts_t count{};
 
-        for (const itemset_t& y: transactions) {
-            for (const itemset_t& x: itemsets) {
+        for (const itemset_t &y: transactions) {
+            for (const itemset_t &x: itemsets) {
                 if (x.is_subset(y, compare)) {
                     ++count[x];
                 }
@@ -79,16 +72,7 @@ namespace fim {
         return count;
     }
 
-    auto itemset_counts_t::get_count(const itemset_t& itemset) const -> size_t {
+    auto itemset_counts_t::get_count(const itemset_t &itemset) const -> size_t {
         return this->contains(itemset) ? this->at(itemset) : 0;
-    }
-
-    auto itemset_counts_t::get_counts() const -> counts_t {
-        counts_t counts{};
-        std::ranges::transform(*this, std::back_inserter(counts), [&](const auto& x) {
-            return x.second;
-        });
-
-        return counts;
     }
 }

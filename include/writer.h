@@ -41,21 +41,21 @@ namespace fim::data {
     /// Result type
     using write_result_t = std::expected<itemsets_t, io_error_t>;
 
-    ///
-    /// @param os
-    /// @param itemsets
-    /// @param config
-    /// @return the result of the writing.
+    /// @brief Writes a collection of itemsets to a CSV format.
+    /// @param os The output stream where the CSV data will be written.
+    /// @param itemsets A collection of itemsets to be written to the CSV.
+    /// @param config Configuration settings that control the CSV writing behavior (optional).
+    /// @return The result of the writing operation, indicating success or failure.
     auto to_csv(
         std::ostream &os,
         const itemsets_t &itemsets,
         const write_csv_config_t &config = write_csv_config_t{}) -> write_result_t;
 
-    ///
-    /// @param file_path
-    /// @param itemsets
-    /// @param config
-    /// @return the result of the writing.
+    /// @brief Writes a collection of itemsets to a CSV file.
+    /// @param file_path The path to the file where the CSV data will be written.
+    /// @param itemsets A collection of itemsets to be written to the CSV file.
+    /// @param config Configuration settings that control the CSV writing behavior (optional).
+    /// @return The result of the writing operation, indicating success or failure.
     auto to_csv(
         const std::string_view &file_path,
         const itemsets_t &itemsets,

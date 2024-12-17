@@ -29,6 +29,7 @@
 #include <algorithm>
 #include <ranges>
 #include <functional>
+#include "database.h"
 #include "eclat.h"
 
 namespace fim::algorithm::eclat {

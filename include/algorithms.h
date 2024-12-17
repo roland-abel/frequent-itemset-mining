@@ -35,7 +35,6 @@
 #include "eclat.h"
 
 namespace fim::algorithm {
-
     /// Define a type alias for a function that takes a database and a minimum support value as inputs,
     /// and perform a frequent itemset mining algorithm.
     using algorithm_function_t = std::function<itemsets_t(const database_t &database, size_t min_support)>;

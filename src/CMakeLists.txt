@@ -30,7 +30,6 @@ set(INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include)
 add_library(${FIM_LIB_NAME}
         itemset.cpp
         item_counts.cpp
-        hash_tree.cpp
         data.cpp
         database.cpp
         reader.cpp

@@ -1,5 +1,5 @@
 /// @file reader.h
-/// @brief
+/// @brief Helper functions for reading transaction from CSV files.
 ///
 /// @author Roland Abel
 /// @date August 30, 2024
@@ -10,7 +10,7 @@
 ///
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
 /// of this software and associated documentation files (the "Software"), to deal
-/// in the Software without restriction, including without limitation the rights
+/// with the Software without restriction, including without limitation the rights
 /// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 /// copies of the Software, and to permit persons to whom the Software is
 /// furnished to do so, subject to the following conditions:
@@ -40,19 +40,8 @@ namespace fim::data {
         char separator = ' ';
     };
 
-    // Struktur für das Itemset und den zugehörigen Support-Wert
-    struct itemset_support_t {
-        itemset_t itemset;  // Das Itemset als Vektor von size_t
-        float support;                // Der zugehörige Support-Wert
-    };
-
     /// Result type
     using read_result_t = std::expected<database_t, io_error_t>;
-
-//    // Itemset type
-//    using itemset_t = std::vector<size_t>;
-
-    using result_t = std::vector<itemset_support_t>;  // Rückgabewert ist ein Vektor von itemset_support_t
 
     /// Reads the transactions from the input stream as CSV.
     /// @param is The input stream to read from.
@@ -67,10 +56,4 @@ namespace fim::data {
     auto read_csv(
         const std::string_view &file_path,
         const read_csv_config_t &config = read_csv_config_t{}) -> read_result_t;
-
-    // Funktion zum Einlesen der Result-Datei
-    auto read_result_csv(std::istream &is, const read_csv_config_t &config = read_csv_config_t{}) -> result_t;
-
-
-    auto read_result_csv(const std::string_view &file_path, const read_csv_config_t &config = read_csv_config_t{}) -> result_t;
 }

@@ -1,5 +1,5 @@
 /// @file data.h
-/// @brief  Helper functions for reading from and writing to CSV files.
+/// @brief Helper functions for reading from and writing to CSV files.
 ///
 /// @author Roland Abel
 /// @date November 13, 2024
@@ -29,7 +29,6 @@
 #pragma once
 
 namespace fim::data {
-
     /// Reader/writer error codes.
     enum class io_error_t {
         FILE_NOT_FOUND,

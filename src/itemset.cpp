@@ -94,7 +94,7 @@ namespace fim {
     }
 
     itemsets_t::itemsets_t(const std::vector<itemset_t> &itemsets)
-        : std::vector<itemset_t>(std::move(itemsets)) {
+        : std::vector<itemset_t>(itemsets) {
     }
 
     auto itemsets_t::add(const itemset_t &itemset) -> void {

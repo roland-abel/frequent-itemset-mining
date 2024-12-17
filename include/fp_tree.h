@@ -28,6 +28,7 @@
 
 #pragma once
 
+#include <memory>
 #include "itemset.h"
 #include "database.h"
 

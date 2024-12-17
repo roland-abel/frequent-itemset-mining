@@ -33,13 +33,12 @@
 #include "item_counts.h"
 
 namespace fim {
-
     database_t::database_t(itemsets_t itemsets)
-            : std::vector<itemset_t>(std::move(itemsets)) {
+        : std::vector<itemset_t>(std::move(itemsets)) {
     }
 
-    auto database_t::sort_lexicographically(const item_compare_t& compare) -> database_t {
-        std::ranges::sort(*this, [&](const itemset_t& x, const itemset_t& y) {
+    auto database_t::sort_lexicographically(const item_compare_t &compare) -> database_t {
+        std::ranges::sort(*this, [&](const itemset_t &x, const itemset_t &y) {
             return lexicographical_compare(x, y, compare);
         });
         return *this;
@@ -47,25 +46,25 @@ namespace fim {
 
     auto database_t::get_item_counts() const -> item_counts_t {
         item_counts_t counts{};
-        for (const auto& item: *this | std::views::join) {
+        for (const auto &item: *this | std::views::join) {
             ++counts[item];
         }
         return std::move(counts);
     }
 
     auto database_t::reduce_database(size_t min_support) -> std::tuple<database_t, item_counts_t> {
-        const auto& item_counts = get_item_counts();
-        const auto& compare = item_counts.get_item_compare();
+        const auto &item_counts = get_item_counts();
+        const auto &compare = item_counts.get_item_compare();
 
-        auto is_infreq_item = [&](const item_t& item) -> bool {
+        auto is_infreq_item = [&](const item_t &item) -> bool {
             return item_counts.at(item) < min_support;
         };
 
-        auto is_empty_itemset = [](const itemset_t& x) -> bool {
+        auto is_empty_itemset = [](const itemset_t &x) -> bool {
             return x.empty();
         };
 
-        for (itemset_t& trans: *this) {
+        for (itemset_t &trans: *this) {
             std::erase_if(trans, is_infreq_item);
             std::ranges::sort(trans, compare);
         }
@@ -73,7 +72,7 @@ namespace fim {
         const auto it = std::ranges::remove_if(*this, is_empty_itemset).begin();
         erase(it, end());
 
-        const auto& counts = get_item_counts();
+        const auto &counts = get_item_counts();
         sort_lexicographically(counts.get_item_compare());
 
         return std::make_tuple(*this, counts);
