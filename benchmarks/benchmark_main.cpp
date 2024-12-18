@@ -2,7 +2,7 @@
 /// @brief Benchmark main function.
 ///
 /// @author Roland Abel
-/// @date August 30, 2004
+/// @date August 30, 2024
 ///
 /// Copyright (c) 2024 Roland Abel
 ///

@@ -2,7 +2,7 @@
 /// @brief Benchmark test for the Apriori algorithm.
 ///
 /// @author Roland Abel
-/// @date September 21, 2004
+/// @date September 21, 2024
 ///
 /// Copyright (c) 2024 Roland Abel
 ///
