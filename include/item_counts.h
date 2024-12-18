@@ -33,6 +33,7 @@
 namespace fim {
     struct database_t;
 
+    using support_values_t = std::vector<float>;
     using counts_t = std::vector<size_t>;
 
     // Item counting
@@ -67,5 +68,11 @@ namespace fim {
         /// @param itemset The itemset whose count is to be retrieved.
         /// @return The count (frequency) of the specified itemset in the itemset counts map.
         [[nodiscard]] auto get_count(const itemset_t &itemset) const -> size_t;
+
+        /// @brief
+        /// @param itemset
+        /// @param db_size
+        /// @return
+        auto get_support(const itemset_t &itemset, size_t db_size) const -> float;
     };
 }

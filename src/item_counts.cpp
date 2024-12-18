@@ -75,4 +75,8 @@ namespace fim {
     auto itemset_counts_t::get_count(const itemset_t &itemset) const -> size_t {
         return this->contains(itemset) ? this->at(itemset) : 0;
     }
+
+    auto itemset_counts_t::get_support(const itemset_t &itemset, const size_t db_size) const -> float {
+        return static_cast<float>(get_count(itemset)) / db_size;
+    }
 }
