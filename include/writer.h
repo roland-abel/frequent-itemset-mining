@@ -29,35 +29,41 @@
 #pragma once
 
 #include <expected>
+#include <item_counts.h>
 #include "data.h"
 
 namespace fim::data {
     /// Configuration for writing of csv data
     struct write_csv_config_t {
-        bool with_header = true;
-        char separator = ' ';
+        bool with_header{true};
+        char separator{' '};
+    };
+
+    struct write_input_t {
+        itemsets_t itemsets{};
+        support_values_t support_values{};
     };
 
     /// Result type
-    using write_result_t = std::expected<itemsets_t, io_error_t>;
+    using write_result_t = std::expected<void, io_error_t>;
 
     /// @brief Writes a collection of itemsets to a CSV format.
     /// @param os The output stream where the CSV data will be written.
-    /// @param itemsets A collection of itemsets to be written to the CSV.
+    /// @param input A struct of the frequent itemsets and their support to be written to the CSV.
     /// @param config Configuration settings that control the CSV writing behavior (optional).
     /// @return The result of the writing operation, indicating success or failure.
     auto to_csv(
         std::ostream &os,
-        const itemsets_t &itemsets,
+        const write_input_t &input,
         const write_csv_config_t &config = write_csv_config_t{}) -> write_result_t;
 
     /// @brief Writes a collection of itemsets to a CSV file.
     /// @param file_path The path to the file where the CSV data will be written.
-    /// @param itemsets A collection of itemsets to be written to the CSV file.
+    /// @param input A struct of the frequent itemsets and their support to be written to the CSV.
     /// @param config Configuration settings that control the CSV writing behavior (optional).
     /// @return The result of the writing operation, indicating success or failure.
     auto to_csv(
         const std::string_view &file_path,
-        const itemsets_t &itemsets,
+        const write_input_t &input,
         const write_csv_config_t &config = write_csv_config_t{}) -> write_result_t;
 }

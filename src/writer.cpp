@@ -30,26 +30,44 @@
 #include <string>
 #include <fstream>
 #include <filesystem>
+#include <iostream>
 #include "itemset.h"
 #include "writer.h"
 
+using namespace std::literals;
 using namespace fim;
 
+using std::ranges::views::transform;
+using std::ranges::views::join_with;
+
 namespace fim::data {
-    auto to_csv(std::ostream &os, const itemsets_t &itemsets, const write_csv_config_t &config) -> write_result_t {
-        using std::ranges::views::transform;
-        using std::ranges::views::join_with;
+    auto to_csv(
+        std::ostream &os,
+        const write_input_t &input,
+        const write_csv_config_t &config) -> write_result_t {
+        // set formatting style
+        std::cout << std::fixed << std::setprecision(2);
+        const auto &[itemsets, support_values] = input;
 
         auto write_header = [&] {
-            os << "itemset_length, itemset" << std::endl;
+            const std::vector columns{"length"sv, "itemset"sv, "support"sv};
+            const auto header = columns | std::views::join_with(config.separator);
+
+            for (const auto h: header) {
+                os << h;
+            }
+
+            os << std::endl;
         };
 
-        auto write_itemset = [&](const itemset_t &itemset) {
-            os << itemset.size() << ", ";
+        auto write_itemset = [&](const itemset_t &itemset, const float &support) {
+            constexpr auto space = " "sv;
+            os << itemset.size() << config.separator;
             std::ranges::for_each(itemset
                                   | transform([](const item_t &item) { return std::to_string(item); })
-                                  | join_with(config.separator), [&](const auto &item) { os << item; });
-            os << std::endl;
+                                  | join_with(space), [&](const auto &item) { os << item; });
+
+            os << config.separator << support << std::endl;
         };
 
         if (itemsets.empty()) {
@@ -60,17 +78,18 @@ namespace fim::data {
             write_header();
         }
 
-        for (const itemset_t &itemset: itemsets) {
-            write_itemset(itemset);
+        for (const auto &&[itemset, support]: std::ranges::views::zip(itemsets, support_values)) {
+            write_itemset(itemset, support);
         }
-        return write_result_t{itemsets};
+        return write_result_t{};
     }
 
     auto to_csv(
         const std::string_view &file_path,
-        const itemsets_t &itemsets,
+        const write_input_t &input,
         const write_csv_config_t &config) -> write_result_t {
-        std::filesystem::path path = std::filesystem::path(file_path).parent_path();
+        const auto &[itemsets, support_values] = input;
+        const std::filesystem::path path = std::filesystem::path(file_path).parent_path();
 
         if (!exists(path)) {
             create_directories(path);
@@ -82,6 +101,6 @@ namespace fim::data {
             return std::unexpected{io_error_t::UNKNOWN_ERROR};
         }
 
-        return to_csv(ofs, itemsets, config);
+        return to_csv(ofs, input, config);
     };
 }
