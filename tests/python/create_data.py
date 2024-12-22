@@ -1,5 +1,25 @@
+"""
+This script generates frequent itemsets and transactions, and saves them to a CSV file.
+
+Usage:
+    python create_data.py <output_file> <min_support>
+
+Arguments:
+    output_file: The name of the file where the transactions will be saved.
+    min_support: The minimal support value for including itemsets in transactions.
+
+Functions:
+    generate_frequent_itemsets: Generates a list of frequent itemsets with random items.
+    generate_transactions: Generates a list of transactions with random lengths and itemsets.
+    save_transactions_to_csv: Save a list of transactions to a CSV file.
+    save_itemsets_to_file: Save the list of frequent itemsets to a file.
+    main: Main function that controls the entire process.
+"""
+
+import sys
 import csv
 import random
+
 
 def generate_frequent_itemsets(items_range, num_frequent_itemsets, max_size):
     """
@@ -19,7 +39,15 @@ def generate_frequent_itemsets(items_range, num_frequent_itemsets, max_size):
 
     return list(frequent_itemsets)
 
-def generate_transactions(num_transactions, min_len, max_len, frequent_itemsets, items_range, min_support):
+
+def generate_transactions(
+        num_transactions: int,
+        min_len: int,
+        max_len: int,
+        frequent_itemsets: list,
+        items_range: range,
+        min_support: float
+) -> list:
     """
     Generates a list of transactions with random lengths and itemsets.
 
@@ -27,30 +55,34 @@ def generate_transactions(num_transactions, min_len, max_len, frequent_itemsets,
     :param num_transactions: The number of transactions to generate.
     :param min_len: The minimum length of a transaction.
     :param max_len: The maximum length of a transaction.
-    :param frequent_itemsets: A list of frequent itemsets to potentially include in transactions.
+    :param frequent_itemsets: A list of frequent itemsets potentially includes in transactions.
     :param items_range: The range of possible items for random selection.
     :return: A list of transactions.
     """
     transactions = []
 
     for _ in range(num_transactions):
+
+        trans = set()
         trans_len = random.randint(min_len, max_len)
-        transaction = []
 
         for itemset in frequent_itemsets:
-            if len(transaction) + len(itemset) <= trans_len and random.random() < min_support:
-                transaction.extend(itemset)
+            if random.random() < min_support:
+                trans.update(itemset)
 
-        while len(transaction) < trans_len:
-            transaction.append(random.choice(items_range))
+        while len(trans) < trans_len:
+            new_item = random.choice(items_range)
+            trans.add(new_item)
 
-        random.shuffle(transaction)
-        transactions.append(transaction)
+        trans = list(trans)
+        random.shuffle(trans)
+
+        transactions.append(trans)
 
     return transactions
 
 
-def save_transactions_to_csv(transactions, filename):
+def save_transactions_to_csv(transactions: list, filename: str) -> None:
     """
     Save a list of transactions to a CSV file.
 
@@ -62,7 +94,7 @@ def save_transactions_to_csv(transactions, filename):
         writer.writerows(transactions)
 
 
-def save_itemsets_to_file(frequent_itemsets, filename):
+def save_itemsets_to_file(frequent_itemsets: list, filename: str) -> None:
     """
     Save the list of frequent itemsets to a file.
 
@@ -73,9 +105,12 @@ def save_itemsets_to_file(frequent_itemsets, filename):
         for itemset in frequent_itemsets:
             file.write(','.join(map(str, itemset)) + '\n')
 
+
 def main():
+    output_file = sys.argv[1]
+    min_support = float(sys.argv[2])
+
     # Parameters for generating frequent itemsets
-    min_support = 0.8
     min_item = 1
     max_item = 100
     items_range = range(min_item, max_item + 1)
@@ -88,15 +123,23 @@ def main():
     max_len = 20
 
     # Generate frequent itemsets and transactions
-    frequent_itemsets = generate_frequent_itemsets(items_range, num_frequent_itemsets, max_size)
-    transactions = generate_transactions(num_transactions, min_len, max_len, frequent_itemsets, items_range, min_support)
+    frequent_itemsets = generate_frequent_itemsets(
+        items_range,
+        num_frequent_itemsets,
+        max_size)
 
-    # Define the filename for saving the itemsets
-    output_file = 'data_01.csv'
+    transactions = generate_transactions(
+        num_transactions,
+        min_len,
+        max_len,
+        frequent_itemsets,
+        items_range,
+        min_support)
 
     # Save transactions to CSV
     save_transactions_to_csv(transactions, output_file)
-    print(f"Generated {num_frequent_itemsets} frequent itemsets and saved them to {output_file}")
+    print(f"Generated {num_frequent_itemsets} frequent itemsets and saved them to {output_file}.")
+
 
 if __name__ == "__main__":
     main()

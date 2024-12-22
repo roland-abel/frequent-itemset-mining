@@ -80,7 +80,7 @@ void add_options(CLI::App &app, configuration_t &config) {
             ->option_text("('apriori', 'fp-growth', 'eclat', 'relim')");
 }
 
-auto main(int argc, char **argv) -> int {
+auto main(const int argc, char **argv) -> int {
     CLI::App app{"Frequent Itemset Mining"};
     app.get_formatter()->column_width(60);
 
@@ -120,7 +120,8 @@ auto main(int argc, char **argv) -> int {
 
         auto apply_algorithm = [&config](const auto &input) {
             const auto &[db, item_counts, min_support, db_size] = input;
-            auto freq_items = get_algorithm(config.algorithm)({db, item_counts}, min_support);
+            auto freq_items = get_algorithm(config.algorithm)({db, item_counts}, min_support)
+                .sort_each_itemset(item_counts.get_item_compare());
 
             return std::optional{std::tuple{db, freq_items, item_counts, db_size}};
         };
@@ -165,7 +166,8 @@ auto main(int argc, char **argv) -> int {
                 .and_then(apply_algorithm)
                 .and_then(count_frequencies)
                 .and_then(get_support_values)
-                .transform(to_csv);
+                .transform(to_csv)
+        ;
 
         if (not result.has_value()) {
             std::cout << "An error occurred" << std::endl;
