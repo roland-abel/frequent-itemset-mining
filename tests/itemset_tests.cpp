@@ -72,9 +72,11 @@ TEST_F(ItemsetTests, ContainsTest) {
 
 TEST_F(ItemsetTests, IsSubsetTest) {
     EXPECT_TRUE(is_subset({}, {}));
+    EXPECT_TRUE(is_subset({94}, {94}));
     EXPECT_TRUE(is_subset({6, 7}, {4, 6, 7}));
     EXPECT_TRUE(is_subset({6, 7}, {6, 5, 7, 4}));
 
+    EXPECT_FALSE(is_subset({4}, {}));
     EXPECT_FALSE(is_subset({1, 4}, {}));
     EXPECT_FALSE(is_subset({7, 6}, {6, 7}));
     EXPECT_FALSE(is_subset({1, 7}, {}));
@@ -109,8 +111,8 @@ TEST_F(ItemsetTests, SetUnionTest) {
 TEST_F(ItemsetTests, HashCodeTest) {
     constexpr auto hash = itemset_hash();
 
-    const auto code1 = hash(itemset_t{5, 1, 2}.sort_itemset());
-    const auto code2 = hash(itemset_t{1, 5, 2}.sort_itemset());
+    const auto code1 = hash(itemset_t{5, 1, 2}.sort_itemset(default_item_compare));
+    const auto code2 = hash(itemset_t{1, 5, 2}.sort_itemset(default_item_compare));
 
     const auto code3 = hash(itemset_t{5, 1, 2});
     const auto code4 = hash(itemset_t{5, 1, 6});

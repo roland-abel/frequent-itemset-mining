@@ -58,4 +58,10 @@ namespace fim::algorithm::eclat {
     /// @param min_support The minimum support threshold for considering an itemset as frequent.
     /// @return A collection of frequent itemsets that meet or exceed the minimum support.
     auto eclat_algorithm(const database_t &database, size_t min_support) -> itemsets_t;
+
+    /// @brief Implements the ECLAT algorithm to find frequent itemsets in the transaction database.
+    /// @param database A tuple containing the reduced database and item's frequencies.
+    /// @param min_support The minimum support threshold for considering an itemset as frequent.
+    /// @return A collection of frequent itemsets that meet or exceed the minimum support.
+    auto eclat_algorithm_(const database_counts_t &database, size_t min_support) -> itemsets_t;
 }

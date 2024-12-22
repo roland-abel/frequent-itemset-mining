@@ -40,7 +40,7 @@ protected:
     static size_t min_support() { return 4; }
 
     static database_t get_database() {
-        itemsets_t database = {
+        return {
             {1, 3, 4, 2, 6, 7, 8},
             {3, 4, 2, 5, 6, 7},
             {1, 4, 5, 6, 7},
@@ -52,13 +52,8 @@ protected:
             {1, 3, 4, 6},
             {1, 3, 2, 5, 6, 7}
         };
-
-        return database
-               | transform([](itemset_t &x) { return x.sort_itemset(); })
-               | std::ranges::to<database_t>();
     }
 };
-
 
 TEST_F(FPTreeTests, NodeIsRootTest) {
     EXPECT_TRUE(node_t::create_root()->is_root());

@@ -112,10 +112,15 @@ namespace fim::algorithm::apriori {
         std::erase_if(candidates, is_infrequent);
     }
 
-    auto apriori_algorithm(const database_t &database, size_t min_support) -> itemsets_t {
+    auto apriori_algorithm(const database_t &database, const size_t min_support) -> itemsets_t {
+        const auto [db, item_counts] = database.transaction_reduction(min_support);
+        return apriori_algorithm_({db, item_counts}, min_support);
+    }
+
+    auto apriori_algorithm_(const database_counts_t &database, size_t min_support) -> itemsets_t {
         itemsets_t freq_itemsets{};
 
-        const auto [db, item_counts] = database.transaction_reduction(min_support);
+        const auto &[db, item_counts] = database;
         const auto compare = item_counts.get_item_compare();
 
         auto insert_itemset = [&](const auto &itemsets) {

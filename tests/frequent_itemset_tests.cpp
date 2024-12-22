@@ -28,6 +28,7 @@
 
 #include <gtest/gtest.h>
 #include <ranges>
+#include <writer.h>
 #include "itemset.h"
 #include "algorithms.h"
 
@@ -63,7 +64,7 @@ TEST_P(FrequentItemsetTests, ApplyAlgorithm) {
     const auto [db, item_counts] = get_database().transaction_reduction(min_support());
     const auto compare = item_counts.get_item_compare();
 
-    const auto &freq_items = get_algorthm()(db, min_support()).sort_each_itemset(compare);
+    const auto &freq_items = get_algorthm()({db, item_counts}, min_support()).sort_each_itemset(compare);
     const auto &counts = itemset_counts_t::create_itemset_counts(db, freq_items, compare);
 
     auto verify = [&](const itemset_t &itemset, const size_t support = 0) -> bool {
@@ -121,8 +122,8 @@ INSTANTIATE_TEST_SUITE_P(
     FrequentItemsetTests,
     FrequentItemsetTests,
     ::testing::Values(
-        apriori::apriori_algorithm,
-        fp_growth::fp_growth_algorithm,
-        eclat::eclat_algorithm,
-        relim::relim_algorithm)
+        get_algorithm(algorithm_t::APRIORI),
+        get_algorithm(algorithm_t::FP_GROWTH),
+        get_algorithm(algorithm_t::ECLAT),
+        get_algorithm(algorithm_t::RELIM))
 );

@@ -90,12 +90,12 @@ namespace fim {
         /// @brief Sorts the items in the itemset.
         /// @param comp The comparison function to use for sorting.
         /// @return A reference to the sorted itemset.
-        auto sort_itemset(const item_compare_t &compare = default_item_compare) -> itemset_t &;
+        auto sort_itemset(const item_compare_t &compare) -> itemset_t &;
 
         /// @brief Sorts the items in the itemset and returns a new sorted itemset.
         /// @param comp The comparison function to use for sorting.
         /// @return A new itemset with sorted items.
-        [[nodiscard]] auto sort_itemset(const item_compare_t &compare = default_item_compare) const -> itemset_t;
+        [[nodiscard]] auto sort_itemset(const item_compare_t &compare) const -> itemset_t;
     };
 
     /// @brief Compares two itemsets lexicographically using a custom comparison function.

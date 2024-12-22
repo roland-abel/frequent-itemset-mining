@@ -105,4 +105,10 @@ namespace fim::algorithm::relim {
     /// @param min_support The minimum support threshold used to filter frequent itemsets.
     /// @return A collection of frequent itemsets that meet the minimum support criteria.
     auto relim_algorithm(const database_t &database, size_t min_support) -> itemsets_t;
+
+    /// @brief Implements the RElim algorithm to find frequent itemsets in the database.
+    /// @param database A tuple containing the reduced database and item's frequencies.
+    /// @param min_support The minimum support threshold used to filter frequent itemsets.
+    /// @return A collection of frequent itemsets that meet the minimum support criteria.
+    auto relim_algorithm_(const database_counts_t &database, size_t min_support) -> itemsets_t;
 }

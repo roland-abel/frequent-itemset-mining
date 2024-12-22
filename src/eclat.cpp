@@ -53,12 +53,20 @@ namespace fim::algorithm::eclat {
     }
 
     auto eclat_algorithm(const database_t &database, const size_t min_support) -> itemsets_t {
+        const auto [db, item_counts] = database.transaction_reduction(min_support);
+        return eclat_algorithm_({db, item_counts}, min_support);
+    }
+
+    auto eclat_algorithm_(const database_counts_t &database, size_t min_support) -> itemsets_t {
         itemsets_t freq_itemsets{};
+
+        const auto &[db, item_counts] = database;
+        const auto compare = item_counts.get_item_compare();
 
         // Creates initial tids.
         auto all_tids = [&]() -> tidset_t {
             return std::ranges::iota_view(0)
-                   | std::views::take(database.size())
+                   | std::views::take(db.size())
                    | std::ranges::to<tidset_t>();
         };
 
@@ -98,7 +106,7 @@ namespace fim::algorithm::eclat {
             }
         };
 
-        const auto &vertical_trans = to_vertical_database(database);
+        const auto &vertical_trans = to_vertical_database(db);
         eclat_({}, vertical_trans, all_tids());
 
         return freq_itemsets;

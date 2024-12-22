@@ -50,11 +50,11 @@ namespace fim::algorithm::apriori {
         size_t k,
         const item_compare_t &compare) -> itemsets_t;
 
-    /// @brief Removes candidate itemsets that do not meet the minimum support threshold.
-    /// @param candidates A collection of candidate itemsets that need to be pruned based on support.
-    /// @param database The dataset used to calculate the support of the candidate itemsets.
-    /// @param min_support The minimum support threshold. Itemsets with support lower than this value will be pruned.
-    /// @param compare A comparison function or object used to compare itemsets, likely for sorting or filtering.
+    /// @brief Prunes the candidate itemsets by removing those that do not meet the minimum support threshold.
+    /// @param candidates A collection of candidate itemsets to be pruned.
+    /// @param database The database used to count the support of itemsets.
+    /// @param min_support The minimum support value used to filter itemsets.
+    /// @param compare A comparison function or object used to compare itemsets.
     /// @return This function modifies the candidates in place.
     auto prune(
         itemsets_t &candidates,
@@ -67,4 +67,11 @@ namespace fim::algorithm::apriori {
     /// @param min_support The minimum support threshold for considering an itemset as frequent.
     /// @return A collection of frequent itemsets that meet or exceed the minimum support.
     auto apriori_algorithm(const database_t &database, size_t min_support) -> itemsets_t;
+
+    /// @brief Implements the Apriori algorithm to find frequent itemsets in the given database.
+    /// This version of the function takes a reduced database and item counts as input.
+    /// @param database A tuple containing the reduced database and item's frequencies.
+    /// @param min_support The minimum support threshold for considering an itemset as frequent.
+    /// @return A collection of frequent itemsets that meet or exceed the minimum support.
+    auto apriori_algorithm_(const database_counts_t &database, size_t min_support) -> itemsets_t;
 }

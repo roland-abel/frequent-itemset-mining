@@ -32,6 +32,8 @@
 #include "item_counts.h"
 
 namespace fim {
+    using database_counts_t = std::tuple<database_t, item_counts_t>;
+
     // The transaction database type.
     struct database_t : std::vector<itemset_t> {
         using std::vector<itemset_t>::vector;
@@ -52,11 +54,11 @@ namespace fim {
         /// @brief Removes all infrequent items from the database and sorts all prefix sets.
         /// @param min_support The minimum support threshold used to filter infrequent items.
         /// @return A tuple containing the reduced database and item's frequencies.
-        auto reduce_database(size_t min_support) -> std::tuple<database_t, item_counts_t>;
+        auto reduce_database(size_t min_support) -> database_counts_t;
 
         /// @brief Removes all infrequent items from the database and sorts all prefix sets (const version).
         /// @param min_support The minimum support threshold used to filter infrequent items.
         /// @return A tuple containing the reduced database and item's frequencies.
-        [[nodiscard]] auto transaction_reduction(size_t min_support) const -> std::tuple<database_t, item_counts_t>;
+        [[nodiscard]] auto transaction_reduction(size_t min_support) const -> database_counts_t;
     };
 }

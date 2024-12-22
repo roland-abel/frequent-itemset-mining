@@ -62,8 +62,8 @@ namespace fim {
         const item_compare_t &compare) -> itemset_counts_t {
         itemset_counts_t count{};
 
-        for (const itemset_t &y: transactions) {
-            for (const itemset_t &x: itemsets) {
+        for (const itemset_t &x: itemsets) {
+            for (const itemset_t &y: transactions) {
                 if (x.is_subset(y, compare)) {
                     ++count[x];
                 }
@@ -77,6 +77,6 @@ namespace fim {
     }
 
     auto itemset_counts_t::get_support(const itemset_t &itemset, const size_t db_size) const -> float {
-        return static_cast<float>(get_count(itemset)) / db_size;
+        return static_cast<float>(get_count(itemset)) / static_cast<float>(db_size);
     }
 }

@@ -39,6 +39,10 @@ class FPGrowthTests : public testing::Test {
 protected:
     static size_t min_support() { return 4; }
 
+    static item_compare_t get_compare() {
+        return default_item_compare;
+    }
+
     static database_t get_database() {
         return database_t{
             {1, 3, 4, 2, 6, 7, 8},
@@ -60,7 +64,7 @@ TEST_F(FPGrowthTests, ConditionalTransactions1Test) {
     const auto &freq_items = item_counts.get_frequent_items(min_support());
 
     const auto &root = build_fp_tree(db, freq_items);
-    const auto &trans = conditional_transactions(root, 7);
+    const auto &trans = conditional_transactions(root, 7, get_compare());
 
     ASSERT_EQ(trans.size(), 6);
     EXPECT_EQ(trans[0], (itemset_t{1, 4, 6}));
@@ -76,7 +80,7 @@ TEST_F(FPGrowthTests, ConditionalTransactions2Test) {
     const auto &freq_items = item_counts.get_frequent_items(min_support());
 
     const auto &root = build_fp_tree(db, freq_items);
-    const auto &trans = conditional_transactions(root, 2);
+    const auto &trans = conditional_transactions(root, 2, get_compare());
 
     ASSERT_EQ(trans.size(), 4);
     EXPECT_EQ(trans[0], (itemset_t{1, 3, 4, 5, 6, 7}));

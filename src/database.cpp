@@ -38,6 +38,10 @@ namespace fim {
     }
 
     auto database_t::sort_lexicographically(const item_compare_t &compare) -> database_t {
+        for (itemset_t &trans: *this) {
+            std::ranges::sort(trans, compare);
+        }
+
         std::ranges::sort(*this, [&](const itemset_t &x, const itemset_t &y) {
             return lexicographical_compare(x, y, compare);
         });
@@ -52,9 +56,8 @@ namespace fim {
         return std::move(counts);
     }
 
-    auto database_t::reduce_database(size_t min_support) -> std::tuple<database_t, item_counts_t> {
+    auto database_t::reduce_database(const size_t min_support) -> database_counts_t {
         const auto &item_counts = get_item_counts();
-        const auto &compare = item_counts.get_item_compare();
 
         auto is_infreq_item = [&](const item_t &item) -> bool {
             return item_counts.at(item) < min_support;
@@ -66,7 +69,6 @@ namespace fim {
 
         for (itemset_t &trans: *this) {
             std::erase_if(trans, is_infreq_item);
-            std::ranges::sort(trans, compare);
         }
 
         const auto it = std::ranges::remove_if(*this, is_empty_itemset).begin();
@@ -78,7 +80,7 @@ namespace fim {
         return std::make_tuple(*this, counts);
     }
 
-    auto database_t::transaction_reduction(size_t min_support) const -> std::tuple<database_t, item_counts_t> {
+    auto database_t::transaction_reduction(const size_t min_support) const -> database_counts_t {
         database_t db(*this); // copy database
         return db.reduce_database(min_support);
     }

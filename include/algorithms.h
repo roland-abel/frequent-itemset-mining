@@ -37,7 +37,7 @@
 namespace fim::algorithm {
     /// Define a type alias for a function that takes a database and a minimum support value as inputs,
     /// and perform a frequent itemset mining algorithm.
-    using algorithm_function_t = std::function<itemsets_t(const database_t &database, size_t min_support)>;
+    using algorithm_function_t = std::function<itemsets_t(const database_counts_t &database, size_t min_support)>;
 
     /// Enum of frequent itemset mining algorithms.
     enum class algorithm_t : int {
@@ -49,10 +49,10 @@ namespace fim::algorithm {
 
     // Map from an enum to function pointers representing frequent itemset mining algorithms.
     const auto map_algorithm_function = std::map<algorithm_t, algorithm_function_t>{
-        {algorithm_t::APRIORI, apriori::apriori_algorithm},
-        {algorithm_t::FP_GROWTH, fp_growth::fp_growth_algorithm},
-        {algorithm_t::RELIM, relim::relim_algorithm},
-        {algorithm_t::ECLAT, eclat::eclat_algorithm},
+        {algorithm_t::APRIORI, apriori::apriori_algorithm_},
+        {algorithm_t::FP_GROWTH, fp_growth::fp_growth_algorithm_},
+        {algorithm_t::RELIM, relim::relim_algorithm_},
+        {algorithm_t::ECLAT, eclat::eclat_algorithm_}
     };
 
     /// @brief Retrieves the algorithm function associated with the specified enum type.

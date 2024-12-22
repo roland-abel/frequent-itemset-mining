@@ -1,5 +1,5 @@
 /// @file main.cpp
-/// @brief
+/// @brief CLI main function.
 ///
 /// @author Roland Abel
 /// @date July 5, 2004
@@ -10,7 +10,7 @@
 ///
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
 /// of this software and associated documentation files (the "Software"), to deal
-/// in the Software without restriction, including without limitation the rights
+/// with the Software without restriction, including without limitation the rights
 /// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 /// copies of the Software, and to permit persons to whom the Software is
 /// furnished to do so, subject to the following conditions:
@@ -29,6 +29,8 @@
 #include <expected>
 #include <iostream>
 #include <string>
+#include <tuple>
+#include <optional>
 #include "CLI/CLI.hpp"
 #include "algorithms.h"
 #include "reader.h"
@@ -66,7 +68,7 @@ void add_options(CLI::App &app, configuration_t &config) {
             ->check(CLI::NonexistentPath);
 
     app.add_option("-s, --min-support", config.min_support)
-            ->description("Minimum support threshold for the frequent suffix")
+            ->description("Minimum support threshold for the frequent itemsets")
             ->check(CLI::Range(0.0f, 1.f))
             ->default_val(0.8)
             ->option_text("(between 0 and 1)");
@@ -80,40 +82,93 @@ void add_options(CLI::App &app, configuration_t &config) {
 
 auto main(int argc, char **argv) -> int {
     CLI::App app{"Frequent Itemset Mining"};
-    app.get_formatter()->column_width(50);
+    app.get_formatter()->column_width(60);
 
     configuration_t config{};
     add_options(app, config);
 
     app.callback([&] {
-        const auto read_config = data::read_csv_config_t{
+        constexpr auto read_config = data::read_csv_config_t{
             .skip_rows = 0,
-            .separator = ' '
+            .separator = ','
         };
 
-        auto write_config = data::write_csv_config_t{
+        constexpr auto write_config = data::write_csv_config_t{
             .with_header = true,
-            .separator = ' '
+            .separator = ';'
         };
 
-        auto read_csv = [&]() -> data::read_result_t {
-            return data::read_csv(config.input_path, read_config);
+        auto read_csv = [&]() -> std::optional<tuple<database_t, size_t> > {
+            const auto res = data::read_csv(config.input_path, read_config);
+            if (not res) {
+                return std::nullopt;
+            }
+
+            const auto &db = *res;
+            return std::tuple{db, db.size()};
         };
 
-        auto to_csv = [&](const itemsets_t &itemsets) -> data::write_result_t {
-            return data::to_csv(config.output_path, itemsets, write_config);
+        auto prepare_database = [&config](const auto &input) {
+            const auto &[database, db_size] = input;
+
+            const auto min_support = static_cast<size_t>(config.min_support * static_cast<float>(db_size));
+            const auto &[db, item_counts] = database.transaction_reduction(min_support);
+            const auto compare = item_counts.get_item_compare();
+
+            return std::optional{std::tuple{db, item_counts, min_support, db_size}};
         };
 
-        auto apply_algorithm = [&](const database_t &database) -> itemsets_t {
-            const auto min_support_abs = config.min_support * database.size();
-            auto &db = const_cast<database_t &>(database);
+        auto apply_algorithm = [&config](const auto &input) {
+            const auto &[db, item_counts, min_support, db_size] = input;
+            auto freq_items = get_algorithm(config.algorithm)({db, item_counts}, min_support);
 
-            const auto algorithm = get_algorithm(config.algorithm);
-            return algorithm(db, min_support_abs);
+            return std::optional{std::tuple{db, freq_items, item_counts, db_size}};
         };
 
-        auto result = read_csv().transform(apply_algorithm).transform(to_csv);
-        if (result.has_value()) {
+        auto count_frequencies = [&](const auto &input) {
+            const auto &[db, freq_items, item_counts, db_size] = input;
+            const auto &counts = itemset_counts_t::create_itemset_counts(
+                db,
+                freq_items,
+                item_counts.get_item_compare());
+
+            return std::optional{std::tuple{freq_items, counts, db_size}};
+        };
+
+        auto get_support_values = [&](const auto &input) {
+            const auto &[freq_items, counts, db_size] = input;
+
+            auto get_support = [&](const auto &itemset) -> float {
+                return counts.get_support(itemset, db_size);
+            };
+
+            support_values_t support_values{};
+            for (const auto &itemset: freq_items) {
+                support_values.push_back(get_support(itemset));
+            }
+
+            return std::optional{std::tuple{freq_items, support_values}};
+        };
+
+        auto to_csv = [&](const auto &input) {
+            const auto &[freq_items, support_values] = input;
+            const auto write_input = data::write_input_t{
+                .itemsets = freq_items,
+                .support_values = support_values
+            };
+
+            return data::to_csv(config.output_path, write_input, write_config);
+        };
+
+        const auto result = read_csv()
+                .and_then(prepare_database)
+                .and_then(apply_algorithm)
+                .and_then(count_frequencies)
+                .and_then(get_support_values)
+                .transform(to_csv);
+
+        if (not result.has_value()) {
+            std::cout << "An error occurred" << std::endl;
         }
     });
 

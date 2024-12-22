@@ -146,10 +146,15 @@ namespace fim::algorithm::relim {
     }
 
     auto relim_algorithm(const database_t &database, const size_t min_support) -> itemsets_t {
+        const auto [db, item_counts] = database.transaction_reduction(min_support);
+        return relim_algorithm_({db, item_counts}, min_support);
+    }
+
+    auto relim_algorithm_(const database_counts_t &database, size_t min_support) -> itemsets_t {
         itemsets_t freq_itemsets{};
 
-        const auto [db, item_count] = database.transaction_reduction(min_support);
-        const auto compare = item_count.get_item_compare();
+        const auto &[db, item_counts] = database;
+        const auto compare = item_counts.get_item_compare();
 
         auto combine = [&](const itemset_t &prefix, const itemset_t &suffix) -> itemset_t {
             auto itemset = prefix.set_union(suffix);
@@ -180,7 +185,7 @@ namespace fim::algorithm::relim {
             }
         };
 
-        const auto &freq_items = item_count.get_frequent_items(min_support);
+        const auto &freq_items = item_counts.get_frequent_items(min_support);
         auto conditional_db = conditional_database_t::create_initial_database(db, freq_items, compare);
 
         relim_algorithm_({}, conditional_db);

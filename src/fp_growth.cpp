@@ -37,7 +37,7 @@ namespace fim::algorithm::fp_growth {
     using std::views::filter;
     using std::views::transform;
 
-    auto conditional_transactions(const node_ptr &root, const item_t item) -> database_t {
+    auto conditional_transactions(const node_ptr &root, const item_t item, const item_compare_t &compare) -> database_t {
         database_t transactions{};
 
         std::function<void(const node_ptr &)> conditional_transactions_ = [&](const node_ptr &node) -> void {
@@ -50,7 +50,7 @@ namespace fim::algorithm::fp_growth {
                     path.add(current->item);
                     current = current->parent.lock();
                 }
-                return path.sort_itemset();
+                return path.sort_itemset(compare);
             };
 
             if (node->item == item) {
@@ -70,9 +70,14 @@ namespace fim::algorithm::fp_growth {
     }
 
     auto fp_growth_algorithm(const database_t &database, const size_t min_support) -> itemsets_t {
+        const auto [db, item_counts] = database.transaction_reduction(min_support);
+        return fp_growth_algorithm_({db, item_counts}, min_support);
+    }
+
+    auto fp_growth_algorithm_(const database_counts_t &database, size_t min_support) -> itemsets_t {
         itemsets_t freq_itemsets{};
 
-        const auto [db, item_counts] = database.transaction_reduction(min_support);
+        const auto &[db, item_counts] = database;
         const auto compare = item_counts.get_item_compare();
 
         const auto update_frequent_itemsets = [&](const item_t &item, const itemsets_t &itemsets) {
@@ -90,7 +95,7 @@ namespace fim::algorithm::fp_growth {
 
         // traverses all frequent items in the reversed order
         for (auto &item: std::ranges::reverse_view(freq_items)) {
-            const auto &cond_trans = conditional_transactions(root, item);
+            const auto &cond_trans = conditional_transactions(root, item, compare);
             const auto &cond_itemsets = fp_growth_algorithm(cond_trans, min_support);
             const auto &itemsets = insert_into_each_itemsets(cond_itemsets, item);
 
