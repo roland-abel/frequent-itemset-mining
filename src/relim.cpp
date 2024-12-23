@@ -1,5 +1,5 @@
 /// @file relim.cpp
-/// @brief
+/// @brief Implementation of the RELim algorithm.
 ///
 /// @author Roland Abel
 /// @date September 12, 2024
@@ -28,6 +28,7 @@
 
 #include <algorithm>
 #include <ranges>
+#include <cassert>
 #include "relim.h"
 
 namespace fim::algorithm::relim {
@@ -55,11 +56,10 @@ namespace fim::algorithm::relim {
         }
     }
 
-    conditional_database_t::conditional_database_t(const itemset_t &freq_items, const item_compare_t &compare)
-        : compare(compare) {
-        auto to_header_element = [](const item_t &item) {
-            return header_element_t{0, item, suffixes_t{}};
-        };
+    conditional_database_t::conditional_database_t(
+        const itemset_t &freq_items,
+        const item_compare_t &compare) : compare(compare) {
+        static auto to_header_element = [](const item_t &item) { return header_element_t{0, item, suffixes_t{}}; };
 
         auto items = freq_items.sort_itemset(compare);
         std::ranges::reverse(items);
@@ -75,14 +75,12 @@ namespace fim::algorithm::relim {
         const item_compare_t &compare) -> conditional_database_t {
         conditional_database_t conditional_db(freq_items, compare);
 
-        auto &header = conditional_db.header;
-        auto it = header.rbegin();
-
+        auto it = conditional_db.header.rbegin();
         for (const itemset_t &trans: database) {
             const auto &prefix = trans.front();
             const auto &suffix = trans | drop(1) | to<itemset_t>();
 
-            it = std::find_if(it, header.rend(), [&](const auto &h) {
+            it = std::find_if(it, conditional_db.header.rend(), [&](const auto &h) {
                 return h.prefix == prefix;
             });
 
@@ -94,8 +92,8 @@ namespace fim::algorithm::relim {
         return conditional_db;
     }
 
-    auto conditional_database_t::get_prefix_database() const -> conditional_database_t {
-        const auto &[support, item, suffixes] = header.back();
+    auto conditional_database_t::create_prefix_database() const -> conditional_database_t {
+        const auto &[_, item, suffixes] = header.back();
         const auto items = header
                            | take(header.size() - 1)
                            | transform([](const auto &x) { return x.prefix; })
@@ -103,16 +101,14 @@ namespace fim::algorithm::relim {
 
         conditional_database_t conditional_db(items, compare);
 
-        auto &header = conditional_db.header;
-        auto it = header.rbegin();
-
+        auto it = conditional_db.header.rbegin();
         for (const auto &[count, itemset]: suffixes) {
             // itemset == {prefix} + {suffix}
             const item_t &prefix = itemset.front();
             const itemset_t &suffix = itemset | drop(1) | to<itemset_t>();
 
             // find prefix
-            it = std::find_if(it, header.rend(), [&](const auto &x) {
+            it = std::find_if(conditional_db.header.rbegin(), conditional_db.header.rend(), [&](const auto &x) {
                 return x.prefix == prefix;
             });
 
@@ -133,6 +129,7 @@ namespace fim::algorithm::relim {
         auto it_prefix = prefix_db.header.rbegin();
 
         while (it != header.rend() && it_prefix != prefix_db.header.rend()) {
+            assert(it->prefix == it_prefix->prefix);
             it->count += it_prefix->count;
 
             for (const auto &[count, itemset]: it_prefix->suffixes) {
@@ -150,15 +147,16 @@ namespace fim::algorithm::relim {
         return relim_algorithm_({db, item_counts}, min_support);
     }
 
-    auto relim_algorithm_(const database_counts_t &database, size_t min_support) -> itemsets_t {
+    auto relim_algorithm_(const database_counts_t &database, const size_t min_support) -> itemsets_t {
         itemsets_t freq_itemsets{};
 
         const auto &[db, item_counts] = database;
         const auto compare = item_counts.get_item_compare();
 
         auto combine = [&](const itemset_t &prefix, const itemset_t &suffix) -> itemset_t {
-            auto itemset = prefix.set_union(suffix);
-            itemset.sort_itemset(compare);
+            itemset_t itemset{};
+            std::ranges::copy(prefix, std::back_inserter(itemset));
+            std::ranges::copy(suffix, std::back_inserter(itemset));
 
             return itemset;
         };
@@ -174,14 +172,13 @@ namespace fim::algorithm::relim {
                 const auto [count, prefix, suffixes] = conditional_db.header.back();
                 const auto new_prefix = combine(itemset_t{itemset_prefix}, itemset_t{prefix});
 
-                if (count >= min_support) {
-                    insert_itemset(new_prefix, count);
-                }
-
-                auto prefix_db = conditional_db.get_prefix_database();
+                auto prefix_db = conditional_db.create_prefix_database();
                 conditional_db.eliminate(prefix_db);
 
-                relim_algorithm_(new_prefix, prefix_db);
+                if (count >= min_support) {
+                    insert_itemset(new_prefix, count);
+                    relim_algorithm_(new_prefix, prefix_db);
+                }
             }
         };
 
