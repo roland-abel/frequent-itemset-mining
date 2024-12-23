@@ -47,7 +47,7 @@ def generate_transactions(
         frequent_itemsets: list,
         items_range: range,
         min_support: float
-) -> list:
+) -> set:
     """
     Generates a list of transactions with random lengths and itemsets.
 
@@ -59,10 +59,9 @@ def generate_transactions(
     :param items_range: The range of possible items for random selection.
     :return: A list of transactions.
     """
-    transactions = []
+    transactions = set()
 
-    for _ in range(num_transactions):
-
+    while len(transactions) < num_transactions:
         trans = set()
         trans_len = random.randint(min_len, max_len)
 
@@ -77,12 +76,12 @@ def generate_transactions(
         trans = list(trans)
         random.shuffle(trans)
 
-        transactions.append(trans)
+        transactions.add(tuple(trans))
 
     return transactions
 
 
-def save_transactions_to_csv(transactions: list, filename: str) -> None:
+def save_transactions_to_csv(transactions: set, filename: str) -> None:
     """
     Save a list of transactions to a CSV file.
 
