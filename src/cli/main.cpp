@@ -45,6 +45,7 @@ struct configuration_t {
     std::string output_path;
     float min_support;
     algorithm_t algorithm;
+    bool override;
 };
 
 void add_options(CLI::App &app, configuration_t &config) {
@@ -54,6 +55,18 @@ void add_options(CLI::App &app, configuration_t &config) {
         {"relim", algorithm_t::RELIM},
         {"eclat", algorithm_t::ECLAT}
     };
+
+    const auto non_existent_path_validator = [&config](const std::string &path) {
+        if (config.override) {
+            return std::string();
+        }
+
+        const std::ifstream file(path);
+        return !file.good() ? std::string() : "File already exists.";
+    };
+
+    app.add_flag("--override", config.override)
+            ->description("If set, the output file will be overwritten");
 
     app.add_option("-i, --input", config.input_path)
             ->description("Path to the input file containing the database")
@@ -65,7 +78,7 @@ void add_options(CLI::App &app, configuration_t &config) {
             ->description("Path to the output file where the frequent itemsets will be saved")
             ->required()
             ->option_text("(none existing file)")
-            ->check(CLI::NonexistentPath);
+            ->check(CLI::Validator(non_existent_path_validator, "NonexistentPath"));
 
     app.add_option("-s, --min-support", config.min_support)
             ->description("Minimum support threshold for the frequent itemsets")
@@ -121,7 +134,7 @@ auto main(const int argc, char **argv) -> int {
         auto apply_algorithm = [&config](const auto &input) {
             const auto &[db, item_counts, min_support, db_size] = input;
             auto freq_items = get_algorithm(config.algorithm)({db, item_counts}, min_support)
-                .sort_each_itemset(item_counts.get_item_compare());
+                    .sort_each_itemset(item_counts.get_item_compare());
 
             return std::optional{std::tuple{db, freq_items, item_counts, db_size}};
         };
