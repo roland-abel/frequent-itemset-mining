@@ -1,5 +1,5 @@
 /// @file fp_tree.cpp
-/// @brief
+/// @brief Implementation of an FP-Tree data structure used for the FP-Growth algorithm.
 ///
 /// @author Roland Abel
 /// @date August 10, 2024

@@ -166,8 +166,7 @@ auto main(const int argc, char **argv) -> int {
                 .and_then(apply_algorithm)
                 .and_then(count_frequencies)
                 .and_then(get_support_values)
-                .transform(to_csv)
-        ;
+                .transform(to_csv);
 
         if (not result.has_value()) {
             std::cout << "An error occurred" << std::endl;

@@ -1,5 +1,5 @@
 /// @file relim.h
-/// @brief
+/// @brief Implementation of the RELim algorithm.
 ///
 /// @author Roland Abel
 /// @date September 12, 2024
@@ -62,7 +62,7 @@ namespace fim::algorithm::relim {
 
     /// Head element
     struct header_element_t {
-        size_t count = 0;
+        size_t count{0};
         item_t prefix{};
         suffixes_t suffixes{};
     };
@@ -92,7 +92,7 @@ namespace fim::algorithm::relim {
 
         /// @brief Returns a conditional database filtered by the prefix.
         /// @return A new conditional database that only includes transactions with the given prefix.
-        [[nodiscard]] auto get_prefix_database() const -> conditional_database_t;
+        [[nodiscard]] auto create_prefix_database() const -> conditional_database_t;
 
         /// @brief Eliminates items from the database based on the given prefix database.
         /// @param prefix_db A conditional database.

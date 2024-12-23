@@ -48,6 +48,10 @@ namespace fim {
         /// @brief Gets a comparator for items based on their support (count).
         /// @return A comparison function that can be used to compare two items based on their support.
         [[nodiscard]] auto get_item_compare() const -> item_compare_t;
+
+        /// @brief Gets a comparator for items based on their support (count) in reverse order.
+        /// @return A comparison function that can be used to compare two items based on their support in reverse order.
+        auto get_item_reverse_compare() const -> item_compare_t;
     };
 
     // Item set counting

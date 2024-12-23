@@ -1,5 +1,5 @@
 /// @file fp_growth.cpp
-/// @brief
+/// @brief Implementation of the FP-Growth algorithm.
 ///
 /// @author Roland Abel
 /// @date August 10, 2024
@@ -56,7 +56,9 @@ namespace fim::algorithm::fp_growth {
             if (node->item == item) {
                 itemset_t items = collect_path(node);
                 for (int i = 0; i < node->frequency; ++i) {
-                    transactions.emplace_back(items);
+                    if (not items.empty()) {
+                        transactions.emplace_back(items);
+                    }
                 }
             } else {
                 for (const auto &child: node->children) {

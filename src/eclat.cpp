@@ -1,5 +1,5 @@
 /// @file eclat.cpp
-/// @brief
+/// @brief Implementation of the ECLAT algorithm.
 ///
 /// @author Roland Abel
 /// @date September 10, 2024

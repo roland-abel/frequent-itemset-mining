@@ -1,5 +1,5 @@
 /// @file apriori.cpp
-/// @brief
+/// @brief Implementation of the Apriori algorithm.
 ///
 /// @author Roland Abel
 /// @date July 07, 2024

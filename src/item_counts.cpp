@@ -56,6 +56,15 @@ namespace fim {
         };
     }
 
+    auto item_counts_t::get_item_reverse_compare() const -> item_compare_t {
+        return [&](const item_t &i, const item_t &j) -> bool {
+            const auto weight_i = at(i);
+            const auto weight_j = at(j);
+
+            return weight_i != weight_j ? weight_i > weight_j : i > j;
+        };
+    }
+
     auto itemset_counts_t::create_itemset_counts(
         const database_t &transactions,
         const itemsets_t &itemsets,

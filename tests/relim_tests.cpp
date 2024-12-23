@@ -211,14 +211,14 @@ TEST_F(RelimTests, CreateInitialDatabaseTest) {
     EXPECT_EQ((++it)->itemset, itemset_t({'b', 'd'}));
 }
 
-TEST_F(RelimTests, GetPrefixDatabaseTest) {
+TEST_F(RelimTests, CreatePrefixDatabaseTest) {
     const auto &[db, counts] = get_database().transaction_reduction(min_support());
     const auto compare = counts.get_item_compare();
 
     const auto freq_items = counts.get_frequent_items(min_support());
     const auto conditional_db = conditional_database_t::create_initial_database(db, freq_items, compare);
 
-    const auto &prefix_db = conditional_db.get_prefix_database();
+    const auto &prefix_db = conditional_db.create_prefix_database();
 
     const auto header = prefix_db.header;
     ASSERT_EQ(header.size(), 4);
@@ -254,7 +254,7 @@ TEST_F(RelimTests, EliminateTest) {
     auto conditional_db = conditional_database_t::create_initial_database(db, freq_items, compare);
 
     // eliminated prefix 'e'
-    auto prefix = conditional_db.eliminate(conditional_db.get_prefix_database());
+    auto prefix = conditional_db.eliminate(conditional_db.create_prefix_database());
     EXPECT_EQ(prefix, 'e');
 
     auto header = conditional_db.header;
@@ -282,7 +282,7 @@ TEST_F(RelimTests, EliminateTest) {
     EXPECT_EQ((++it)->itemset, itemset_t({'d'}));
 
     // eliminated prefix 'a'
-    prefix = conditional_db.eliminate(conditional_db.get_prefix_database());
+    prefix = conditional_db.eliminate(conditional_db.create_prefix_database());
     EXPECT_EQ(prefix, 'a');
 
     header = conditional_db.header;
@@ -305,7 +305,7 @@ TEST_F(RelimTests, EliminateTest) {
     EXPECT_EQ((++it)->itemset, itemset_t({'d'}));
 
     // eliminated prefix 'c'
-    prefix = conditional_db.eliminate(conditional_db.get_prefix_database());
+    prefix = conditional_db.eliminate(conditional_db.create_prefix_database());
     EXPECT_EQ(prefix, 'c');
 
     header = conditional_db.header;
@@ -322,7 +322,7 @@ TEST_F(RelimTests, EliminateTest) {
     EXPECT_EQ(it->itemset, itemset_t({'d'}));
 
     // eliminated prefix 'b'
-    prefix = conditional_db.eliminate(conditional_db.get_prefix_database());
+    prefix = conditional_db.eliminate(conditional_db.create_prefix_database());
     EXPECT_EQ(prefix, 'b');
 
     header = conditional_db.header;

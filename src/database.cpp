@@ -59,20 +59,17 @@ namespace fim {
     auto database_t::reduce_database(const size_t min_support) -> database_counts_t {
         const auto &item_counts = get_item_counts();
 
-        auto is_infreq_item = [&](const item_t &item) -> bool {
-            return item_counts.at(item) < min_support;
-        };
-
-        auto is_empty_itemset = [](const itemset_t &x) -> bool {
-            return x.empty();
-        };
-
+        // Remove items from transactions that do not meet the minimum support threshold
         for (itemset_t &trans: *this) {
-            std::erase_if(trans, is_infreq_item);
+            std::erase_if(trans, [&](const item_t &item) -> bool {
+                return item_counts.at(item) < min_support;
+            });
         }
 
-        const auto it = std::ranges::remove_if(*this, is_empty_itemset).begin();
-        erase(it, end());
+        // Remove empty itemsets from the database
+        std::erase_if(*this, [](const itemset_t &x) -> bool {
+            return x.empty();
+        });
 
         const auto &counts = get_item_counts();
         sort_lexicographically(counts.get_item_compare());

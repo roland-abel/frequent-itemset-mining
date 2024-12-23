@@ -124,3 +124,63 @@ TEST_F(ItemsetCountsTests, GetCountTest) {
     EXPECT_EQ(get_count({5, 4, 1}), 3);
 }
 
+TEST_F(ItemsetCountsTests, GetSupportTest) {
+    constexpr auto eps = 0.1f;
+    const auto &[db, item_counts] = get_database().transaction_reduction(min_support());
+    const auto compare = item_counts.get_item_compare();
+
+    itemsets_t candidates{
+        {4, 3, 1},
+        {1, 4, 5},
+        {1, 3, 6},
+        {3, 2, 7}
+    };
+
+    candidates.sort_each_itemset(compare);
+    const auto &counts = itemset_counts_t::create_itemset_counts(db, candidates, compare);
+
+    auto get_support = [&](const itemset_t &itemset) -> float {
+        return counts.get_support(itemset.sort_itemset(compare), db.size());
+    };
+
+    ASSERT_EQ(counts.size(), 4);
+
+    EXPECT_FLOAT_EQ(get_support({2, 3, 7}), 0.44444445f);
+    EXPECT_FLOAT_EQ(get_support({3, 4, 1}), 0.33333334f);
+    EXPECT_FLOAT_EQ(get_support({3, 6, 1}), 0.44444445f);
+    EXPECT_FLOAT_EQ(get_support({5, 4, 1}), 0.33333334f);
+}
+
+TEST_F(ItemsetCountsTests, ItemCompareTest) {
+    const auto &db = get_database();
+    const auto &counts = db.get_item_counts();
+    const auto compare = counts.get_item_compare();
+
+    const itemset_t &items = counts.get_frequent_items(min_support());
+
+    //  1 > 4 > 7 > 6 > 5 > 3 > 2 > 8 (ascending order)
+    EXPECT_FALSE(compare(1, 4));
+    EXPECT_TRUE(compare(4, 1));
+    EXPECT_FALSE(compare(7, 6));
+    EXPECT_TRUE(compare(6, 7));
+    EXPECT_FALSE(compare(5, 3));
+    EXPECT_TRUE(compare(3, 5));
+    EXPECT_FALSE(compare(2, 8));
+    EXPECT_TRUE(compare(8, 2));
+}
+
+TEST_F(ItemsetCountsTests, ItemCompareReverseTest) {
+    const auto &db = get_database();
+    const auto &counts = db.get_item_counts();
+    const auto compare = counts.get_item_reverse_compare();
+
+    //  8 > 2 > 3 > 5 > 6 > 7 > 4 > 1 (descending order)
+    EXPECT_TRUE(compare(1, 4));
+    EXPECT_FALSE(compare(4, 1));
+    EXPECT_TRUE(compare(7, 6));
+    EXPECT_FALSE(compare(6, 7));
+    EXPECT_TRUE(compare(5, 3));
+    EXPECT_FALSE(compare(3, 5));
+    EXPECT_TRUE(compare(2, 8));
+    EXPECT_FALSE(compare(8, 2));
+}
