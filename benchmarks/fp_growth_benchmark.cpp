@@ -55,6 +55,9 @@ BENCHMARK_CAPTURE(fp_growth_benchmark, "retail", "data/retail.dat")
         ->Arg(90)
         ->Unit(benchmark::kMillisecond);
 
+#ifdef NDEBUG
 BENCHMARK_CAPTURE(fp_growth_benchmark, "chess", "data/chess.dat")
+        ->Arg(80)
         ->Arg(90)
         ->Unit(benchmark::kMillisecond);
+#endif

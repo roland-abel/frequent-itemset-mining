@@ -54,3 +54,10 @@ BENCHMARK_CAPTURE(apriori_benchmark, "retail", "data/retail.dat")
         ->Arg(80)
         ->Arg(90)
         ->Unit(benchmark::kMillisecond);
+
+#ifdef NDEBUG
+BENCHMARK_CAPTURE(apriori_benchmark, "chess", "data/chess.dat")
+        ->Arg(80)
+        ->Arg(90)
+        ->Unit(benchmark::kMillisecond);
+#endif

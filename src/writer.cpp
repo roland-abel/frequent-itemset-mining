@@ -102,5 +102,5 @@ namespace fim::data {
         }
 
         return to_csv(ofs, input, config);
-    };
+    }
 }

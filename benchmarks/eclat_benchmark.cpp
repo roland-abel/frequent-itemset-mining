@@ -48,3 +48,16 @@ BENCHMARK_CAPTURE(eclat_benchmark, "mushroom", "data/mushroom.dat")
         ->Arg(80)
         ->Arg(90)
         ->Unit(benchmark::kMillisecond);
+
+BENCHMARK_CAPTURE(eclat_benchmark, "retail", "data/retail.dat")
+        ->Arg(60)
+        ->Arg(80)
+        ->Arg(90)
+        ->Unit(benchmark::kMillisecond);
+
+#ifdef NDEBUG
+BENCHMARK_CAPTURE(eclat_benchmark, "chess", "data/chess.dat")
+        ->Arg(80)
+        ->Arg(90)
+        ->Unit(benchmark::kMillisecond);
+#endif

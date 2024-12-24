@@ -10,7 +10,7 @@
 ///
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
 /// of this software and associated documentation files (the "Software"), to deal
-/// in the Software without restriction, including without limitation the rights
+/// with the Software without restriction, including without limitation the rights
 /// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 /// copies of the Software, and to permit persons to whom the Software is
 /// furnished to do so, subject to the following conditions:
@@ -48,3 +48,17 @@ BENCHMARK_CAPTURE(relim_benchmark, "mushroom", "data/mushroom.dat")
         ->Arg(80)
         ->Arg(90)
         ->Unit(benchmark::kMillisecond);
+
+BENCHMARK_CAPTURE(relim_benchmark, "retail", "data/retail.dat")
+        ->Arg(60)
+        ->Arg(80)
+        ->Arg(90)
+        ->Unit(benchmark::kMillisecond);
+
+#ifdef NDEBUG
+BENCHMARK_CAPTURE(relim_benchmark, "chess", "data/chess.dat")
+        ->Arg(80)
+        ->Arg(90)
+        ->Unit(benchmark::kMillisecond);
+#endif
+
