@@ -1,5 +1,6 @@
 # @file CMakefile
-#
+# @brief CMake configuration file for the frequent-itemset-mining project.
+
 # @author Roland Abel
 # @date July 02, 2024
 #

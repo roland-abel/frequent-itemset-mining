@@ -1,5 +1,5 @@
 /// @file item_counts.cpp
-/// @brief
+/// @brief Implementation of itemset counter's type and functions namespace.
 ///
 /// @author Roland Abel
 /// @date December 11, 2024

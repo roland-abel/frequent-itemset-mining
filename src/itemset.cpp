@@ -1,5 +1,5 @@
 /// @file itemset.cpp
-/// @brief
+/// @brief Implementation of the itemsets types and functions.
 ///
 /// @author Roland Abel
 /// @date September 21, 2004

@@ -66,7 +66,7 @@ void add_options(CLI::App &app, configuration_t &config) {
     };
 
     app.add_flag("--override", config.override)
-            ->description("If set, the output file will be overwritten");
+            ->description("If set, the output file is overwritten if it already exists");
 
     app.add_option("-i, --input", config.input_path)
             ->description("Path to the input file containing the database")

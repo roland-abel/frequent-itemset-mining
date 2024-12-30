@@ -1,5 +1,5 @@
 /// @file reader.cpp
-/// @brief
+/// @brief Implementation of the reader's functions namespace.
 ///
 /// @author Roland Abel
 /// @date August 30, 2024

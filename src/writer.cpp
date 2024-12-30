@@ -1,5 +1,5 @@
 /// @file writer.cpp
-/// @brief
+/// @brief Implementation of the writer's functions namespace.
 ///
 /// @author Roland Abel
 /// @date August 30, 2024

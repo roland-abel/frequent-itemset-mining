@@ -1,5 +1,5 @@
 /// @file data.cpp
-/// @brief
+/// @brief Implementation of the data namespace.
 ///
 /// @author Roland Abel
 /// @date December 08, 2024
