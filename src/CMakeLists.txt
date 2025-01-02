@@ -41,7 +41,6 @@ add_library(${FIM_LIB_NAME}
         eclat.cpp
         relim.cpp)
 
-set(INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include)
 target_include_directories(${FIM_LIB_NAME} PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}
         ${INCLUDE_DIR})
