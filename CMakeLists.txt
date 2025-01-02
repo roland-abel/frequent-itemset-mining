@@ -1,5 +1,5 @@
 # @file CMakefile
-# @brief CMake configuration file for the frequent-itemset-mining unit tests.
+# @brief Main CMake configuration file.
 #
 # @author Roland Abel
 # @date July 02, 2024
