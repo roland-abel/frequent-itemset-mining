@@ -5,7 +5,8 @@
     "name" : "cli11",
     "version>=" : "2.4.2"
   }, {
-    "name" : "gtest"
+    "name" : "gtest",
+    "version>=" : "1.15.2"
   }, {
     "name" : "benchmark",
     "version>=" : "1.8.3#3"
