@@ -88,12 +88,12 @@ namespace fim {
         [[nodiscard]] auto contains(const item_t &item) const -> bool;
 
         /// @brief Sorts the items in the itemset.
-        /// @param comp The comparison function to use for sorting.
+        /// @param compare The comparison function to use for sorting.
         /// @return A reference to the sorted itemset.
         auto sort_itemset(const item_compare_t &compare) -> itemset_t &;
 
         /// @brief Sorts the items in the itemset and returns a new sorted itemset.
-        /// @param comp The comparison function to use for sorting.
+        /// @param compare The comparison function to use for sorting.
         /// @return A new itemset with sorted items.
         [[nodiscard]] auto sort_itemset(const item_compare_t &compare) const -> itemset_t;
     };
